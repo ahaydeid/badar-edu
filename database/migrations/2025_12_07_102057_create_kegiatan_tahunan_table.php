@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('kegiatan_tahunan', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama');
+            $table->enum('kategori', ['KEGIATAN','ADMINISTRASI','LIBUR','UJIAN']);
+            $table->tinyInteger('tanggal');
+            $table->tinyInteger('bulan');
+            $table->boolean('is_hari_efektif')->default(true);
+            $table->enum('status', ['ACTIVE','INACTIVE'])->default('ACTIVE');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kegiatan_tahunan');
+    }
+};

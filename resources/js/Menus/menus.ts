@@ -1,0 +1,337 @@
+import type { LucideIcon } from "lucide-react";
+import {
+    LayoutDashboard,
+    Upload,
+    WalletCards,
+    NotebookPen,
+    QrCode,
+    Calendar,
+    GraduationCap,
+    CalendarDays,
+    ClipboardList,
+    Users2,
+    Layers,
+    ClipboardCheck,
+    UserCheck,
+    Presentation,
+    Megaphone,
+    Settings,
+    ShieldAlert,
+    CalendarClock,
+} from "lucide-react";
+
+export type MenuItem = {
+    section?: string;
+    name?: string;
+    icon?: LucideIcon;
+    path?: string;
+    permission?: string;
+    children?: MenuItem[];
+};
+
+export const panelMenu: MenuItem[] = [
+    // ================================================================
+    // SECTION: DASHBOARD
+    // ================================================================
+    {
+        section: "",
+        children: [
+            {
+                name: "Dashboard",
+                icon: LayoutDashboard,
+                path: "/dashboard",
+                permission: "dashboard.view",
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: HARI INI
+    // ================================================================
+    {
+        section: "Hari Ini",
+        children: [
+            {
+                name: "Absensi Guru",
+                icon: UserCheck,
+                path: "/absensi-guru",
+                permission: "absensi_guru.view"
+            },
+            {
+                name: "Aktifitas Kelas",
+                icon: Presentation,
+                path: "/aktifitas-kelas",
+                permission: "aktifitas-kelas.view",
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: PENGUMUMAN
+    // ================================================================
+    {
+        section: "",
+        children: [
+            {
+                name: "Pengumuman",
+                icon: Megaphone,
+                path: "/pengumuman",
+                permission: "pengumuman.view",
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: AKADEMIK
+    // ================================================================
+    {
+        section: "Akademik",
+        children: [
+            {
+                name: "Jadwal",
+                icon: Calendar,
+                path: "/jadwal",
+                permission: "jadwal.view",
+            },
+            {
+                name: "Absen Siswa",
+                icon: ClipboardList,
+                path: "/absensi-siswa",
+                permission: "absen.siswa.view",
+            },
+
+            // ==== KELAS BINAAN → PERBAIKAN DATA SISWA PATH ====
+            {
+                name: "Kelas Binaan",
+                icon: GraduationCap,
+                path: "/kelas-binaan",
+                permission: "kelas_binaan.view",
+                children: [
+                    {
+                        name: "Jadwal Kelas",
+                        path: "/kelas-binaan/jadwal-kelas",
+                    },
+                    { name: "Absensi Kelas", path: "/kelas-binaan/absensi" },
+                    { name: "Data Siswa", path: "/kesiswaan/data-siswa" },
+                ],
+            },
+
+            {
+                name: "Tugas",
+                icon: NotebookPen,
+                path: "/tugas",
+                permission: "tugas.view",
+            },
+            {
+                name: "Modul Ajar",
+                icon: Upload,
+                path: "/modul-ajar",
+                permission: "modul.view",
+                children: [
+                    {
+                        name: "Upload Modul Ajar",
+                        path: "/modul-ajar/upload",
+                    },
+                ],
+            },
+            {
+                name: "Jadwal Semua Kelas",
+                icon: CalendarClock,
+                path: "/jadwal-semua-kelas",
+                permission: "kalender.view",
+            },
+
+            {
+                name: "Kalender Akademik",
+                icon: CalendarDays,
+                path: "/kalender-akademik",
+                permission: "kalender.view",
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: KESISWAAN
+    // ================================================================
+    {
+        section: "Kesiswaan",
+        children: [
+            {
+                name: "Kedisiplinan Siswa",
+                icon: ClipboardCheck,
+                path: "/kedisiplinan",
+                permission: "kedisiplinan.view",
+                children: [
+                    {
+                        name: "Status Kedisiplinan",
+                        path: "/kedisiplinan/status",
+                    },
+                    {
+                        name: "Riwayat Pelanggaran",
+                        path: "/kedisiplinan/pelanggaran",
+                    },
+                    { name: "Konseling", path: "/kedisiplinan/konseling" },
+                    { name: "Surat Peringatan", path: "/kedisiplinan/sp" },
+                    {
+                        name: "Pemanggilan Orang Tua",
+                        path: "/kedisiplinan/pemanggilan",
+                    },
+                ],
+            },
+            // ==== PPDB → DISAMAKAN DENGAN ROUTE LARAVEL ====
+            {
+                name: "PPDB",
+                icon: GraduationCap,
+                path: "/ppdb",
+                permission: "ppdb.view",
+                children: [
+                    {
+                        name: "Pendaftaran",
+                        path: "/ppdb/pendaftaran",
+                        permission: "ppdb.pendaftaran.view",
+                    },
+                    {
+                        name: "Data Pendaftar",
+                        path: "/ppdb/pendaftar", // SESUAIKAN DGN ROUTE KAMU
+                        permission: "ppdb.pendaftar.view",
+                    },
+                    {
+                        name: "Verifikasi Berkas",
+                        path: "/ppdb/verifikasi-berkas", // FIX
+                        permission: "ppdb.verifikasi.view",
+                    },
+                    {
+                        name: "Seleksi & Penilaian",
+                        path: "/ppdb/seleksi",
+                        permission: "ppdb.seleksi.view",
+                    },
+                    {
+                        name: "Pengumuman",
+                        path: "/ppdb/pengumuman-kelulusan", // FIX
+                        permission: "ppdb.pengumuman.view",
+                    },
+                    {
+                        name: "Daftar Ulang",
+                        path: "/ppdb/penempatan-rombel", // FIX: sesuaikan nama route kamu
+                        permission: "ppdb.daftarulang.view",
+                    },
+                    {
+                        name: "Pengaturan PPDB",
+                        path: "/ppdb/pengaturan", // harus kamu buat route-nya
+                        permission: "ppdb.settings.view",
+                    },
+                ],
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: ADMINISTRASI
+    // ================================================================
+    {
+        section: "Administrasi",
+        children: [
+            {
+                name: "Payrol",
+                icon: WalletCards,
+                path: "/payroll",
+                permission: "payroll.view",
+                children: [
+                    { name: "Jalankan Payroll", path: "/payroll/run" },
+                    { name: "Slip Gaji", path: "/payroll/slip" },
+                ],
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: PENGGUNA
+    // ================================================================
+    {
+        section: "Pengguna",
+        children: [
+            {
+                name: "Akun",
+                icon: Users2,
+                path: "/akun",
+                permission: "akun.view",
+            },
+            {
+                name: "Registrasi Kartu",
+                icon: QrCode,
+                path: "/rfid",
+                permission: "rfid.register.view",
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: MASTER DATA
+    // ================================================================
+    {
+        section: "Master Data",
+        children: [
+            {
+                name: "Master Data",
+                icon: Layers,
+                path: "/master-data",
+                permission: "master.view",
+                children: [
+                    { name: "Guru", path: "/master-data/guru" },
+                    { name: "Siswa", path: "/master-data/siswa" },
+                    { name: "Staff & Pegawai", path: "/master-data/staff" },
+                    {
+                        name: "Jadwal Ajar",
+                        path: "/master-data/jadwal-ajar",
+                    },
+                    { name: "Rombel", path: "/master-data/rombel" },
+                ],
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: KONFIGURASI
+    // ================================================================
+    {
+        section: "Konfigurasi",
+        children: [
+            {
+                name: "Konfigurasi",
+                icon: Settings,
+                path: "/konfigurasi",
+                permission: "konfigurasi.view",
+                children: [
+                    { name: "Jurusan", path: "/konfigurasi/jurusan" },
+                    { name: "Giat Tahunan", path: "/konfigurasi/giat-tahunan" },
+                    {
+                        name: "Kalender Akademik",
+                        path: "/konfigurasi/kalender-akademik",
+                    },
+                    { name: "Mata Pelajaran", path: "/konfigurasi/mapel" },
+
+                    {
+                        name: "Jadwal",
+                        path: "/konfigurasi/jadwal",
+                        children: [
+                            { name: "Hari", path: "/konfigurasi/jadwal/hari" },
+                            { name: "Jam", path: "/konfigurasi/jadwal/jam" },
+                            {
+                                name: "Semester",
+                                path: "/konfigurasi/jadwal/semester",
+                            },
+                        ],
+                    },
+                    {
+                        name: "Titik Absensi",
+                        path: "/konfigurasi/titik-absen",
+                    },
+                    {
+                        name: "Role",
+                        path: "/konfigurasi/role",
+                    },
+                ],
+            },
+        ],
+    },
+];
