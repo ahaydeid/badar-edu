@@ -13,11 +13,13 @@ import {
     Layers,
     ClipboardCheck,
     UserCheck,
-    Presentation,
     Megaphone,
     Settings,
-    ShieldAlert,
     CalendarClock,
+    Loader2Icon,
+    Loader2,
+    Loader,
+    LoaderPinwheelIcon,
 } from "lucide-react";
 
 export type MenuItem = {
@@ -27,6 +29,7 @@ export type MenuItem = {
     path?: string;
     permission?: string;
     children?: MenuItem[];
+    spin?: boolean;
 };
 
 export const panelMenu: MenuItem[] = [
@@ -58,10 +61,11 @@ export const panelMenu: MenuItem[] = [
                 permission: "absensi_guru.view"
             },
             {
-                name: "Aktifitas Kelas",
-                icon: Presentation,
-                path: "/aktifitas-kelas",
-                permission: "aktifitas-kelas.view",
+                name: "Kelas Berlangsung",
+                icon: Loader,
+                spin: true,
+                path: "/kelas-berlangsung",
+                permission: "kelas-berlangsung.view",
             },
         ],
     },

@@ -1,12 +1,15 @@
 import { Link } from "@inertiajs/react";
-import { UserCircle } from "lucide-react";
+import { Bell, UserCircle } from "lucide-react";
 
 interface TopbarProps {
     role?: string;
     name?: string;
 }
 
-export default function Topbar({ role = "Admin", name = "Ahadi" }: TopbarProps) {
+export default function Topbar({
+    role = "Admin",
+    name = "Ahadi",
+}: TopbarProps) {
     const roleLabel =
         typeof role === "string" && role.length
             ? role.charAt(0).toUpperCase() + role.slice(1)
@@ -33,19 +36,37 @@ export default function Topbar({ role = "Admin", name = "Ahadi" }: TopbarProps) 
             </div>
 
             {/* Kanan */}
-            <Link
-                href="/profile"
-                className="flex items-center gap-3 hover:bg-gray-100 py-2 rounded transition"
-                title="Lihat Profil"
-            >
-                <span className="text-sm font-medium text-gray-700">
-                    <span className="bg-blue-500 py-0.5 px-1 text-xs text-white">
-                        {roleLabel}
-                    </span>{" "}
-                    - {name}
-                </span>
-                <UserCircle className="w-6 h-6 text-gray-700" />
-            </Link>
+            <div className="flex items-center gap-4">
+                {/* Ikon Notifikasi */}
+                <button
+                    type="button"
+                    className="relative p-1 rounded hover:bg-gray-100 transition"
+                    title="Notifikasi"
+                >
+                    <Bell className="w-6 h-6 text-gray-700" />
+                    {/* Jika nanti ingin badge jumlah notifikasi */}
+                    {/* 
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-1 rounded-full">
+                3
+            </span>
+            */}
+                </button>
+
+                {/* Profil */}
+                <Link
+                    href="/profile"
+                    className="flex items-center gap-3 hover:bg-gray-100 py-2 rounded transition"
+                    title="Lihat Profil"
+                >
+                    <span className="text-sm font-medium text-gray-700">
+                        <span className="bg-blue-500 py-0.5 px-1 text-xs text-white">
+                            {roleLabel}
+                        </span>{" "}
+                        - {name}
+                    </span>
+                    <UserCircle className="w-6 h-6 text-gray-700" />
+                </Link>
+            </div>
         </header>
     );
 }

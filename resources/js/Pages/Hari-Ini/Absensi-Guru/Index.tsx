@@ -4,6 +4,7 @@ import { useState, type ChangeEvent } from "react";
 import LokasiAbsenModal from "./LokasiAbsenModal";
 import { usePage } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
+import { MapPin } from "lucide-react";
 
 export default function AbsensiGuru() {
     const [search, setSearch] = useState("");
@@ -64,29 +65,47 @@ export default function AbsensiGuru() {
 
     return (
         <AppLayout title="Absensi Guru Hari Ini">
+            <h2 className="font-bold text-3xl mb-6">Absensi Guru Hari Ini</h2>
             <div className="space-y-4">
                 <input
                     type="text"
                     placeholder="Cari guru atau mapel..."
-                    className="w-full md:w-1/3 px-3 py-2 border rounded-md text-sm focus:ring-1 focus:ring-gray-500"
+                    className="w-full md:w-1/3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-gray-400"
                     value={search}
                     onChange={handleSearch}
                 />
 
                 <div className="overflow-x-auto border border-gray-200 rounded bg-white">
                     <table className="w-full text-sm">
-                        <thead className="bg-gray-100 text-gray-700 text-left">
-                            <tr>
-                                <th className="p-3">No</th>
-                                <th className="p-3">Nama</th>
-                                <th className="p-3">Mengajar</th>
-                                <th className="p-3">Jadwal Masuk</th>
-                                <th className="p-3">Absen Masuk</th>
-                                <th className="p-3">Absen Pulang</th>
-                                <th className="p-3">Status</th>
-                                <th className="p-3">Lokasi</th>
+                        <thead className="bg-sky-100 text-gray-700">
+                            <tr className="text-center">
+                                <th className="p-3 border-r border-gray-50">
+                                    No
+                                </th>
+                                <th className="p-3 border-r border-gray-50">
+                                    Nama
+                                </th>
+                                <th className="p-3 border-r border-gray-50">
+                                    Mengajar
+                                </th>
+                                <th className="p-3 border-r border-gray-50">
+                                    Jadwal Masuk
+                                </th>
+                                <th className="p-3 border-r border-gray-50">
+                                    Absen Masuk
+                                </th>
+                                <th className="p-3 border-r border-gray-50">
+                                    Absen Pulang
+                                </th>
+                                <th className="p-3 border-r border-gray-50">
+                                    Status
+                                </th>
+                                <th className="p-3 border-r border-gray-50">
+                                    Lokasi
+                                </th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {filtered.length === 0 ? (
                                 <tr>
@@ -99,31 +118,35 @@ export default function AbsensiGuru() {
                                 </tr>
                             ) : (
                                 filtered.map((item, idx) => (
-                                    <tr key={item.id} className="border-t">
+                                    <tr
+                                        key={item.id}
+                                        className="border-b border-gray-100"
+                                    >
                                         <td className="p-3">{idx + 1}</td>
                                         <td className="p-3">{item.nama}</td>
                                         <td className="p-3">{item.mapel}</td>
                                         <td className="p-3">
                                             {item.jadwalMasuk}
                                         </td>
-                                        <td className="p-3">
+                                        <td className="p-3 text-center">
                                             {item.jamMasuk ?? "-"}
                                         </td>
-                                        <td className="p-3">
+                                        <td className="p-3 text-center">
                                             {item.jamPulang ?? "-"}
                                         </td>
-                                        <td className="p-3">
+                                        <td className="p-3 text-center">
                                             <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
                                                 HADIR
                                             </span>
                                         </td>
-                                        <td className="p-3">
+                                        <td className="p-3 text-center">
                                             <button
                                                 type="button"
                                                 onClick={() => openModal(item)}
-                                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md"
+                                                className="inline-flex items-center px-3 py-1 text-sm bg-blue-500 cursor-pointer text-white rounded-md"
                                             >
-                                                Lihat
+                                                <MapPin className="mr-1 h-4 w-4" />
+                                                <span>Lihat</span>
                                             </button>
                                         </td>
                                     </tr>

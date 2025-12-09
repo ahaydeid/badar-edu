@@ -16,7 +16,7 @@ Route::get('/hari-ini', $ud);
 
 // HARI INI
 Route::get('/absensi-guru', [AbsensiGuruController::class, 'index']);
-Route::get('/aktifitas-kelas', $ud);
+Route::get('/kelas-berlangsung', fn() => Inertia::render('Hari-Ini/Kelas-Berlangsung/Index'));
 
 
 // PENGUMUMAN

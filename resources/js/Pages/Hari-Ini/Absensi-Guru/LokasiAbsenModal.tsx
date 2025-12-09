@@ -27,7 +27,7 @@ export default function LokasiAbsenModal({
                 {/* Header */}
                 <div className="flex justify-between items-center">
                     <h3 className="text-xl font-semibold mt-4">
-                        Detail Lokasi Guru
+                        Absensi <span className="text-sky-600">{nama}</span>
                     </h3>
                     <button
                         onClick={onClose}
@@ -41,7 +41,7 @@ export default function LokasiAbsenModal({
                 {hasLocation ? (
                     <div className="space-y-4">
                         {/* MAPS */}
-                        <div className="w-full h-[450px] overflow-hidden border">
+                        <div className="w-full h-[450px] overflow-hidden border border-gray-200">
                             <iframe
                                 width="100%"
                                 height="100%"
@@ -52,12 +52,7 @@ export default function LokasiAbsenModal({
                         </div>
 
                         {/* Info */}
-                        <div className="pt-4 border-t space-y-2 text-sm text-gray-800">
-                            <p>
-                                <span className="font-semibold">Nama:</span>{" "}
-                                {nama}
-                            </p>
-
+                        <div className="pt-4 border-t border-gray-300 space-y-2 text-sm text-gray-800">
                             <p>
                                 <span className="font-semibold">
                                     Jam Masuk:
@@ -73,7 +68,7 @@ export default function LokasiAbsenModal({
                             </p>
 
                             {/* Status Lokasi */}
-                            <div className="mt-3">
+                            <div className="mt-6">
                                 <span
                                     className={`px-4 py-2 text-sm font-semibold ${
                                         hasLocation

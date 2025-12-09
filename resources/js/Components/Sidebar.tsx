@@ -1,4 +1,10 @@
-import { ChevronDown, ChevronRight, ChevronsLeftIcon, Menu, X } from "lucide-react";
+import {
+    ChevronDown,
+    ChevronRight,
+    ChevronsLeftIcon,
+    Menu,
+    X,
+} from "lucide-react";
 import { panelMenu } from "@/Menus/menus";
 import { Link, usePage } from "@inertiajs/react";
 import { useState } from "react";
@@ -83,7 +89,9 @@ export default function Sidebar({ isOpen, onToggle }) {
             // WRAPPER ICON FIXED → size konsisten
             const renderIcon = Icon ? (
                 <div className="size-5 shrink-0 flex items-center justify-center">
-                    <Icon className="size-5" />
+                    <Icon
+                        className={`size-5 ${item.spin ? "animate-spin" : ""}`}
+                    />
                 </div>
             ) : null;
 
