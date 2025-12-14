@@ -21,7 +21,7 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
         <>
             <Head title={title ? `${title} | ${appName}` : appName} />
 
-            <div className="relative min-h-screen">
+            <div className="relative min-h-screen  bg-gray-50">
                 <Sidebar isOpen={isOpen} onToggle={() => setIsOpen(!isOpen)} />
 
                 <div

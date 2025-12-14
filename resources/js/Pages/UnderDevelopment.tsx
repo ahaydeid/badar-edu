@@ -2,7 +2,7 @@ import AppLayout from "@/Layouts/AppLayout";
 
 export default function UnderDevelopment() {
     return (
-        <div className="flex items-center justify-center min-h-[80vh] px-6">
+        <div className="flex items-center bg-white justify-center min-h-[85vh] px-6">
             <div className="text-center">
                 <img
                     src="/img/underdev.gif"

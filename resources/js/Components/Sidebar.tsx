@@ -109,7 +109,7 @@ export default function Sidebar({ isOpen, onToggle }) {
                                     }
                                     ${
                                         active
-                                            ? "bg-sky-600 text-white font-semibold"
+                                            ? "bg-purple-600 text-white font-semibold"
                                             : "text-gray-700 hover:bg-sky-50"
                                     }`}
                             >
@@ -140,7 +140,7 @@ export default function Sidebar({ isOpen, onToggle }) {
                                 ${isOpen ? "justify-start" : "justify-center"}
                                 ${
                                     active
-                                        ? "bg-sky-600 text-white font-semibold"
+                                        ? "bg-purple-600 text-white font-semibold"
                                         : "text-gray-700 hover:bg-sky-50"
                                 }`}
                         >
@@ -161,7 +161,7 @@ export default function Sidebar({ isOpen, onToggle }) {
             <div className="flex items-center justify-between px-4 h-14 sticky top-0 bg-white">
                 {isOpen && (
                     <h1 className="font-bold text-lg">
-                        Badar <span className="text-yellow-400">Edu</span>
+                        Badar <span className="text-purple-500">Edu</span>
                     </h1>
                 )}
                 <button

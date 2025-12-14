@@ -29,8 +29,8 @@ export default function Topbar({
                         SMKS Al Badar Balaraja
                     </span>
                     <span className="text-xs text-gray-600 -mt-0.5">
-                        Jl. Raya Gembong–Cariu, Kp. Dangdeur, Desa Sukamurni,
-                        Kec. Balaraja, Kab. Tangerang, Banten
+                        Jl. Raya Gembong–Cariu, Kp. Dangdeur, Sukamurni,
+                        Balaraja, Tangerang
                     </span>
                 </div>
             </div>

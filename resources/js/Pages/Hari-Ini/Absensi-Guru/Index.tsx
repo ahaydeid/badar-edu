@@ -10,7 +10,6 @@ export default function AbsensiGuru() {
     const [search, setSearch] = useState("");
     const [open, setOpen] = useState(false);
 
-    // Dummy detail untuk modal (UI only)
     const [detail, setDetail] = useState<{
         nama: string | null;
         mapel: string | null;
@@ -56,7 +55,7 @@ export default function AbsensiGuru() {
             nama: item.nama,
             mapel: item.mapel,
             jamMasuk: item.jamMasuk,
-            status: "HADIR", // Static, UI only
+            status: "HADIR",
             lat: item.lat,
             lng: item.lng,
         });
@@ -122,7 +121,9 @@ export default function AbsensiGuru() {
                                         key={item.id}
                                         className="border-b border-gray-100"
                                     >
-                                        <td className="p-3">{idx + 1}</td>
+                                        <td className="p-3 text-center">
+                                            {idx + 1}
+                                        </td>
                                         <td className="p-3">{item.nama}</td>
                                         <td className="p-3">{item.mapel}</td>
                                         <td className="p-3">

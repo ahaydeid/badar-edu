@@ -11,10 +11,14 @@ import {
     ChevronRight,
 } from "lucide-react";
 import SiswaTable from "./components/SiswaTable";
+import TambahSiswaModal from "./components/TambahSiswa";
+
+/* ===================== TYPES ===================== */
 
 type StudentRow = {
     id: number;
     nama: string;
+    foto: string | null;
     nipd: string | null;
     jk: "L" | "P" | null;
     nisn: string | null;
@@ -35,8 +39,9 @@ type StudentRow = {
     hp: string | null;
     email: string | null;
     skhun: string | null;
+
     penerima_kps: string;
-    no_kps: string | null;
+    nomor_kps: string | null;
 
     ayah_nama: string | null;
     ayah_tahun_lahir: number | null;
@@ -59,68 +64,59 @@ type StudentRow = {
     wali_penghasilan: string | null;
     wali_nik: string | null;
 
-    rombel_saat_ini: number | null;
-    no_peserta_un: string | null;
-    no_seri_ijazah: string | null;
-    penerima_kip: string;
-    nomor_kip: string | null;
-    nama_di_kip: string | null;
-    nomor_kks: string | null;
-    no_reg_akta: string | null;
-    bank: string | null;
-    bank_rekening: string | null;
-    bank_atas_nama: string | null;
-    layak_pip: string;
-    alasan_layak_pip: string | null;
-    kebutuhan_khusus: string | null;
-    sekolah_asal: string | null;
-    anak_ke: number | null;
-    lintang: string | null;
-    bujur: string | null;
-    no_kk: string | null;
-    berat_badan: number | null;
-    tinggi_badan: number | null;
-    lingkar_kepala: number | null;
-    jumlah_saudara: number | null;
-    jarak_rumah: number | string | null;
+    rombel_id: number | null;
+    rombel_nama: string | null;
 };
 
+type PageProps = {
+    students: StudentRow[];
+    rombelList: {
+        id: number;
+        nama: string;
+    }[];
+};
+
+/* ===================== PAGE ===================== */
+
 export default function Index() {
-    // Ambil props dari Inertia dengan tipe aman
-    const { students } = usePage<
-        { students: StudentRow[] } & InertiaPageProps
-    >().props;
+    const { students, rombelList } = usePage<PageProps & InertiaPageProps>()
+        .props;
 
     const [searchTerm, setSearchTerm] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useState(1);
+    const [isTambahOpen, setIsTambahOpen] = useState(false);
 
-    // FILTER
+    /* ===================== FILTER ===================== */
     const filtered = useMemo(() => {
-        return students.filter((r) =>
-            (r.nama ?? "").toLowerCase().includes(searchTerm.toLowerCase())
+        const q = searchTerm.toLowerCase();
+        return students.filter(
+            (r) =>
+                (r.nama ?? "").toLowerCase().includes(q) ||
+                (r.rombel_nama ?? "").toLowerCase().includes(q)
         );
     }, [students, searchTerm]);
 
-    // PAGINATION
+    /* ===================== PAGINATION ===================== */
     const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
     const start = (page - 1) * rowsPerPage;
     const paginated = filtered.slice(start, start + rowsPerPage);
 
-    // NOMOR URUT
     const numbered = paginated.map((r, i) => ({
         ...r,
         no: start + i + 1,
     }));
 
     return (
-        <AppLayout title="Master Data Siswa">   
+        <AppLayout title="Master Data Siswa">
             <div className="w-full space-y-6">
                 {/* HEADER */}
                 <div className="space-y-4">
-                    {/* ACTION BUTTONS */}
                     <div className="flex items-center text-sm gap-2 flex-wrap">
-                        <button className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded">
+                        <button
+                            onClick={() => setIsTambahOpen(true)}
+                            className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded"
+                        >
                             <UserPlus className="w-4 h-4" />
                             Tambah Siswa
                         </button>
@@ -141,7 +137,6 @@ export default function Index() {
                         </button>
                     </div>
 
-                    {/* TITLE + FILTER */}
                     <div className="flex items-center justify-between gap-4">
                         <h1 className="text-xl font-semibold text-gray-800">
                             Data Siswa
@@ -163,7 +158,7 @@ export default function Index() {
 
                             <input
                                 type="text"
-                                placeholder="Cari nama..."
+                                placeholder="Cari nama / rombel..."
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
@@ -203,6 +198,13 @@ export default function Index() {
                     </button>
                 </div>
             </div>
+
+            {/* MODAL */}
+            <TambahSiswaModal
+                open={isTambahOpen}
+                onClose={() => setIsTambahOpen(false)}
+                rombelList={rombelList}
+            />
         </AppLayout>
     );
 }

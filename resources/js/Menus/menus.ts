@@ -289,6 +289,7 @@ export const panelMenu: MenuItem[] = [
                         path: "/master-data/jadwal-ajar",
                     },
                     { name: "Rombel", path: "/master-data/rombel" },
+                    { name: "Alumni", path: "/master-data/alumni" },
                 ],
             },
         ],

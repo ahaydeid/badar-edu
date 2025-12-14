@@ -103,17 +103,24 @@ Route::get('/rfid', $ud);
 
 // MASTER DATA
 Route::prefix('master-data')->group(function () use ($ud) {
-    Route::get('/', $ud);
-    Route::get('/guru', $ud);
 
-    // Data Siswa versi menu "Master Data" (utama)
-    Route::get('/siswa', [SiswaController::class, 'index']);
-    Route::get('/siswa/{id}', [SiswaController::class, 'show']);
+    // ===== ROUTE YANG SUDAH DIPAKAI MODUL LAIN =====
+    Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
+    Route::get('/siswa/{id}', [SiswaController::class, 'show'])->name('siswa.show');
+    Route::post('/siswa', [SiswaController::class, 'store'])->name('siswa.store');
 
+    // ===== ROUTE KHUSUS MASTER DATA (EDIT / UPDATE / DELETE) =====
+    Route::get('/siswa/{id}/edit', [SiswaController::class, 'edit'])->name('siswa.edit');
+    Route::put('/siswa/{id}', [SiswaController::class, 'update'])->name('siswa.update');
+    Route::delete('/siswa/{id}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
+
+    // ===== LAINNYA =====
     Route::get('/staff', $ud);
     Route::get('/jadwal-pembelajaran', $ud);
     Route::get('/rombel', $ud);
+    Route::get('/alumni', $ud);
 });
+
 
 
 // KONFIGURASI
