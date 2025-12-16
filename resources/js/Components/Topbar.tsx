@@ -25,10 +25,10 @@ export default function Topbar({
                     className="w-9 h-9 object-contain"
                 />
                 <div className="flex flex-col leading-tight">
-                    <span className="text-lg font-semibold text-gray-800">
+                    <span className="text-lg font-semibold text-gray-600">
                         SMKS Al Badar Balaraja
                     </span>
-                    <span className="text-xs text-gray-600 -mt-0.5">
+                    <span className="text-xs text-gray-400 -mt-0.5">
                         Jl. Raya Gembong–Cariu, Kp. Dangdeur, Sukamurni,
                         Balaraja, Tangerang
                     </span>

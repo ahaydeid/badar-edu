@@ -36,6 +36,7 @@ export default function AbsensiGuru() {
         jamPulang: string | null;
         lat: number | null;
         lng: number | null;
+        metodeAbsen: "geo" | "rfid";
     }[];
 
     const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -100,7 +101,7 @@ export default function AbsensiGuru() {
                                     Status
                                 </th>
                                 <th className="p-3 border-r border-gray-50">
-                                    Lokasi
+                                    Jenis Absen
                                 </th>
                             </tr>
                         </thead>
@@ -141,14 +142,22 @@ export default function AbsensiGuru() {
                                             </span>
                                         </td>
                                         <td className="p-3 text-center">
-                                            <button
-                                                type="button"
-                                                onClick={() => openModal(item)}
-                                                className="inline-flex items-center px-3 py-1 text-sm bg-blue-500 cursor-pointer text-white rounded-md"
-                                            >
-                                                <MapPin className="mr-1 h-4 w-4" />
-                                                <span>Lihat</span>
-                                            </button>
+                                            {item.metodeAbsen === "geo" ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        openModal(item)
+                                                    }
+                                                    className="inline-flex items-center px-3 py-1 text-sm bg-blue-500 cursor-pointer text-white rounded-md"
+                                                >
+                                                    <MapPin className="mr-1 h-4 w-4" />
+                                                    <span>Lokasi</span>
+                                                </button>
+                                            ) : (
+                                                <span className="inline-flex items-center px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-md cursor-default">
+                                                    Kartu
+                                                </span>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

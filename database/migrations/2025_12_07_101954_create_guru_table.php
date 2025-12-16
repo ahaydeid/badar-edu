@@ -11,10 +11,12 @@ return new class extends Migration
         Schema::create('guru', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
+            $table->string('foto')->nullable();
             $table->string('nuptk')->nullable();
             $table->enum('jk', ['L','P']);
             $table->string('tempat_lahir')->nullable();
             $table->date('tanggal_lahir')->nullable();
+            $table->string('nik')->nullable();
             $table->string('nip')->nullable();
             $table->string('status_kepegawaian')->nullable();
             $table->string('jenis_ptk')->nullable();

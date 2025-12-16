@@ -1,10 +1,12 @@
+// resources/js/Pages/Master-Data/Siswa/components/SiswaTable.tsx
+
 import { Link, router } from "@inertiajs/react";
 import { Eye, MapPin, Pencil, Trash2, User } from "lucide-react";
 import MapsModal from "./MapsModal";
 import ModalFoto from "./ModalFoto";
 import { useState } from "react";
 
-export default function SiswaTable({ data, loading }) {
+export default function SiswaTable({ data, loading, onEdit }) {
     const [openMaps, setOpenMaps] = useState(false);
     const [selectedMap, setSelectedMap] = useState(null);
 
@@ -37,7 +39,6 @@ export default function SiswaTable({ data, loading }) {
         <div className="rounded border border-gray-200 bg-white">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-max text-sm text-left border-collapse">
-                    {/* HEADER */}
                     <thead>
                         <tr className="bg-sky-100 text-gray-700 h-12">
                             <th className="p-3 text-center">No</th>
@@ -56,7 +57,6 @@ export default function SiswaTable({ data, loading }) {
                         </tr>
                     </thead>
 
-                    {/* BODY */}
                     <tbody>
                         {loading ? (
                             <tr>
@@ -80,7 +80,6 @@ export default function SiswaTable({ data, loading }) {
                                         {s.no}
                                     </td>
 
-                                    {/* FOTO + NAMA (CLICKABLE) */}
                                     <td className="py-2 px-3">
                                         <div className="flex items-center gap-3">
                                             <button
@@ -106,26 +105,32 @@ export default function SiswaTable({ data, loading }) {
                                     <td className="py-2 px-3 text-center">
                                         {s.nipd ?? "-"}
                                     </td>
-
                                     <td className="py-2 px-3 text-center">
                                         {s.nisn ?? "-"}
                                     </td>
-
                                     <td className="py-2 px-3 text-center">
                                         {s.jk}
                                     </td>
-
                                     <td className="py-2 px-3 text-center">
                                         {formatDateShort(s.tanggal_lahir)}
                                     </td>
-
                                     <td className="py-2 px-3 text-center">
                                         {s.rombel_nama ?? "-"}
                                     </td>
 
                                     <td className="py-2 px-3 whitespace-nowrap">
-                                        {s.alamat}, RT{s.rt}/RW{s.rw},{" "}
-                                        {s.kelurahan}, {s.kecamatan}
+                                        {[
+                                            s.alamat,
+                                            s.rt || s.rw
+                                                ? `RT${s.rt || ""}${
+                                                      s.rt && s.rw ? "/" : ""
+                                                  }${s.rw ? `RW${s.rw}` : ""}`
+                                                : "",
+                                            s.kelurahan,
+                                            s.kecamatan,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(", ") || "-"}
                                     </td>
 
                                     <td className="py-2 px-3 text-center">
@@ -141,11 +146,9 @@ export default function SiswaTable({ data, loading }) {
                                     <td className="py-2 px-3 text-center">
                                         {s.hp ?? "-"}
                                     </td>
-
                                     <td className="py-2 px-3">
                                         {s.ayah_nama ?? "-"}
                                     </td>
-
                                     <td className="py-2 px-3">
                                         {s.ibu_nama ?? "-"}
                                     </td>
@@ -162,6 +165,10 @@ export default function SiswaTable({ data, loading }) {
 
                                             <Link
                                                 href={`/master-data/siswa/${s.id}/edit`}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    onEdit(s.id);
+                                                }}
                                                 className="px-3 py-2 bg-amber-500 text-white rounded-md text-xs flex items-center gap-1"
                                             >
                                                 <Pencil className="w-4 h-4" />
@@ -170,15 +177,18 @@ export default function SiswaTable({ data, loading }) {
 
                                             <button
                                                 onClick={() => {
-                                                    if (
-                                                        confirm(
-                                                            "Yakin ingin menghapus data siswa ini?"
-                                                        )
-                                                    ) {
-                                                        router.delete(
-                                                            `/master-data/siswa/${s.id}`
-                                                        );
-                                                    }
+                                                    console.log(
+                                                        "ID SISWA:",
+                                                        s.id
+                                                    );
+
+                                                    router.delete(
+                                                        `/master-data/siswa/${s.id}`,
+                                                        {
+                                                            preserveScroll:
+                                                                true,
+                                                        }
+                                                    );
                                                 }}
                                                 className="px-3 py-2 bg-rose-500 text-white rounded-md text-xs flex items-center gap-1"
                                             >
@@ -193,7 +203,6 @@ export default function SiswaTable({ data, loading }) {
                     </tbody>
                 </table>
 
-                {/* MODALS */}
                 {openMaps && (
                     <MapsModal
                         student={selectedMap}

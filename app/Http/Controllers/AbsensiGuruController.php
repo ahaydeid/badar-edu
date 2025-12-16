@@ -30,6 +30,7 @@ class AbsensiGuruController extends Controller
                 "lat" => $item->latitude,
                 "lng" => $item->longitude,
                 "status" => $item->status->nama ?? "-",
+                "metodeAbsen" => $item->metode_absen,
             ];
         });
 

@@ -177,7 +177,17 @@ export default function Sidebar({ isOpen, onToggle }) {
             </nav>
 
             <div className="sticky bottom-0 bg-white border-t border-gray-200 p-3">
-                <h3 className="text-xs text-gray-400">Created by Hadi</h3>
+                <h3 className="text-xs text-gray-400">
+                    Created by{" "}
+                    <a
+                        href="https://ahadi.my.id/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-600 hover:underline"
+                    >
+                        Hadi
+                    </a>
+                </h3>
             </div>
         </aside>
     );

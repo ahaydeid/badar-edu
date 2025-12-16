@@ -1,8 +1,8 @@
-// resources/js/Pages/Master-Data/Siswa/Index.tsx
+// resources/js/Pages/Master-Data/Guru/Index.tsx
 
 import { useState, useMemo } from "react";
-import { usePage } from "@inertiajs/react";
-import { PageProps as InertiaPageProps, router } from "@inertiajs/core";
+import { usePage, router } from "@inertiajs/react";
+import { PageProps as InertiaPageProps } from "@inertiajs/core";
 import AppLayout from "@/Layouts/AppLayout";
 import {
     UserPlus,
@@ -12,53 +12,46 @@ import {
     ChevronLeft,
     ChevronRight,
 } from "lucide-react";
-import SiswaTable from "./components/SiswaTable";
-import TambahSiswaModal from "./components/TambahSiswa";
-import ImportSiswaModal from "./components/ImportSiswaModal";
+import GuruTable from "./components/GuruTable";
+import TambahGuru from "./components/TambahGuru";
 
-type StudentRow = any;
+type GuruRow = any;
 
 type PageProps = {
-    students: StudentRow[];
-    rombelList: { id: number; nama: string }[];
+    guru: GuruRow[];
 };
 
 export default function Index() {
-    const { students, rombelList } = usePage<PageProps & InertiaPageProps>()
-        .props;
+    const { guru } = usePage<PageProps & InertiaPageProps>().props;
 
     const [searchTerm, setSearchTerm] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useState(1);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [importOpen, setImportOpen] = useState(false);
+    const [openForm, setOpenForm] = useState(false);
+
     const [editId, setEditId] = useState<number | null>(null);
     const [editInitial, setEditInitial] = useState<any>(null);
 
     const filtered = useMemo(() => {
         const q = searchTerm.toLowerCase();
-        return students.filter(
+        return guru.filter(
             (r) =>
                 (r.nama ?? "").toLowerCase().includes(q) ||
-                (r.rombel_nama ?? "").toLowerCase().includes(q)
+                (r.nip ?? "").toLowerCase().includes(q)
         );
-    }, [students, searchTerm]);
+    }, [guru, searchTerm]);
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
     const start = (page - 1) * rowsPerPage;
     const paginated = filtered.slice(start, start + rowsPerPage);
-
-    const numbered = paginated.map((r, i) => ({ ...r, no: start + i + 1 }));
-
-    async function handleOpenCreate() {
-        setEditId(null);
-        setEditInitial(null);
-        setIsModalOpen(true);
-    }
+    const numbered = paginated.map((r, i) => ({
+        ...r,
+        no: start + i + 1,
+    }));
 
     async function handleOpenEdit(id: number) {
-        const res = await fetch(`/master-data/siswa/${id}/edit`, {
+        const res = await fetch(`/master-data/guru/${id}/edit`, {
             headers: { Accept: "application/json" },
         });
 
@@ -67,26 +60,27 @@ export default function Index() {
         const payload = await res.json();
         setEditId(id);
         setEditInitial(payload);
-        setIsModalOpen(true);
+        setOpenForm(true);
     }
 
     return (
-        <AppLayout title="Master Data Siswa">
+        <AppLayout title="Master Data Guru">
             <div className="w-full space-y-6">
                 <div className="space-y-4">
                     <div className="flex items-center text-sm gap-2 flex-wrap">
                         <button
-                            onClick={handleOpenCreate}
+                            onClick={() => {
+                                setEditId(null);
+                                setEditInitial(null);
+                                setOpenForm(true);
+                            }}
                             className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded"
                         >
                             <UserPlus className="w-4 h-4" />
-                            Tambah Siswa
+                            Tambah Guru
                         </button>
 
-                        <button
-                            onClick={() => setImportOpen(true)}
-                            className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded"
-                        >
+                        <button className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded">
                             <Upload className="w-4 h-4" />
                             Import
                         </button>
@@ -104,7 +98,7 @@ export default function Index() {
 
                     <div className="flex items-center justify-between gap-4">
                         <h1 className="text-xl font-semibold text-gray-800">
-                            Data Siswa
+                            Data Guru
                         </h1>
 
                         <div className="flex text-sm items-center gap-3">
@@ -123,7 +117,7 @@ export default function Index() {
 
                             <input
                                 type="text"
-                                placeholder="Cari nama / rombel..."
+                                placeholder="Cari nama / NIP..."
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
@@ -135,7 +129,7 @@ export default function Index() {
                     </div>
                 </div>
 
-                <SiswaTable
+                <GuruTable
                     data={numbered}
                     loading={false}
                     onEdit={handleOpenEdit}
@@ -166,17 +160,11 @@ export default function Index() {
                 </div>
             </div>
 
-            <TambahSiswaModal
-                open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                rombelList={rombelList}
+            <TambahGuru
+                open={openForm}
+                onClose={() => setOpenForm(false)}
                 editId={editId}
                 initialData={editInitial}
-            />
-            <ImportSiswaModal
-                open={importOpen}
-                onClose={() => setImportOpen(false)}
-                onImported={() => router.reload()}
             />
         </AppLayout>
     );

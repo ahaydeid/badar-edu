@@ -14,16 +14,26 @@ class Jadwal extends Model
 
     public function guru()
     {
-        return $this->belongsTo(Guru::class, 'guru_id');
+        return $this->belongsTo(Guru::class);
     }
 
     public function mapel()
     {
-        return $this->belongsTo(Mapel::class, 'mapel_id');
+        return $this->belongsTo(Mapel::class);
     }
 
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class, 'kelas_id');
+        return $this->belongsTo(Kelas::class);
+    }
+
+    public function hari()
+    {
+        return $this->belongsTo(Hari::class);
+    }
+
+    public function jam()
+    {
+        return $this->belongsTo(Jam::class);
     }
 }

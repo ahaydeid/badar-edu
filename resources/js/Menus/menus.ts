@@ -20,6 +20,13 @@ import {
     Loader2,
     Loader,
     LoaderPinwheelIcon,
+    Users,
+    FileCheck,
+    ShieldCheck,
+    AlertTriangle,
+    MessageSquareHeart,
+    FileWarning,
+    UsersRound,
 } from "lucide-react";
 
 export type MenuItem = {
@@ -58,7 +65,7 @@ export const panelMenu: MenuItem[] = [
                 name: "Absensi Guru",
                 icon: UserCheck,
                 path: "/absensi-guru",
-                permission: "absensi_guru.view"
+                permission: "absensi_guru.view",
             },
             {
                 name: "Kelas Berlangsung",
@@ -94,7 +101,7 @@ export const panelMenu: MenuItem[] = [
             {
                 name: "Jadwal",
                 icon: Calendar,
-                path: "/jadwal",
+                path: "/jadwal-mapel",
                 permission: "jadwal.view",
             },
             {
@@ -116,15 +123,8 @@ export const panelMenu: MenuItem[] = [
                         path: "/kelas-binaan/jadwal-kelas",
                     },
                     { name: "Absensi Kelas", path: "/kelas-binaan/absensi" },
-                    { name: "Data Siswa", path: "/kesiswaan/data-siswa" },
+                    { name: "Data Siswa", path: "/kelas-binaan/data-siswa" },
                 ],
-            },
-
-            {
-                name: "Tugas",
-                icon: NotebookPen,
-                path: "/tugas",
-                permission: "tugas.view",
             },
             {
                 name: "Modul Ajar",
@@ -155,76 +155,112 @@ export const panelMenu: MenuItem[] = [
     },
 
     // ================================================================
+    // SECTION: LMS
+    // ================================================================
+    {
+        section: "LMS",
+        children: [
+            {
+                name: "Materi",
+                icon: ClipboardList,
+                path: "/lms-materi",
+                permission: "absen.siswa.view",
+            },
+            {
+                name: "Tugas",
+                icon: NotebookPen,
+                path: "/lms-tugas",
+                permission: "tugas.view",
+            },
+        ],
+    },
+
+    // ================================================================
     // SECTION: KESISWAAN
     // ================================================================
     {
         section: "Kesiswaan",
         children: [
             {
-                name: "Kedisiplinan Siswa",
-                icon: ClipboardCheck,
-                path: "/kedisiplinan",
-                permission: "kedisiplinan.view",
-                children: [
-                    {
-                        name: "Status Kedisiplinan",
-                        path: "/kedisiplinan/status",
-                    },
-                    {
-                        name: "Riwayat Pelanggaran",
-                        path: "/kedisiplinan/pelanggaran",
-                    },
-                    { name: "Konseling", path: "/kedisiplinan/konseling" },
-                    { name: "Surat Peringatan", path: "/kedisiplinan/sp" },
-                    {
-                        name: "Pemanggilan Orang Tua",
-                        path: "/kedisiplinan/pemanggilan",
-                    },
-                ],
+                name: "Status Kedisiplinan",
+                icon: ShieldCheck,
+                path: "/kedisiplinan/status",
+                permission: "kedisiplinan.status.view",
             },
-            // ==== PPDB → DISAMAKAN DENGAN ROUTE LARAVEL ====
             {
-                name: "PPDB",
-                icon: GraduationCap,
-                path: "/ppdb",
-                permission: "ppdb.view",
-                children: [
-                    {
-                        name: "Pendaftaran",
-                        path: "/ppdb/pendaftaran",
-                        permission: "ppdb.pendaftaran.view",
-                    },
-                    {
-                        name: "Data Pendaftar",
-                        path: "/ppdb/pendaftar", // SESUAIKAN DGN ROUTE KAMU
-                        permission: "ppdb.pendaftar.view",
-                    },
-                    {
-                        name: "Verifikasi Berkas",
-                        path: "/ppdb/verifikasi-berkas", // FIX
-                        permission: "ppdb.verifikasi.view",
-                    },
-                    {
-                        name: "Seleksi & Penilaian",
-                        path: "/ppdb/seleksi",
-                        permission: "ppdb.seleksi.view",
-                    },
-                    {
-                        name: "Pengumuman",
-                        path: "/ppdb/pengumuman-kelulusan", // FIX
-                        permission: "ppdb.pengumuman.view",
-                    },
-                    {
-                        name: "Daftar Ulang",
-                        path: "/ppdb/penempatan-rombel", // FIX: sesuaikan nama route kamu
-                        permission: "ppdb.daftarulang.view",
-                    },
-                    {
-                        name: "Pengaturan PPDB",
-                        path: "/ppdb/pengaturan", // harus kamu buat route-nya
-                        permission: "ppdb.settings.view",
-                    },
-                ],
+                name: "Riwayat Pelanggaran",
+                icon: AlertTriangle,
+                path: "/kedisiplinan/pelanggaran",
+                permission: "kedisiplinan.pelanggaran.view",
+            },
+            {
+                name: "Konseling",
+                icon: MessageSquareHeart,
+                path: "/kedisiplinan/konseling",
+                permission: "kedisiplinan.konseling.view",
+            },
+            {
+                name: "Surat Peringatan",
+                icon: FileWarning,
+                path: "/kedisiplinan/sp",
+                permission: "kedisiplinan.sp.view",
+            },
+            {
+                name: "Pemanggilan Orang Tua",
+                icon: UsersRound,
+                path: "/kedisiplinan/pemanggilan",
+                permission: "kedisiplinan.pemanggilan.view",
+            },
+        ],
+    },
+
+    // ================================================================
+    // SECTION: PPDB
+    // ================================================================
+    {
+        section: "PPDB",
+        children: [
+            {
+                name: "Pendaftaran",
+                icon: ClipboardList,
+                path: "/ppdb/pendaftaran",
+                permission: "ppdb.pendaftaran.view",
+            },
+            {
+                name: "Data Pendaftar",
+                icon: Users,
+                path: "/ppdb/pendaftar",
+                permission: "ppdb.pendaftar.view",
+            },
+            {
+                name: "Verifikasi Berkas",
+                icon: FileCheck,
+                path: "/ppdb/verifikasi-berkas",
+                permission: "ppdb.verifikasi.view",
+            },
+            {
+                name: "Seleksi & Penilaian",
+                icon: ClipboardCheck,
+                path: "/ppdb/seleksi",
+                permission: "ppdb.seleksi.view",
+            },
+            {
+                name: "Pengumuman",
+                icon: Megaphone,
+                path: "/ppdb/pengumuman-kelulusan",
+                permission: "ppdb.pengumuman.view",
+            },
+            {
+                name: "Daftar Ulang",
+                icon: Layers,
+                path: "/ppdb/penempatan-rombel",
+                permission: "ppdb.daftarulang.view",
+            },
+            {
+                name: "Pengaturan PPDB",
+                icon: Settings,
+                path: "/ppdb/pengaturan",
+                permission: "ppdb.settings.view",
             },
         ],
     },
