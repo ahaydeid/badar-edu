@@ -49,7 +49,7 @@ export default function Page(): React.ReactElement {
         <AppLayout title="Jadwal Mata Pelajaran">
             <div className="min-h-screen pb-4">
                 <h1 className="text-center text-2xl font-extrabold pb-4 mb-4 bg-gray-50">
-                    Jadwal Mengajar
+                    Jadwal Mengajar Mapel
                 </h1>
 
                 <div className="mx-auto max-w-7xl px-6">

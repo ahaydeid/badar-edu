@@ -8,6 +8,8 @@ use App\Http\Controllers\AbsensiGuruController;
 use App\Http\Controllers\KalendarAkademikController;
 use App\Http\Controllers\JadwalKelasController;
 use App\Http\Controllers\JadwalGuruController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PengumumanController;
 
 
 Route::get('/', fn() => Inertia::render('Home'));
@@ -15,7 +17,9 @@ $ud = fn() => Inertia::render('UnderDevelopment');
 
 
 // DASHBOARD
-Route::get('/dashboard', $ud);
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');
 Route::get('/hari-ini', $ud);
 
 
@@ -25,7 +29,14 @@ Route::get('/kelas-berlangsung', fn() => Inertia::render('Hari-Ini/Kelas-Berlang
 
 
 // PENGUMUMAN
-Route::get('/pengumuman', $ud);
+Route::prefix('pengumuman')->group(function () {
+    Route::get('/', [PengumumanController::class, 'index'])->name('pengumuman.index');
+    Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.create');
+    Route::post('/', [PengumumanController::class, 'store'])->name('pengumuman.store');
+    Route::get('/{pengumuman}/edit', [PengumumanController::class, 'edit'])->name('pengumuman.edit');
+    Route::put('/{pengumuman}', [PengumumanController::class, 'update'])->name('pengumuman.update');
+    Route::delete('/{pengumuman}', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy');
+});
 
 
 // AKADEMIK: ABSEN SISWA
@@ -45,6 +56,7 @@ Route::prefix('kelas-binaan')->group(function () use ($ud) {
     // Data Siswa versi menu "Kelas Binaan"
     Route::get('/data-siswa', [SiswaController::class, 'index']);
     Route::get('/siswa/{id}', [SiswaController::class, 'show']);
+    Route::get('/rapor-siswa', $ud);
 });
 
 
@@ -136,7 +148,7 @@ Route::prefix('master-data')->group(function () use ($ud) {
     Route::post('/siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
 
     Route::get('/staff', $ud);
-    Route::get('/jadwal-pembelajaran', $ud);
+    Route::get('/jadwal-ajar', $ud);
     Route::get('/rombel', $ud);
     Route::get('/alumni', $ud);
 });
@@ -153,8 +165,12 @@ Route::prefix('konfigurasi')->group(function () use ($ud) {
         Route::get('/semester', $ud);
     });
 
-    Route::get('/kalender-akademik', $ud);
-    Route::get('/giat-tahunan', $ud);
+    Route::prefix('kalender-akademik')->group(function () use ($ud) {
+        Route::get('/', $ud);
+        Route::get('/giat-khusus', $ud);
+        Route::get('/giat-tahunan', $ud);
+    });
+
     Route::get('/jurusan', $ud);
     Route::get('/mapel', $ud);
     Route::get('/titik-absen', $ud);

@@ -1,29 +1,21 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { Bell, UserCircle } from "lucide-react";
+import { useState } from "react";
+import PengumumanModal from "./PengumumanModal";
+import PengumumanList from "./PengumumanList";
 
-interface TopbarProps {
-    role?: string;
-    name?: string;
-}
+export default function Topbar({ role = "Admin", name = "Ahadi" }) {
+    const { topAnnouncements = [] } = usePage<any>().props;
 
-export default function Topbar({
-    role = "Admin",
-    name = "Ahadi",
-}: TopbarProps) {
-    const roleLabel =
-        typeof role === "string" && role.length
-            ? role.charAt(0).toUpperCase() + role.slice(1)
-            : "User";
+    const [openList, setOpenList] = useState(false);
+    const [active, setActive] = useState<any>(null);
+
+    const activeCount = topAnnouncements.filter((p: any) => p.is_active).length;
 
     return (
-        <header className="w-full h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
-            {/* Kiri */}
-            <div className="flex items-center gap-3">
-                <img
-                    src="/img/logo-albadar.png"
-                    alt="Logo Al Badar"
-                    className="w-9 h-9 object-contain"
-                />
+        <>
+            <header className="w-full h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
+                {/* kiri */}
                 <div className="flex flex-col leading-tight">
                     <span className="text-lg font-semibold text-gray-600">
                         SMKS Al Badar Balaraja
@@ -33,40 +25,57 @@ export default function Topbar({
                         Balaraja, Tangerang
                     </span>
                 </div>
-            </div>
 
-            {/* Kanan */}
-            <div className="flex items-center gap-4">
-                {/* Ikon Notifikasi */}
-                <button
-                    type="button"
-                    className="relative p-1 rounded hover:bg-gray-100 transition"
-                    title="Notifikasi"
-                >
-                    <Bell className="w-6 h-6 text-gray-700" />
-                    {/* Jika nanti ingin badge jumlah notifikasi */}
-                    {/* 
-            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-1 rounded-full">
-                3
-            </span>
-            */}
-                </button>
+                {/* kanan */}
+                <div className="flex items-center gap-4 relative">
+                    <button
+                        onClick={() => setOpenList((v) => !v)}
+                        className="relative p-1 cursor-pointer"
+                    >
+                        <Bell className="w-6 h-6 text-gray-700" />
+                        {activeCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-1 rounded-full">
+                                {activeCount}
+                            </span>
+                        )}
+                    </button>
 
-                {/* Profil */}
-                <Link
-                    href="/profile"
-                    className="flex items-center gap-3 hover:bg-gray-100 py-2 rounded transition"
-                    title="Lihat Profil"
-                >
-                    <span className="text-sm font-medium text-gray-700">
-                        <span className="bg-blue-500 py-0.5 px-1 text-xs text-white">
-                            {roleLabel}
-                        </span>{" "}
-                        - {name}
-                    </span>
-                    <UserCircle className="w-6 h-6 text-gray-700" />
-                </Link>
-            </div>
-        </header>
+                    {openList && (
+                        <div className="absolute right-0 top-12 w-96 bg-white border border-gray-200 rounded shadow-lg z-40">
+                            <div className="px-4 py-3 border-b border-gray-200 font-semibold text-sky-600 text-center">
+                                Pengumuman
+                            </div>
+
+                            <div className="max-h-100 overflow-y-auto">
+                                <PengumumanList
+                                    items={topAnnouncements}
+                                    onSelect={(item) => {
+                                        setActive(item);
+                                        setOpenList(false);
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <Link
+                        href="/profile"
+                        className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded"
+                    >
+                        <span className="text-sm text-gray-700">
+                            Admin - {name}
+                        </span>
+                        <UserCircle className="w-6 h-6 text-gray-700" />
+                    </Link>
+                </div>
+            </header>
+
+            {/* MODAL DI LUAR TOPBAR */}
+            <PengumumanModal
+                open={!!active}
+                data={active}
+                onClose={() => setActive(null)}
+            />
+        </>
     );
 }

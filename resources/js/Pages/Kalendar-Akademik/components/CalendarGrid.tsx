@@ -80,16 +80,14 @@ export default function CalendarGrid({ currentMonth, today, events }: Props) {
                     const isRedDay = isLibur || isSunday;
 
                     let className =
-                        "relative rounded-xl p-2 text-lg font-medium transition-all border border-gray-300 text-center ";
+                        "relative rounded-lg p-2 text-lg font-medium transition-all border border-gray-300 text-center ";
 
                     if (isRedDay) {
                         className += "bg-red-500 text-white border-red-600";
+                    } else if (isToday) {
+                        className += "bg-sky-500 text-white font-bold border-sky-600";
                     } else {
                         className += "bg-white text-gray-700 hover:shadow-sm";
-                    }
-
-                    if (isToday && !isRedDay) {
-                        className += " border-sky-500 border-2 text-sky-700 font-bold";
                     }
 
                     return (
@@ -98,12 +96,14 @@ export default function CalendarGrid({ currentMonth, today, events }: Props) {
                             onClick={() => openModal(date)}
                             className={className}
                         >
-                            {!isRedDay && hasEvent && (
-                                <div className="absolute left-0 top-1 bottom-1 w-1 rounded-full bg-sky-500" />
-                            )}
-
-                            {isRedDay && hasEvent && (
-                                <div className="absolute left-0 top-1 bottom-1 w-1 rounded-full bg-white" />
+                            {hasEvent && (
+                                <div
+                                    className={`absolute left-0 top-1 bottom-1 w-1 rounded-full ${
+                                        isRedDay || isToday
+                                            ? "bg-white"
+                                            : "bg-sky-500"
+                                    }`}
+                                />
                             )}
 
                             {date.date()}

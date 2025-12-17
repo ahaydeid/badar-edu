@@ -124,6 +124,7 @@ export const panelMenu: MenuItem[] = [
                     },
                     { name: "Absensi Kelas", path: "/kelas-binaan/absensi" },
                     { name: "Data Siswa", path: "/kelas-binaan/data-siswa" },
+                    { name: "Rapor Siswa", path: "/kelas-binaan/rapor-siswa" },
                 ],
             },
             {
@@ -344,13 +345,8 @@ export const panelMenu: MenuItem[] = [
                 permission: "konfigurasi.view",
                 children: [
                     { name: "Jurusan", path: "/konfigurasi/jurusan" },
-                    { name: "Giat Tahunan", path: "/konfigurasi/giat-tahunan" },
-                    {
-                        name: "Kalender Akademik",
-                        path: "/konfigurasi/kalender-akademik",
-                    },
-                    { name: "Mata Pelajaran", path: "/konfigurasi/mapel" },
 
+                    { name: "Mata Pelajaran", path: "/konfigurasi/mapel" },
                     {
                         name: "Jadwal",
                         path: "/konfigurasi/jadwal",
@@ -360,6 +356,20 @@ export const panelMenu: MenuItem[] = [
                             {
                                 name: "Semester",
                                 path: "/konfigurasi/jadwal/semester",
+                            },
+                        ],
+                    },
+                    {
+                        name: "Kalender Akademik",
+                        path: "/konfigurasi/kalender-akademik",
+                        children: [
+                            {
+                                name: "Giat Khusus",
+                                path: "/konfigurasi/kalender-akademik/giat-khusus",
+                            },
+                            {
+                                name: "Giat Tahunan",
+                                path: "/konfigurasi/kalender-akademik/giat-tahunan",
                             },
                         ],
                     },

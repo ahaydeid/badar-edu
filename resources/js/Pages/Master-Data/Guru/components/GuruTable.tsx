@@ -26,9 +26,6 @@ export default function GuruTable({ data, loading, onEdit }) {
                             <tr className="bg-sky-100 text-gray-700 h-12">
                                 <th className="p-3 text-center">No</th>
                                 <th className="p-3 text-center">Nama</th>
-                                <th className="p-3 text-center">NIP</th>
-                                <th className="p-3 text-center">NIK</th>
-                                <th className="p-3 text-center">NUPTK</th>
                                 <th className="p-3 text-center">JK</th>
                                 <th className="p-3 text-center">
                                     Tempat Lahir
@@ -36,17 +33,10 @@ export default function GuruTable({ data, loading, onEdit }) {
                                 <th className="p-3 text-center">Tgl Lahir</th>
                                 <th className="p-3">Status Kepegawaian</th>
                                 <th className="p-3">Jenis PTK</th>
-                                <th className="p-3">Gelar Depan</th>
                                 <th className="p-3">Gelar Belakang</th>
                                 <th className="p-3">Jenjang</th>
                                 <th className="p-3">Prodi</th>
-                                <th className="p-3">Sertifikasi</th>
-                                <th className="p-3 text-center">TMT Kerja</th>
-                                <th className="p-3">Tugas Tambahan</th>
                                 <th className="p-3">Mengajar</th>
-                                <th className="p-3 text-center">Jam TT</th>
-                                <th className="p-3 text-center">JJM</th>
-                                <th className="p-3 text-center">Total JJM</th>
                                 <th className="p-3">Kompetensi</th>
                                 <th className="p-3 text-center">Aksi</th>
                             </tr>
@@ -56,7 +46,7 @@ export default function GuruTable({ data, loading, onEdit }) {
                             {loading ? (
                                 <tr>
                                     <td
-                                        colSpan={22}
+                                        colSpan={13}
                                         className="p-4 text-center"
                                     >
                                         Memuat data...
@@ -65,7 +55,7 @@ export default function GuruTable({ data, loading, onEdit }) {
                             ) : data.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan={22}
+                                        colSpan={13}
                                         className="p-4 text-center"
                                     >
                                         Tidak ada data guru.
@@ -117,15 +107,6 @@ export default function GuruTable({ data, loading, onEdit }) {
                                         </td>
 
                                         <td className="py-2 px-3 text-center">
-                                            {g.nip ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3 text-center">
-                                            {g.nik ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3 text-center">
-                                            {g.nuptk ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3 text-center">
                                             {g.jk}
                                         </td>
                                         <td className="py-2 px-3 text-center">
@@ -141,9 +122,6 @@ export default function GuruTable({ data, loading, onEdit }) {
                                             {g.jenis_ptk ?? "-"}
                                         </td>
                                         <td className="py-2 px-3">
-                                            {g.gelar_depan ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3">
                                             {g.gelar_belakang ?? "-"}
                                         </td>
                                         <td className="py-2 px-3">
@@ -153,25 +131,7 @@ export default function GuruTable({ data, loading, onEdit }) {
                                             {g.prodi ?? "-"}
                                         </td>
                                         <td className="py-2 px-3">
-                                            {g.sertifikasi ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3 text-center">
-                                            {formatDateShort(g.tmt_kerja)}
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            {g.tugas_tambahan ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3">
                                             {g.mengajar ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3 text-center">
-                                            {g.jam_tugas_tambahan ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3 text-center">
-                                            {g.jjm ?? "-"}
-                                        </td>
-                                        <td className="py-2 px-3 text-center">
-                                            {g.total_jjm ?? "-"}
                                         </td>
                                         <td className="py-2 px-3">
                                             {g.kompetensi ?? "-"}
