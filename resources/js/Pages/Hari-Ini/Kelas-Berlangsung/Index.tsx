@@ -34,7 +34,7 @@ interface DummyKegiatan {
 const dummyData: DummyKegiatan[] = [
     {
         id: 1,
-        kelas: "12 MPLB 2",
+        kelas: "XII MPLB 2",
         wali: "Siti",
         siswa: { hadir: 25, izin: 3, sakit: 0, alfa: 7 },
         jadwal: [
@@ -61,7 +61,7 @@ const dummyData: DummyKegiatan[] = [
                 jam: "10:30 - 12:00",
                 mapel: "Coding",
                 guru: "Ahadi",
-                status: "berlangsung",
+                status: "belum",
                 color: "bg-pink-500",
                 hadir: null,
             },
@@ -69,14 +69,14 @@ const dummyData: DummyKegiatan[] = [
     },
     {
         id: 2,
-        kelas: "10 RPL 1",
+        kelas: "X TKR 1",
         wali: "Budi",
         siswa: { hadir: 30, izin: 5, sakit: 2, alfa: 1 },
         jadwal: [
             {
                 id: 1,
                 jam: "07:30 - 09:00",
-                mapel: "Basis Data",
+                mapel: "Dasar-dasar Otomotif",
                 guru: "Dewi",
                 status: "belum",
                 color: "bg-yellow-500",
@@ -85,7 +85,7 @@ const dummyData: DummyKegiatan[] = [
             {
                 id: 2,
                 jam: "09:45 - 10:30",
-                mapel: "UI/UX",
+                mapel: "Pemeliharaan Mesin Kendaraan Ringan",
                 guru: "Riko",
                 status: "selesai",
                 color: "bg-purple-500",
@@ -94,7 +94,7 @@ const dummyData: DummyKegiatan[] = [
             {
                 id: 3,
                 jam: "10:30 - 12:00",
-                mapel: "Web",
+                mapel: "Sistem Kelistrikan Kendaraan",
                 guru: "Rizal",
                 status: "berlangsung",
                 color: "bg-orange-500",
@@ -104,14 +104,14 @@ const dummyData: DummyKegiatan[] = [
     },
     {
         id: 3,
-        kelas: "11 AKL 2",
+        kelas: "XI TBSM 2",
         wali: "Lina",
         siswa: { hadir: 28, izin: 3, sakit: 4, alfa: 2 },
         jadwal: [
             {
                 id: 1,
                 jam: "07:30 - 09:00",
-                mapel: "Akuntansi",
+                mapel: "Pemeliharaan Mesin Sepeda Motor",
                 guru: "Bambang",
                 status: "selesai",
                 color: "bg-green-500",
@@ -120,7 +120,7 @@ const dummyData: DummyKegiatan[] = [
             {
                 id: 2,
                 jam: "09:45 - 10:30",
-                mapel: "Perpajakan",
+                mapel: "Sistem Injeksi Sepeda Motor",
                 guru: "Tia",
                 status: "selesai",
                 color: "bg-red-500",
@@ -129,7 +129,7 @@ const dummyData: DummyKegiatan[] = [
             {
                 id: 3,
                 jam: "10:30 - 12:00",
-                mapel: "Excel",
+                mapel: "Kelistrikan Sepeda Motor",
                 guru: "Nina",
                 status: "berlangsung",
                 color: "bg-blue-500",
