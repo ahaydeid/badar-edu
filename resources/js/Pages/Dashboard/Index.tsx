@@ -83,6 +83,13 @@ export default function DashboardSekolah() {
         return "#f5365c";
     };
 
+    const getPersentase = (data: { name: string; value: number }[]) => {
+        const total = data.reduce((a, b) => a + b.value, 0);
+        const hadir =
+            data.find((d) => d.name.toLowerCase() === "hadir")?.value ?? 0;
+        return total === 0 ? 0 : Math.round((hadir / total) * 100);
+    };
+
     return (
         <AppLayout title="Dashboard">
             <div className="space-y-6">
@@ -93,7 +100,7 @@ export default function DashboardSekolah() {
                             key={s.label}
                             className={`${s.color} text-white rounded-xl p-5 flex items-center justify-between relative overflow-hidden`}
                         >
-                            <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full" />
+                            <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white/20 rounded-full" />
                             <div>
                                 <p className="text-xs tracking-wide uppercase opacity-80">
                                     {s.label}
@@ -102,7 +109,7 @@ export default function DashboardSekolah() {
                                     {s.value}
                                 </p>
                             </div>
-                            <s.icon className="w-10 h-10 opacity-40" />
+                            <s.icon className="w-10 h-10 opacity-50" />
                         </div>
                     ))}
                 </div>
@@ -175,35 +182,53 @@ export default function DashboardSekolah() {
                                                     />
                                                 ))}
                                             </Pie>
+
+                                            {/* CENTER PERCENTAGE */}
+                                            <text
+                                                x="50%"
+                                                y="50%"
+                                                textAnchor="middle"
+                                                dominantBaseline="middle"
+                                                className="fill-slate-800 font-semibold text-xl"
+                                            >
+                                                {getPersentase(item.data)}%
+                                            </text>
+
                                             <Tooltip />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
 
                                 <div className="mt-4 space-y-1 text-sm">
-                                    {item.data.map((d) => (
-                                        <div
-                                            key={d.name}
-                                            className="flex items-center justify-between"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <span
-                                                    className="w-2.5 h-2.5 rounded-full"
-                                                    style={{
-                                                        backgroundColor:
-                                                            d.color,
-                                                    }}
-                                                />
-                                                <span className="text-slate-600">
-                                                    {d.name}
-                                                </span>
-                                            </div>
-                                            <span className="font-medium">
-                                                {d.value}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
+    {item.data.map((d) => (
+        <div
+            key={d.name}
+            className="flex items-center justify-between"
+        >
+            <div className="flex items-center gap-2">
+                <span
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: d.color }}
+                />
+                <span className="text-slate-600">
+                    {d.name}
+                </span>
+            </div>
+            <span className="font-medium">
+                {d.value}
+            </span>
+        </div>
+    ))}
+
+    {/* TOTAL */}
+    <div className="pt-2 mt-2 border-t border-slate-200 flex items-center justify-between font-semibold text-slate-800">
+        <span>Total</span>
+        <span>
+            {item.data.reduce((sum, d) => sum + d.value, 0)}
+        </span>
+    </div>
+</div>
+
                             </div>
                         ))}
                     </div>

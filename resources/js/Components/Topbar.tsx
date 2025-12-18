@@ -16,16 +16,22 @@ export default function Topbar({ role = "Admin", name = "Ahadi" }) {
         <>
             <header className="w-full h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
                 {/* kiri */}
-                <div className="flex flex-col leading-tight">
-                    <span className="text-lg font-semibold text-gray-600">
-                        SMKS Al Badar Balaraja
-                    </span>
-                    <span className="text-xs text-gray-400 -mt-0.5">
-                        Jl. Raya Gembong–Cariu, Kp. Dangdeur, Sukamurni,
-                        Balaraja, Tangerang
-                    </span>
+                <div className="flex items-center gap-3">
+                    {/* <img
+                        src="/img/logo-albadar.png"
+                        alt="Logo Al Badar"
+                        className="w-9 h-9 object-contain"
+                    /> */}
+                    <div className="flex flex-col leading-tight">
+                        <span className="text-lg font-semibold text-gray-600">
+                            SMKS Al Badar Balaraja
+                        </span>
+                        <span className="text-xs text-gray-400 -mt-0.5">
+                            Jl. Raya Gembong–Cariu, Kp. Dangdeur, Sukamurni,
+                            Balaraja, Tangerang
+                        </span>
+                    </div>
                 </div>
-
                 {/* kanan */}
                 <div className="flex items-center gap-4 relative">
                     <button
@@ -63,7 +69,7 @@ export default function Topbar({ role = "Admin", name = "Ahadi" }) {
                         className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded"
                     >
                         <span className="text-sm text-gray-700">
-                            Admin - {name}
+                           {name}
                         </span>
                         <UserCircle className="w-6 h-6 text-gray-700" />
                     </Link>

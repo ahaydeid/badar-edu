@@ -60,7 +60,11 @@ export default function Sidebar({ isOpen, onToggle }) {
         items.map((item) => {
             const hasChildren = !!item.children?.length;
             const path = item.path ?? "";
-            const key = path || item.name || item.section || "";
+            const key =
+                path ||
+                item.name ||
+                item.section ||
+                `menu-${level}-${Math.random().toString(36).slice(2)}`;
             const open = isDropdownOpen(path);
 
             // SECTION
@@ -79,7 +83,15 @@ export default function Sidebar({ isOpen, onToggle }) {
 
             // item tanpa name/path
             if (!item.name && !item.path && !item.section && hasChildren) {
-                return <div key={key}>{renderMenu(item.children!, level)}</div>;
+                return (
+                    <div
+                        key={`group-${level}-${Math.random()
+                            .toString(36)
+                            .slice(2)}`}
+                    >
+                        {renderMenu(item.children!, level)}
+                    </div>
+                );
             }
 
             const active = path ? isActive(path) : false;
@@ -109,7 +121,7 @@ export default function Sidebar({ isOpen, onToggle }) {
                                     }
                                     ${
                                         active
-                                            ? "bg-purple-600 text-white font-semibold"
+                                            ? "bg-sky-600 text-white font-semibold"
                                             : "text-gray-700 hover:bg-sky-50"
                                     }`}
                             >
@@ -140,7 +152,7 @@ export default function Sidebar({ isOpen, onToggle }) {
                                 ${isOpen ? "justify-start" : "justify-center"}
                                 ${
                                     active
-                                        ? "bg-purple-600 text-white font-semibold"
+                                        ? "bg-sky-600 text-white font-semibold"
                                         : "text-gray-700 hover:bg-sky-50"
                                 }`}
                         >

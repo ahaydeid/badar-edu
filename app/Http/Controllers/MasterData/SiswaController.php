@@ -11,6 +11,9 @@ use App\Models\WaliSiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Services\Import\DapodikNormalizer;
+use Illuminate\Support\Facades\Log;
+
 
 class SiswaController extends Controller
 {
@@ -444,16 +447,19 @@ class SiswaController extends Controller
         return redirect('/master-data/siswa')->with('success', 'Data siswa berhasil diperbarui');
     }
 
-    public function destroy($id)
-    {
-        DB::transaction(function () use ($id) {
-            $siswa = Siswa::findOrFail($id);
-            $siswa->wali()->delete();
-            $siswa->delete();
-        });
+   public function destroy($id)
+{
+    DB::transaction(function () use ($id) {
+        $siswa = Siswa::findOrFail($id);
+        $siswa->wali()->delete();
+        $siswa->delete();
+    });
 
-        return redirect('/master-data/siswa')->with('success', 'Data siswa berhasil dihapus');
-    }
+    return redirect('/master-data/siswa')
+        ->with('success', 'Data siswa berhasil dihapus')
+        ->setStatusCode(303);
+}
+
 
     /* ============================================================
      * IMPORT (FIXED)
@@ -550,111 +556,177 @@ class SiswaController extends Controller
     {
         $rows = $request->input('rows', []);
 
+        $errors = [];
+
         DB::beginTransaction();
 
         try {
             foreach ($rows as $i => $r) {
+                try {
+                    // =============================
+                    // KODE LAMA KAMU (TIDAK DIUBAH)
+                    // =============================
 
-                // SUPPORT 2 FORMAT:
-                // - Excel: "Nama"
-                // - FE payload: "nama"
-                $nama = $this->pick($r, 'Nama', 'nama');
-                if (trim((string)$nama) === '') continue;
+                    $nama = $this->pick($r, 'Nama', 'nama');
+                    if (trim((string)$nama) === '') continue;
 
-                // ROMBEL: Excel "Rombel Saat Ini" atau payload "rombel_saat_ini"
-                $rombelRaw = $this->pick($r, 'Rombel Saat Ini', 'rombel_saat_ini');
-                $rombelId = $this->resolveRombelId($rombelRaw);
+                    $rombelRaw = $this->pick($r, 'Rombel Saat Ini', 'rombel_saat_ini');
+                    $rombelNormalized = DapodikNormalizer::normalizeRombel($rombelRaw);
+                    $rombelId = $this->resolveRombelId($rombelNormalized);
 
-                // BOOLEAN: Excel "Penerima KPS" atau payload "penerima_kps"
-                $penerimaKps = ImportHelper::yesNo($this->pick($r, 'Penerima KPS', 'penerima_kps'));
-                $penerimaKip = ImportHelper::yesNo($this->pick($r, 'Penerima KIP', 'penerima_kip'));
-                $layakPip    = ImportHelper::yesNo($this->pick($r, 'Layak PIP (usulan dari sekolah)', 'layak_pip'));
+                    $penerimaKps = DapodikNormalizer::normalizeYesNo(
+                        $this->pick($r, 'Penerima KPS', 'penerima_kps')
+                    );
+                    $penerimaKip = ImportHelper::yesNo($this->pick($r, 'Penerima KIP', 'penerima_kip'));
+                    $layakPip    = ImportHelper::yesNo($this->pick($r, 'Layak PIP (usulan dari sekolah)', 'layak_pip'));
 
-                $nomorKps = ImportHelper::text($this->pick($r, 'No. KPS', 'nomor_kps'));
-                $nomorKip = ImportHelper::text($this->pick($r, 'Nomor KIP', 'nomor_kip'));
-                $namaDiKip = ImportHelper::text($this->pick($r, 'Nama di KIP', 'nama_di_kip'));
-                $alasanPip = ImportHelper::text($this->pick($r, 'Alasan Layak PIP', 'alasan_layak_pip'));
+                    $nomorKps  = ImportHelper::text($this->pick($r, 'No. KPS', 'nomor_kps'));
+                    $nomorKip  = ImportHelper::text($this->pick($r, 'Nomor KIP', 'nomor_kip'));
+                    $namaDiKip = ImportHelper::text($this->pick($r, 'Nama di KIP', 'nama_di_kip'));
+                    $alasanPip = ImportHelper::text($this->pick($r, 'Alasan Layak PIP', 'alasan_layak_pip'));
 
-                // rules nulling seperti normalize()
-                if (!$penerimaKps) $nomorKps = null;
-                if (!$penerimaKip) { $nomorKip = null; $namaDiKip = null; }
-                if (!$layakPip) $alasanPip = null;
+                    if (!$penerimaKps) $nomorKps = null;
+                    if (!$penerimaKip) { $nomorKip = null; $namaDiKip = null; }
+                    if (!$layakPip) $alasanPip = null;
 
-                $siswa = Siswa::create([
-                    'nama' => ImportHelper::text($nama),
-                    'nipd' => ImportHelper::text($this->pick($r, 'NIPD', 'nipd')),
-                    'nisn' => ImportHelper::text($this->pick($r, 'NISN', 'nisn')),
-                    'jenis_kelamin' => strtoupper((string)($this->pick($r, 'JK', 'jenis_kelamin') ?? 'L')) === 'P' ? 'P' : 'L',
+                    $siswa = Siswa::create([
+                        'nama' => ImportHelper::text($nama),
+                        'nipd' => ImportHelper::text($this->pick($r, 'NIPD', 'nipd')),
+                        'nisn' => ImportHelper::text($this->pick($r, 'NISN', 'nisn')),
+                        'jenis_kelamin' =>
+                            strtoupper((string)($this->pick($r, 'JK', 'jenis_kelamin') ?? 'L')) === 'P' ? 'P' : 'L',
 
-                    'tempat_lahir' => ImportHelper::text($this->pick($r, 'Tempat Lahir', 'tempat_lahir')),
-                    'tanggal_lahir' => ImportHelper::date($this->pick($r, 'Tanggal Lahir', 'tanggal_lahir')),
-                    'nik' => ImportHelper::text($this->pick($r, 'NIK', 'nik')),
-                    'agama' => ImportHelper::text($this->pick($r, 'Agama', 'agama')),
+                        'tempat_lahir' => ImportHelper::text($this->pick($r, 'Tempat Lahir', 'tempat_lahir')),
+                        'tanggal_lahir' => ImportHelper::date($this->pick($r, 'Tanggal Lahir', 'tanggal_lahir')),
+                        'nik' => ImportHelper::text($this->pick($r, 'NIK', 'nik')),
+                        'agama' => ImportHelper::text($this->pick($r, 'Agama', 'agama')),
 
-                    'alamat' => ImportHelper::text($this->pick($r, 'Alamat', 'alamat')),
-                    'rt' => ImportHelper::text($this->pick($r, 'RT', 'rt')),
-                    'rw' => ImportHelper::text($this->pick($r, 'RW', 'rw')),
-                    'dusun' => ImportHelper::text($this->pick($r, 'Dusun', 'dusun')),
-                    'kelurahan' => ImportHelper::text($this->pick($r, 'Kelurahan', 'kelurahan')),
-                    'kecamatan' => ImportHelper::text($this->pick($r, 'Kecamatan', 'kecamatan')),
-                    'kode_pos' => ImportHelper::text($this->pick($r, 'Kode Pos', 'kode_pos')),
+                        'alamat' => ImportHelper::text($this->pick($r, 'Alamat', 'alamat')),
+                        'rt' => ImportHelper::text($this->pick($r, 'RT', 'rt')),
+                        'rw' => ImportHelper::text($this->pick($r, 'RW', 'rw')),
+                        'dusun' => ImportHelper::text($this->pick($r, 'Dusun', 'dusun')),
+                        'kelurahan' => ImportHelper::text($this->pick($r, 'Kelurahan', 'kelurahan')),
+                        'kecamatan' => ImportHelper::text($this->pick($r, 'Kecamatan', 'kecamatan')),
+                        'kode_pos' => ImportHelper::text($this->pick($r, 'Kode Pos', 'kode_pos')),
 
-                    'jenis_tinggal' => ImportHelper::text($this->pick($r, 'Jenis Tinggal', 'jenis_tinggal')),
-                    'alat_transportasi' => ImportHelper::text($this->pick($r, 'Alat Transportasi', 'alat_transportasi')),
-                    'telepon' => ImportHelper::text($this->pick($r, 'Telepon', 'telepon')),
-                    'hp' => ImportHelper::text($this->pick($r, 'HP', 'hp')),
-                    'email' => ImportHelper::text($this->pick($r, 'E-Mail', 'email')),
-                    'skhun' => ImportHelper::text($this->pick($r, 'SKHUN', 'skhun')),
+                        'jenis_tinggal' => ImportHelper::text($this->pick($r, 'Jenis Tinggal', 'jenis_tinggal')),
+                        'alat_transportasi' => ImportHelper::text($this->pick($r, 'Alat Transportasi', 'alat_transportasi')),
+                        'telepon' => ImportHelper::text($this->pick($r, 'Telepon', 'telepon')),
+                        'hp' => ImportHelper::text($this->pick($r, 'HP', 'hp')),
+                        'email' => ImportHelper::text($this->pick($r, 'E-Mail', 'email')),
+                        'skhun' => ImportHelper::text($this->pick($r, 'SKHUN', 'skhun')),
 
-                    // boolean DB tinyint(1)
-                    'penerima_kps' => $penerimaKps,
-                    'nomor_kps' => $nomorKps,
+                        'penerima_kps' => $penerimaKps,
+                        'nomor_kps' => $nomorKps,
 
-                    // ROMBEL FK: id hasil resolve nama->id
-                    'rombel_saat_ini' => $rombelId,
+                        'rombel_saat_ini' => $rombelId,
 
-                    'no_peserta_un' => ImportHelper::text($this->pick($r, 'No Peserta Ujian Nasional', 'no_peserta_un')),
-                    'no_seri_ijazah' => ImportHelper::text($this->pick($r, 'No Seri Ijazah', 'no_seri_ijazah')),
+                        'no_peserta_un' => ImportHelper::text($this->pick($r, 'No Peserta Ujian Nasional', 'no_peserta_un')),
+                        'no_seri_ijazah' => ImportHelper::text($this->pick($r, 'No Seri Ijazah', 'no_seri_ijazah')),
 
-                    'penerima_kip' => $penerimaKip,
-                    'nomor_kip' => $nomorKip,
-                    'nama_di_kip' => $namaDiKip,
-                    'nomor_kks' => ImportHelper::text($this->pick($r, 'Nomor KKS', 'nomor_kks')),
+                        'penerima_kip' => $penerimaKip,
+                        'nomor_kip' => $nomorKip,
+                        'nama_di_kip' => $namaDiKip,
+                        'nomor_kks' => ImportHelper::text($this->pick($r, 'Nomor KKS', 'nomor_kks')),
 
-                    'no_registrasi_akta_lahir' => ImportHelper::text($this->pick($r, 'No Registrasi Akta Lahir', 'no_registrasi_akta_lahir')),
+                        'no_registrasi_akta_lahir' =>
+                            ImportHelper::text($this->pick($r, 'No Registrasi Akta Lahir', 'no_registrasi_akta_lahir')),
 
-                    'bank' => ImportHelper::text($this->pick($r, 'Bank', 'bank')),
-                    'nomor_rekening_bank' => ImportHelper::text($this->pick($r, 'Nomor Rekening Bank', 'nomor_rekening_bank')),
-                    'rekening_atas_nama' => ImportHelper::text($this->pick($r, 'Rekening Atas Nama', 'rekening_atas_nama')),
+                        'bank' => ImportHelper::text($this->pick($r, 'Bank', 'bank')),
+                        'nomor_rekening_bank' =>
+                            ImportHelper::text($this->pick($r, 'Nomor Rekening Bank', 'nomor_rekening_bank')),
+                        'rekening_atas_nama' =>
+                            ImportHelper::text($this->pick($r, 'Rekening Atas Nama', 'rekening_atas_nama')),
 
-                    'layak_pip' => $layakPip,
-                    'alasan_layak_pip' => $alasanPip,
+                        'layak_pip' => $layakPip,
+                        'alasan_layak_pip' => $alasanPip,
 
-                    'kebutuhan_khusus' => ImportHelper::text($this->pick($r, 'Kebutuhan Khusus', 'kebutuhan_khusus')),
-                    'sekolah_asal' => ImportHelper::text($this->pick($r, 'Sekolah Asal', 'sekolah_asal')),
-                    'anak_ke' => ImportHelper::number($this->pick($r, 'Anak ke-berapa', 'anak_ke')),
+                        'kebutuhan_khusus' =>
+                            ImportHelper::text($this->pick($r, 'Kebutuhan Khusus', 'kebutuhan_khusus')),
+                        'sekolah_asal' =>
+                            ImportHelper::text($this->pick($r, 'Sekolah Asal', 'sekolah_asal')),
 
-                    'lintang' => ImportHelper::text($this->pick($r, 'Lintang', 'lintang')),
-                    'bujur' => ImportHelper::text($this->pick($r, 'Bujur', 'bujur')),
+                        'anak_ke' => DapodikNormalizer::normalizeAnakKe(
+                            $this->pick($r, 'Anak ke-berapa', 'anak_ke')
+                        ),
 
-                    'no_kk' => ImportHelper::text($this->pick($r, 'No KK', 'no_kk')),
+                        'lintang' => ImportHelper::text($this->pick($r, 'Lintang', 'lintang')),
+                        'bujur' => ImportHelper::text($this->pick($r, 'Bujur', 'bujur')),
+                        'no_kk' => ImportHelper::text($this->pick($r, 'No KK', 'no_kk')),
 
-                    'berat_badan' => ImportHelper::number($this->pick($r, 'Berat Badan', 'berat_badan')),
-                    'tinggi_badan' => ImportHelper::number($this->pick($r, 'Tinggi Badan', 'tinggi_badan')),
-                    'lingkar_kepala' => ImportHelper::number($this->pick($r, 'Lingkar Kepala', 'lingkar_kepala')),
-                    'jumlah_saudara_kandung' => ImportHelper::number($this->pick($r, 'Jml. Saudara Kandung', 'jumlah_saudara_kandung')),
-                    'jarak_rumah_ke_sekolah_km' => ImportHelper::number($this->pick($r, 'Jarak Rumah ke Sekolah (KM)', 'jarak_rumah_ke_sekolah_km')),
-                ]);
+                        'berat_badan' => ImportHelper::number($this->pick($r, 'Berat Badan', 'berat_badan')),
+                        'tinggi_badan' => ImportHelper::number($this->pick($r, 'Tinggi Badan', 'tinggi_badan')),
+                        'lingkar_kepala' => ImportHelper::number($this->pick($r, 'Lingkar Kepala', 'lingkar_kepala')),
+                        'jumlah_saudara_kandung' =>
+                            ImportHelper::number($this->pick($r, 'Jml. Saudara Kandung', 'jumlah_saudara_kandung')),
+                        'jarak_rumah_ke_sekolah_km' =>
+                            ImportHelper::number($this->pick($r, 'Jarak Rumah ke Sekolah (KM)', 'jarak_rumah_ke_sekolah_km')),
+                    ]);
 
-                // WALI: dari kolom Excel ATAU dari payload wali
-                $this->saveWaliFromImportRow($siswa->id, $r);
+                    $this->saveWaliFromImportRow($siswa->id, $r);
+
+                } catch (\Throwable $e) {
+                    $errors[] = [
+                        'nama'   => ImportHelper::text($nama) ?: '(Tanpa Nama)',
+                        'reason' => $this->humanizeImportError($e),
+                    ];
+
+
+                    Log::error('Import siswa gagal', [
+                        'row' => $i + 2,
+                        'error' => $e->getMessage(),
+                        'data' => $r,
+                    ]);
+                }
             }
 
             DB::commit();
+
+            if (!empty($errors)) {
+                return back()->with([
+                    'import_failed' => true,
+                    'import_errors' => $errors,
+                ]);
+            }
+
             return back()->with('success', 'Import data siswa berhasil');
+
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw $e;
+
+            return back()->with([
+                'import_failed' => true,
+                'import_errors' => [[
+                    'nama' => $nama ?? '(Tidak diketahui)',
+                    'reason' => $e->getMessage(),
+                ]],
+            ]);
         }
+
     }
+
+    private function humanizeImportError(\Throwable $e): string
+{
+    $msg = strtolower($e->getMessage());
+
+    if (str_contains($msg, 'anak_ke')) {
+        return 'Anak ke-berapa harus berupa angka yang wajar';
+    }
+
+    if (str_contains($msg, 'rombel')) {
+        return 'Rombel tidak ditemukan';
+    }
+
+    if (str_contains($msg, 'date') || str_contains($msg, 'tanggal')) {
+        return 'Format tanggal tidak valid';
+    }
+
+    if (str_contains($msg, 'numeric') || str_contains($msg, 'out of range')) {
+        return 'Data angka tidak valid / terlalu besar';
+    }
+
+    return 'Data tidak valid';
+}
+
+
 }

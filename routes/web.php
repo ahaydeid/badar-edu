@@ -62,8 +62,6 @@ Route::prefix('kelas-binaan')->group(function () use ($ud) {
 
 Route::get('/jadwal-mapel', [JadwalGuruController::class, 'index']);
 
-Route::get('/jadwal-semua-kelas', $ud);
-
 
 // AKADEMIK: TUGAS
 
@@ -80,7 +78,7 @@ Route::get('/kalender-akademik', [KalendarAkademikController::class, 'index']);
 
 
 // AKADEMIK: JADWAL
-Route::get('/jadwal-mapel', function () {
+Route::get('/jadwal-semua-kelas', function () {
     return Inertia::render('Akademik/JadwalMapel/Index');
 });
 

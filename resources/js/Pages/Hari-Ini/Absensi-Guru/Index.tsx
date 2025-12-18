@@ -80,14 +80,14 @@ export default function AbsensiGuru() {
 
             if (nowMinutes >= jadwalPulangMin) {
                 return (
-                    <span className="inline-block px-2 py-1 text-xs bg-red-500 text-white">
+                    <span className="inline-block px-2 py-1 text-xs bg-red-100 text-red-700">
                         Tidak Hadir
                     </span>
                 );
             }
 
             return (
-                <span className="inline-block px-2 py-1 text-xs bg-red-500 text-white">
+                <span className="inline-block px-2 py-1 text-xs bg-red-100 text-red-700">
                     Belum Hadir
                 </span>
             );
@@ -125,7 +125,7 @@ export default function AbsensiGuru() {
             </button>
         ) : (
             <span className="inline-flex items-center px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-md cursor-default">
-                Kartu
+                ID Card
             </span>
         );
     };

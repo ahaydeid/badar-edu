@@ -15,6 +15,8 @@ import {
 import SiswaTable from "./components/SiswaTable";
 import TambahSiswaModal from "./components/TambahSiswa";
 import ImportSiswaModal from "./components/ImportSiswaModal";
+import Toast from "@/Components/ui/Toast";
+import { useUiFeedback } from "@/hooks/useUiFeedback";
 
 type StudentRow = any;
 
@@ -35,6 +37,7 @@ export default function Index() {
     const [importOpen, setImportOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
     const [editInitial, setEditInitial] = useState<any>(null);
+    const { toast, showToast } = useUiFeedback();
 
     const filtered = useMemo(() => {
         const q = searchTerm.toLowerCase();
@@ -85,7 +88,7 @@ export default function Index() {
 
                         <button
                             onClick={() => setImportOpen(true)}
-                            className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded"
+                            className="flex items-center gap-2 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded"
                         >
                             <Upload className="w-4 h-4" />
                             Import
@@ -94,11 +97,6 @@ export default function Index() {
                         <button className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded">
                             <Download className="w-4 h-4" />
                             Export
-                        </button>
-
-                        <button className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300 px-4 py-2 rounded">
-                            <FileSpreadsheet className="w-4 h-4" />
-                            Unduh Template
                         </button>
                     </div>
 
@@ -172,11 +170,23 @@ export default function Index() {
                 rombelList={rombelList}
                 editId={editId}
                 initialData={editInitial}
+                onSuccess={(msg) => showToast(msg, "success")}
+                onError={(msg) => showToast(msg, "error")}
             />
+
             <ImportSiswaModal
                 open={importOpen}
                 onClose={() => setImportOpen(false)}
-                onImported={() => router.reload()}
+                onImported={() => {
+                    showToast("Import data siswa berhasil", "success");
+                    router.reload({ only: ["students"] });
+                }}
+            />
+
+            <Toast
+                open={toast.open}
+                message={toast.message}
+                type={toast.type}
             />
         </AppLayout>
     );

@@ -73,8 +73,8 @@ export default function PengumumanList({ items, onSelect }: Props) {
                     <div className="text-xs text-gray-500 mt-1">
                         {truncateWords(p.isi)}
                     </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                        {formatDateShort(p.tanggal_mulai)}
+                    <div className="text-xs text-gray-700 italic mt-1">
+                        - {formatDateShort(p.tanggal_mulai)}
                     </div>
                 </button>
             ))}

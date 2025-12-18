@@ -7,12 +7,12 @@ import JadwalHariCard from "./components/JadwalHariCard";
 
 type DayRow = { id: number; nama: string };
 
-type RawJadwal = {
+type JadwalRow = {
     id: number;
     hari_id: number;
     kelas?: { nama?: string } | null;
-    jamPertama?: string | null;
-    jamKedua?: string | null;
+    jp: number;
+    jamLabels: string[];
     jamMulai?: string | null;
     jamSelesai?: string | null;
 };
@@ -23,15 +23,19 @@ const toMinutes = (time: string | null): number => {
     return Number(h) * 60 + Number(m);
 };
 
-export default function Page(): React.ReactElement {
+export default function Index(): React.ReactElement {
     const { days, jadwals } = usePage().props as any;
 
     const jadwalMap = useMemo(() => {
-        const map = new Map<number, RawJadwal[]>();
+        // const map = new Map<number, JadwalRow[]>();
+        const map = new Map<number, any[]>();
 
-        (jadwals || []).forEach((j: RawJadwal) => {
-            if (!map.has(j.hari_id)) map.set(j.hari_id, []);
-            map.get(j.hari_id)!.push(j);
+        (days || []).forEach((day: DayRow) => {
+            map.set(day.id, []);
+        });
+
+        (jadwals || []).forEach((j: JadwalRow) => {
+            map.get(j.hari_id)?.push(j);
         });
 
         map.forEach((list) =>
@@ -43,7 +47,7 @@ export default function Page(): React.ReactElement {
         );
 
         return map;
-    }, [jadwals]);
+    }, [days, jadwals]);
 
     return (
         <AppLayout title="Jadwal Mata Pelajaran">
@@ -53,13 +57,10 @@ export default function Page(): React.ReactElement {
                 </h1>
 
                 <div className="mx-auto max-w-7xl px-6">
-                    <div
-                        className="grid grid-cols-3 gap-4"
-                        style={{ gridAutoRows: "1fr" }}
-                    >
+                    <div className="grid grid-cols-3 gap-4">
                         {(days || []).map((day: DayRow) => (
                             <JadwalHariCard
-                                key={day.id}
+                                key={`day-${day.id ?? "x"}-${day.nama}`}
                                 day={day}
                                 list={jadwalMap.get(day.id) ?? []}
                             />

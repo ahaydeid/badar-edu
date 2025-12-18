@@ -6,8 +6,8 @@ type Jadwal = {
     id: number;
     kelas?: { nama?: string } | null;
 
-    jamPertama?: string | null;
-    jamKedua?: string | null;
+    jp: number;
+    jamLabels: string[];
 
     jamMulai?: string | null;
     jamSelesai?: string | null;
@@ -56,7 +56,7 @@ export default function JadwalHariCard({ day, list }: Props) {
                 {/* Kolom Jadwal */}
                 <div
                     className={`flex-1 min-h-0 border-l-3 pl-2 ${
-                        isToday ? "border-white" : "border-gray-400"
+                        isToday ? "border-white" : "border-gray-200"
                     }`}
                 >
                     <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
@@ -66,12 +66,12 @@ export default function JadwalHariCard({ day, list }: Props) {
                             </div>
                         ) : (
                             list.map((j) => {
-                                const hasPertama = Boolean(j.jamPertama);
-                                const hasKedua = Boolean(j.jamKedua);
+                                const hasTwoJam =
+                                    j.jamLabels && j.jamLabels.length >= 2;
 
                                 return (
                                     <div
-                                        key={j.id}
+                                        key={`jadwal-${j.id}-${j.jamMulai}`}
                                         className="flex flex-row items-center justify-between rounded-lg bg-gray-50 px-2 py-2 border border-gray-200"
                                     >
                                         {/* Detail kelas */}
@@ -83,17 +83,13 @@ export default function JadwalHariCard({ day, list }: Props) {
 
                                             {/* Hitung JP */}
                                             <div className="text-xs text-gray-600 mt-2">
-                                                <span className="px-3 py-1 rounded-full bg-gray-100 border border-gray-300">
-                                                    {hasPertama && hasKedua
-                                                        ? "2 JP"
-                                                        : hasPertama
-                                                        ? "1 JP"
-                                                        : "0 JP"}
+                                                <span className="px-3 py-0.5 rounded-full bg-gray-700 text-white border border-gray-300">
+                                                    {j.jp} JP
                                                 </span>
                                             </div>
 
                                             <div className="text-xs text-gray-600 mt-3">
-                                                <span className="px-2 py-1 rounded-full bg-amber-300 text-gray-900">
+                                                <span className="px-2 py-0.5 rounded-full bg-amber-300 text-gray-900">
                                                     {j.jamMulai?.slice(0, 5)} -{" "}
                                                     {j.jamSelesai?.slice(0, 5)}
                                                 </span>
@@ -108,22 +104,24 @@ export default function JadwalHariCard({ day, list }: Props) {
                                                     : "bg-white text-gray-800 border border-gray-300"
                                             }`}
                                         >
-                                            {hasPertama && hasKedua ? (
+                                            {hasTwoJam ? (
                                                 <>
                                                     <span className="text-lg font-extrabold">
-                                                        {j.jamPertama}
+                                                        {j.jamLabels[0]}
                                                     </span>
                                                     <div className="w-8 h-0.5 bg-gray-300" />
                                                     <span className="text-lg font-extrabold">
-                                                        {j.jamKedua}
+                                                        {
+                                                            j.jamLabels[
+                                                                j.jamLabels
+                                                                    .length - 1
+                                                            ]
+                                                        }
                                                     </span>
                                                 </>
                                             ) : (
-                                                // Jika hanya satu jam → tampil di TENGAH
                                                 <span className="text-lg font-extrabold py-1">
-                                                    {j.jamPertama ??
-                                                        j.jamKedua ??
-                                                        "?"}
+                                                    {j.jamLabels?.[0] ?? "?"}
                                                 </span>
                                             )}
                                         </div>

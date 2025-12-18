@@ -62,17 +62,17 @@ export const panelMenu: MenuItem[] = [
         section: "Hari Ini",
         children: [
             {
-                name: "Absensi Guru",
-                icon: UserCheck,
-                path: "/absensi-guru",
-                permission: "absensi_guru.view",
-            },
-            {
                 name: "Kelas Berlangsung",
                 icon: Loader,
                 spin: true,
                 path: "/kelas-berlangsung",
                 permission: "kelas-berlangsung.view",
+            },
+            {
+                name: "Absensi Guru",
+                icon: UserCheck,
+                path: "/absensi-guru",
+                permission: "absensi_guru.view",
             },
         ],
     },
@@ -207,7 +207,7 @@ export const panelMenu: MenuItem[] = [
                 permission: "kedisiplinan.sp.view",
             },
             {
-                name: "Pemanggilan Orang Tua",
+                name: "Pemanggilan Wali",
                 icon: UsersRound,
                 path: "/kedisiplinan/pemanggilan",
                 permission: "kedisiplinan.pemanggilan.view",

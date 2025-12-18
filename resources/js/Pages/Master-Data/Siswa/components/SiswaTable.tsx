@@ -5,6 +5,9 @@ import { Eye, MapPin, Pencil, Trash2, User } from "lucide-react";
 import MapsModal from "./MapsModal";
 import ModalFoto from "./ModalFoto";
 import { useState } from "react";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
+import Toast from "@/Components/ui/Toast";
+import { useUiFeedback } from "@/hooks/useUiFeedback";
 
 export default function SiswaTable({ data, loading, onEdit }) {
     const [openMaps, setOpenMaps] = useState(false);
@@ -15,6 +18,10 @@ export default function SiswaTable({ data, loading, onEdit }) {
         foto: string | null;
         nama: string | null;
     } | null>(null);
+
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
+    const { toast, showToast } = useUiFeedback();
 
     function openMapsModal(s) {
         setSelectedMap(s);
@@ -181,14 +188,8 @@ export default function SiswaTable({ data, loading, onEdit }) {
                                                         "ID SISWA:",
                                                         s.id
                                                     );
-
-                                                    router.delete(
-                                                        `/master-data/siswa/${s.id}`,
-                                                        {
-                                                            preserveScroll:
-                                                                true,
-                                                        }
-                                                    );
+                                                    setSelectedId(s.id);
+                                                    setConfirmOpen(true);
                                                 }}
                                                 className="px-3 py-2 bg-rose-500 text-white rounded-md text-xs flex items-center gap-1"
                                             >
@@ -218,6 +219,34 @@ export default function SiswaTable({ data, loading, onEdit }) {
                         onClose={() => setOpenFoto(false)}
                     />
                 )}
+
+                <ConfirmDialog
+                    open={confirmOpen}
+                    title="Hapus Siswa"
+                    message="Data siswa yang dihapus tidak dapat dikembalikan. Lanjutkan?"
+                    onClose={() => setConfirmOpen(false)}
+                    onConfirm={() => {
+                        if (!selectedId) return;
+
+                        router.delete(`/master-data/siswa/${selectedId}`, {
+                            preserveScroll: true,
+                            onSuccess: () => {
+                                showToast("Siswa berhasil dihapus");
+                                setConfirmOpen(false);
+                                setSelectedId(null);
+                            },
+                            onError: () => {
+                                showToast("Gagal menghapus siswa", "error");
+                            },
+                        });
+                    }}
+                />
+
+                <Toast
+                    open={toast.open}
+                    message={toast.message}
+                    type={toast.type}
+                />
             </div>
         </div>
     );
