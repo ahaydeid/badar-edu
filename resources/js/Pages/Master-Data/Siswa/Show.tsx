@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { ArrowLeft, Download, User, Pencil, Trash2 } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 import { PageProps as InertiaPageProps } from "@inertiajs/core";
-import AppLayout from "@/Layouts/AppLayout";
 import ModalFoto from "./components/ModalFoto";
 
 /* ===================== TYPES ===================== */
@@ -34,7 +33,7 @@ export default function SiswaDetailPage() {
     }
 
     return (
-        <AppLayout title="Master Data Siswa">
+        <>
             <div className="w-full max-w-7xl mx-auto pb-6 px-2 space-y-10">
                 {/* BACK BUTTON */}
                 <Link
@@ -346,7 +345,7 @@ export default function SiswaDetailPage() {
                     onClose={() => setOpenFoto(false)}
                 />
             )}
-        </AppLayout>
+        </>
     );
 }
 

@@ -1,9 +1,10 @@
-import AppLayout from "@/Layouts/AppLayout";
+import { useEffect } from "react";
+import { router } from "@inertiajs/react";
 
 export default function Home() {
-    return (
-        <AppLayout>
-            <h1>Selamat Datang, Hadi</h1>
-        </AppLayout>
-    );
+    useEffect(() => {
+        router.visit("/dashboard");
+    }, []);
+
+    return null;
 }

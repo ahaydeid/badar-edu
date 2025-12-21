@@ -10,6 +10,18 @@ use App\Http\Controllers\JadwalKelasController;
 use App\Http\Controllers\JadwalGuruController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\MasterData\JadwalController;
+use App\Http\Controllers\MasterData\KelasController;
+use App\Http\Controllers\Konfigurasi\KalenderAkademik\KegiatanKhususController;
+use App\Http\Controllers\Konfigurasi\KalenderAkademik\KegiatanTahunanController;
+use App\Http\Controllers\Konfigurasi\Jadwal\HariController;
+use App\Http\Controllers\Konfigurasi\Jadwal\JamController;
+use App\Http\Controllers\Konfigurasi\Jadwal\SemesterController;
+use App\Http\Controllers\Konfigurasi\MapelController;
+use App\Http\Controllers\Konfigurasi\JurusanController;
+use App\Http\Controllers\Konfigurasi\RoleController;
+use App\Http\Controllers\Kedisiplinan\KedisiplinanController;
+
 
 
 Route::get('/', fn() => Inertia::render('Home'));
@@ -48,12 +60,8 @@ Route::prefix('absensi-siswa')->group(function () use ($ud) {
 
 // AKADEMIK: KELAS BINAAN
 Route::prefix('kelas-binaan')->group(function () use ($ud) {
-
     Route::get('/jadwal-kelas', [JadwalKelasController::class, 'index']);
-
     Route::get('/absensi', $ud);
-
-    // Data Siswa versi menu "Kelas Binaan"
     Route::get('/data-siswa', [SiswaController::class, 'index']);
     Route::get('/siswa/{id}', [SiswaController::class, 'show']);
     Route::get('/rapor-siswa', $ud);
@@ -79,7 +87,7 @@ Route::get('/kalender-akademik', [KalendarAkademikController::class, 'index']);
 
 // AKADEMIK: JADWAL
 Route::get('/jadwal-semua-kelas', function () {
-    return Inertia::render('Akademik/JadwalMapel/Index');
+    return Inertia::render('Akademik/JadwalSemuaKelas/Index');
 });
 
 
@@ -100,15 +108,30 @@ Route::prefix('ppdb')->group(function () use ($ud) {
 });
 
 
-// KEDISIPLINAN
-Route::prefix('kedisiplinan')->group(function () use ($ud) {
-    Route::get('/', $ud);
-    Route::get('/status', $ud);
-    Route::get('/pelanggaran', $ud);
-    Route::get('/konseling', $ud);
-    Route::get('/sp', $ud);
-    Route::get('/pemanggilan', $ud);
+// KEDISIPLINAN SISWA
+Route::prefix('kedisiplinan')->name('kedisiplinan.')->group(function () {
+
+    // DASHBOARD
+    Route::get('/', [KedisiplinanController::class, 'dashboard'])->name('dashboard');
+
+    // PERLU TINDAKAN
+    Route::get('/perlu-tindakan', [KedisiplinanController::class, 'perluTindakan'])->name('perlu-tindakan');
+
+    // SISWA
+    Route::get('/siswa', [KedisiplinanController::class, 'siswaIndex'])->name('siswa.index');
+    Route::get('/siswa/{siswa}', [KedisiplinanController::class, 'siswaShow'])->name('siswa.show');
+
+    // RIWAYAT
+    Route::get('/riwayat-sanksi', [KedisiplinanController::class, 'riwayatSanksi'])->name('riwayat-sanksi');
+
+    // MASTER DATA
+    Route::prefix('master')->name('master.')->group(function () {
+        Route::get('/jenis-pelanggaran', [KedisiplinanController::class, 'jenisPelanggaranIndex'])->name('jenis-pelanggaran.index');
+        Route::get('/jenis-sanksi', [KedisiplinanController::class, 'jenisSanksiIndex'])->name('jenis-sanksi.index');
+    });
 });
+
+
 
 
 
@@ -146,9 +169,12 @@ Route::prefix('master-data')->group(function () use ($ud) {
     Route::post('/siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
 
     Route::get('/staff', $ud);
-    Route::get('/jadwal-ajar', $ud);
+    
+    Route::get('/jadwal-ajar', [JadwalController::class, 'index'])
+        ->name('jadwal.index');
     Route::get('/rombel', $ud);
-    Route::get('/alumni', $ud);
+    Route::get('/rombel', [KelasController::class, 'index'])
+    ->name('kelas.index');
 });
 
 
@@ -158,19 +184,29 @@ Route::prefix('konfigurasi')->group(function () use ($ud) {
 
     Route::prefix('jadwal')->group(function () use ($ud) {
         Route::get('/', $ud);
-        Route::get('/hari', $ud);
-        Route::get('/jam', $ud);
-        Route::get('/semester', $ud);
-    });
+        Route::get('/hari', [HariController::class, 'index'])
+            ->name('hari.index');
+        Route::get('/jam', [JamController::class, 'index'])
+            ->name('jam.index');       
+        Route::get('/semester', [SemesterController::class, 'index'])
+            ->name('semester.index');
+            });
 
-    Route::prefix('kalender-akademik')->group(function () use ($ud) {
-        Route::get('/', $ud);
-        Route::get('/giat-khusus', $ud);
-        Route::get('/giat-tahunan', $ud);
-    });
+        Route::prefix('kalender-akademik')->group(function () use ($ud) {
+            Route::get('/', $ud);
+        
+        Route::get('/giat-khusus', [KegiatanKhususController::class, 'index'])
+            ->name('kegiatan-khusus.index');
+        
+        Route::get('/giat-tahunan', [KegiatanTahunanController::class, 'index'])
+            ->name('kegiatan-tahunan.index');
+            });
 
-    Route::get('/jurusan', $ud);
-    Route::get('/mapel', $ud);
+    Route::get('/jurusan', [JurusanController::class, 'index'])
+    ->name('jurusan.index');
+    Route::get('/mapel', [MapelController::class, 'index'])
+    ->name('mapel.index');
     Route::get('/titik-absen', $ud);
-    Route::get('/role', $ud);
+    Route::get('/role', [RoleController::class, 'index'])
+    ->name('role.index');
 });

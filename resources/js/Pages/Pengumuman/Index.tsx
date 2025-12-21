@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { usePage } from "@inertiajs/react";
-import AppLayout from "@/Layouts/AppLayout";
 import PengumumanTable from "./components/PengumumanTable";
 
 export default function Index() {
@@ -28,7 +27,7 @@ export default function Index() {
     }));
 
     return (
-        <AppLayout title="Pengumuman">
+        <>
             <PengumumanTable
                 data={numbered}
                 page={page}
@@ -46,6 +45,6 @@ export default function Index() {
                 onPrev={() => setPage((p) => Math.max(1, p - 1))}
                 onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
             />
-        </AppLayout>
+        </>
     );
 }

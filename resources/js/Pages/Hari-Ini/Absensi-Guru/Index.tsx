@@ -3,7 +3,6 @@
 import { useState, type ChangeEvent } from "react";
 import LokasiAbsenModal from "./LokasiAbsenModal";
 import { usePage } from "@inertiajs/react";
-import AppLayout from "@/Layouts/AppLayout";
 import { MapPin } from "lucide-react";
 
 function timeToMinutes(time: string) {
@@ -33,7 +32,7 @@ export default function AbsensiGuru() {
         id: number;
         nama: string;
         mapel: string;
-        jadwal: string; // "07:30-08:15"
+        jadwal: string;
         jamMasuk: string | null;
         jamPulang: string | null;
         status: string;
@@ -131,7 +130,7 @@ export default function AbsensiGuru() {
     };
 
     return (
-        <AppLayout title="Absensi Guru Hari Ini">
+        <>
             <h2 className="font-bold text-3xl mb-6">Absensi Guru Hari Ini</h2>
 
             <div className="space-y-4">
@@ -179,7 +178,7 @@ export default function AbsensiGuru() {
                                         colSpan={8}
                                         className="text-center p-4 text-gray-500"
                                     >
-                                        Tidak ada data ditemukan.
+                                        Tidak ada jadwal hari ini.
                                     </td>
                                 </tr>
                             ) : (
@@ -224,6 +223,6 @@ export default function AbsensiGuru() {
                     jamMasuk={detail.jamMasuk}
                 />
             </div>
-        </AppLayout>
+        </>
     );
 }

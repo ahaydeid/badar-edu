@@ -36,4 +36,10 @@ class Jadwal extends Model
     {
         return $this->belongsTo(Jam::class);
     }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
 }

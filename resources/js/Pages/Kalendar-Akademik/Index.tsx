@@ -7,7 +7,6 @@ import CalendarGrid from "./components/CalendarGrid";
 import { usePage } from "@inertiajs/react";
 import { PageProps as InertiaPageProps } from "@inertiajs/core";
 import { CalendarEvent } from "./components/AgendaModal";
-import AppLayout from "@/Layouts/AppLayout";
 
 export default function Page() {
     const { events } = usePage<InertiaPageProps & { events: CalendarEvent[] }>()
@@ -21,7 +20,7 @@ export default function Page() {
     const nextMonth = () => setCurrentMonth((prev) => prev.add(1, "month"));
 
     return (
-        <AppLayout title="Kalender Akademik">
+        <>
             <section className="w-full min-h-screen px-24 pt-6">
                 <div>
                     <div className="flex items-center justify-center mb-10">
@@ -125,6 +124,6 @@ export default function Page() {
                     })()}
                 </div>
             </section>
-        </AppLayout>
+        </>
     );
 }

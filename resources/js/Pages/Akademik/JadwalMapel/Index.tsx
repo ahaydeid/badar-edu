@@ -50,7 +50,7 @@ export default function Index(): React.ReactElement {
     }, [days, jadwals]);
 
     return (
-        <AppLayout title="Jadwal Mata Pelajaran">
+        <>
             <div className="min-h-screen pb-4">
                 <h1 className="text-center text-2xl font-extrabold pb-4 mb-4 bg-gray-50">
                     Jadwal Mengajar Mapel
@@ -68,6 +68,6 @@ export default function Index(): React.ReactElement {
                     </div>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }

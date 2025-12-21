@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import { usePage } from "@inertiajs/react";
 import { PageProps as InertiaPageProps, router } from "@inertiajs/core";
-import AppLayout from "@/Layouts/AppLayout";
 import {
     UserPlus,
     Upload,
@@ -74,7 +73,7 @@ export default function Index() {
     }
 
     return (
-        <AppLayout title="Master Data Siswa">
+        <>
             <div className="w-full space-y-6">
                 <div className="space-y-4">
                     <div className="flex items-center text-sm gap-2 flex-wrap">
@@ -188,6 +187,6 @@ export default function Index() {
                 message={toast.message}
                 type={toast.type}
             />
-        </AppLayout>
+        </>
     );
 }

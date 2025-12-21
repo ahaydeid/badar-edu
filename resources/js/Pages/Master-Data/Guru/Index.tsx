@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import { usePage, router } from "@inertiajs/react";
 import { PageProps as InertiaPageProps } from "@inertiajs/core";
-import AppLayout from "@/Layouts/AppLayout";
 import {
     UserPlus,
     Upload,
@@ -64,7 +63,7 @@ export default function Index() {
     }
 
     return (
-        <AppLayout title="Master Data Guru">
+        <>
             <div className="w-full space-y-6">
                 <div className="space-y-4">
                     <div className="flex items-center text-sm gap-2 flex-wrap">
@@ -88,11 +87,6 @@ export default function Index() {
                         <button className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded">
                             <Download className="w-4 h-4" />
                             Export
-                        </button>
-
-                        <button className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300 px-4 py-2 rounded">
-                            <FileSpreadsheet className="w-4 h-4" />
-                            Unduh Template
                         </button>
                     </div>
 
@@ -166,6 +160,6 @@ export default function Index() {
                 editId={editId}
                 initialData={editInitial}
             />
-        </AppLayout>
+        </>
     );
 }

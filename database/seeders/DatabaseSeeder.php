@@ -57,7 +57,8 @@ class DatabaseSeeder extends Seeder
             PengajuanAbsenGuruSeeder::class,
 
             // KEDISIPLINAN
-            KedisiplinanSiswaSeeder::class,
+            JenisPelanggaranSeeder::class,
+            JenisSanksiSeeder::class,
         ]);
     }
 }
