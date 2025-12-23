@@ -1,69 +1,127 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
+import type { PageProps } from "@inertiajs/core";
+import { BookOpen, Users } from "lucide-react";
 
-type DayRow = { id: number; nama: string };
-
-type JadwalRow = {
+type KelasItem = {
     id: number;
-    hari_id: number;
-    kelas?: { nama?: string } | null;
-    jp: number;
-    jamLabels: string[];
-    jamMulai?: string | null;
-    jamSelesai?: string | null;
+    nama_rombel: string;
+    wali_nama: string | null;
+    jumlah_siswa: number;
 };
 
-const toMinutes = (time: string | null): number => {
-    if (!time) return 9999;
-    const [h = "0", m = "0"] = time.split(":");
-    return Number(h) * 60 + Number(m);
+type Props = PageProps & {
+    kelasList: KelasItem[];
 };
 
-export default function Index(): React.ReactElement {
-    const { days, jadwals } = usePage().props as any;
-
-    const jadwalMap = useMemo(() => {
-        // const map = new Map<number, JadwalRow[]>();
-        const map = new Map<number, any[]>();
-
-        (days || []).forEach((day: DayRow) => {
-            map.set(day.id, []);
-        });
-
-        (jadwals || []).forEach((j: JadwalRow) => {
-            map.get(j.hari_id)?.push(j);
-        });
-
-        map.forEach((list) =>
-            list.sort(
-                (a, b) =>
-                    toMinutes(a.jamMulai ?? null) -
-                    toMinutes(b.jamMulai ?? null)
-            )
-        );
-
-        return map;
-    }, [days, jadwals]);
+export default function Index() {
+    const { kelasList } = usePage<Props>().props;
 
     return (
-            <div className="min-h-screen pb-4">
-                <h1 className="text-center text-2xl font-extrabold pb-4 mb-4 bg-gray-50">
-                    Jadwal Semua Kelas
-                </h1>
+        <div className="min-h-screen bg-slate-50 p-8">
+            <div className="max-w-7xl mx-auto space-y-8">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-extrabold text-slate-800">
+                            Master Jadwal
+                        </h1>
+                        <p className="text-slate-500 mt-1">
+                            Pilih kelas untuk melihat jadwal pelajaran
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-400">
+                        <Users className="w-5 h-5" />
+                        <span className="text-sm">
+                            {kelasList.length} Kelas
+                        </span>
+                    </div>
+                </div>
 
-                <div className="mx-auto max-w-7xl px-6">
-                    <div className="grid grid-cols-3 gap-4">
-                        {/* {(days || []).map((day: DayRow) => (
-                            <JadwalHariCard
-                                key={`day-${day.id ?? "x"}-${day.nama}`}
-                                day={day}
-                                list={jadwalMap.get(day.id) ?? []}
-                            />
-                        ))} */}
+                {/* KELAS X */}
+                <div className="space-y-4">
+                    <h2 className="text-2xl font-bold text-sky-600">
+                        Kelas X
+                    </h2>
+
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {kelasList
+                            .filter((k) => k.nama_rombel.startsWith("X "))
+                            .map((k) => (
+                                <Card k={k} key={k.id} />
+                            ))}
+                    </div>
+                </div>
+
+                {/* KELAS XI */}
+                <div className="space-y-4 pt-6">
+                    <h2 className="text-2xl font-bold text-sky-600">
+                        Kelas XI
+                    </h2>
+
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {kelasList
+                            .filter((k) => k.nama_rombel.startsWith("XI "))
+                            .map((k) => (
+                                <Card k={k} key={k.id} />
+                            ))}
+                    </div>
+                </div>
+
+                {/* KELAS XII */}
+                <div className="space-y-4 pt-6">
+                    <h2 className="text-2xl font-bold text-sky-600">
+                        Kelas XII
+                    </h2>
+
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {kelasList
+                            .filter((k) => k.nama_rombel.startsWith("XII "))
+                            .map((k) => (
+                                <Card k={k} key={k.id} />
+                            ))}
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function Card({ k }: { k: KelasItem }) {
+    return (
+        <div
+            onClick={() => {
+                router.get(`/jadwal-semua-kelas/${k.id}`);
+            }}
+            className="group cursor-pointer rounded-xl border border-slate-200 bg-white p-6 transition hover:shadow-lg"
+        >
+            <div className="flex items-start justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-800 group-hover:text-sky-600 transition">
+                        {k.nama_rombel}
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                        {k.wali_nama
+                            ? `Wali: ${k.wali_nama}`
+                            : "Belum ada wali kelas"}
+                    </p>
+                </div>
+
+                <div className="rounded-lg bg-sky-50 p-2 text-sky-600">
+                    <BookOpen className="w-5 h-5" />
+                </div>
+            </div>
+
+            <div className="mt-5 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Users className="w-4 h-4" />
+                    <span>{k.jumlah_siswa} siswa</span>
+                </div>
+
+                <span className="text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition">
+                    Lihat Jadwal →
+                </span>
+            </div>
+        </div>
     );
 }

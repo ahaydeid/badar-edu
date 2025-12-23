@@ -24,38 +24,44 @@ export default function JadwalPage() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-                {Object.entries(jadwal).map(([hari, list]: any) => (
-                    <div
-                        key={hari}
-                        className="bg-white border border-gray-200 rounded-md p-4"
-                    >
-                        <h3 className="text-xl font-bold mb-4">{hari}</h3>
+            {Object.keys(jadwal || {}).length === 0 ? (
+                <div className="py-10 text-center text-gray-500">
+                    Belum ada jadwal yang diatur
+                </div>
+            ) : (
+                <div className="grid grid-cols-3 gap-4">
+                    {Object.entries(jadwal).map(([hari, list]: any) => (
+                        <div
+                            key={hari}
+                            className="bg-white border border-gray-200 rounded-md p-4"
+                        >
+                            <h3 className="text-xl font-bold mb-4">{hari}</h3>
 
-                        <div className="space-y-1">
-                            {list.map((j: JadwalItem, idx: number) => (
-                                <div
-                                    key={idx}
-                                    className="flex text-sm text-gray-700 rounded"
-                                    style={{ backgroundColor: j.warna }}
-                                >
-                                    <div className="w-28 px-2 py-2 text-xs font-semibold border-r border-white">
-                                        {j.jam_mulai} - {j.jam_selesai}
-                                    </div>
+                            <div className="space-y-1">
+                                {list.map((j: JadwalItem, idx: number) => (
+                                    <div
+                                        key={idx}
+                                        className="flex text-sm text-gray-700 rounded"
+                                        style={{ backgroundColor: j.warna }}
+                                    >
+                                        <div className="w-28 px-2 py-2 text-xs font-semibold border-r border-white">
+                                            {j.jam_mulai} - {j.jam_selesai}
+                                        </div>
 
-                                    <div className="flex-1 px-3 py-2 uppercase font-bold text-xs">
-                                        {j.mapel}
-                                    </div>
+                                        <div className="flex-1 px-3 py-2 uppercase font-bold text-xs">
+                                            {j.mapel}
+                                        </div>
 
-                                    <div className="w-28 px-3 py-2 text-xs">
-                                        {j.guru ?? "-"}
+                                        <div className="w-28 px-3 py-2 text-xs">
+                                            {j.guru ?? "-"}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

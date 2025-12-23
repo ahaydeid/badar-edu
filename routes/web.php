@@ -6,7 +6,7 @@ use App\Http\Controllers\MasterData\SiswaController;
 use App\Http\Controllers\MasterData\GuruController;
 use App\Http\Controllers\AbsensiGuruController;
 use App\Http\Controllers\KalendarAkademikController;
-use App\Http\Controllers\JadwalKelasController;
+use App\Http\Controllers\KelasBinaan\JadwalKelasController;
 use App\Http\Controllers\JadwalGuruController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengumumanController;
@@ -21,8 +21,8 @@ use App\Http\Controllers\Konfigurasi\MapelController;
 use App\Http\Controllers\Konfigurasi\JurusanController;
 use App\Http\Controllers\Konfigurasi\RoleController;
 use App\Http\Controllers\Kedisiplinan\KedisiplinanController;
-
-
+use App\Http\Controllers\JadwalSemuaKelasController;
+use App\Http\Controllers\KelasBinaan\DataSiswaController;
 
 Route::get('/', fn() => Inertia::render('Home'));
 $ud = fn() => Inertia::render('UnderDevelopment');
@@ -62,7 +62,7 @@ Route::prefix('absensi-siswa')->group(function () use ($ud) {
 Route::prefix('kelas-binaan')->group(function () use ($ud) {
     Route::get('/jadwal-kelas', [JadwalKelasController::class, 'index']);
     Route::get('/absensi', $ud);
-    Route::get('/data-siswa', [SiswaController::class, 'index']);
+    Route::get('/data-siswa', [DataSiswaController::class, 'index']);
     Route::get('/siswa/{id}', [SiswaController::class, 'show']);
     Route::get('/rapor-siswa', $ud);
 });
@@ -86,9 +86,8 @@ Route::get('/kalender-akademik', [KalendarAkademikController::class, 'index']);
 
 
 // AKADEMIK: JADWAL
-Route::get('/jadwal-semua-kelas', function () {
-    return Inertia::render('Akademik/JadwalSemuaKelas/Index');
-});
+Route::get('/jadwal-semua-kelas', [JadwalSemuaKelasController::class, 'index']);
+Route::get('/jadwal-semua-kelas/{kelas}', [JadwalSemuaKelasController::class, 'show']);
 
 
 Route::get('/lms-materi', $ud);
@@ -167,14 +166,15 @@ Route::prefix('master-data')->group(function () use ($ud) {
     Route::delete('/siswa/{id}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
 
     Route::post('/siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
-
-    Route::get('/staff', $ud);
     
     Route::get('/jadwal-ajar', [JadwalController::class, 'index'])
         ->name('jadwal.index');
     Route::get('/rombel', $ud);
     Route::get('/rombel', [KelasController::class, 'index'])
     ->name('kelas.index');
+
+    Route::get('/alumni', $ud);
+
 });
 
 

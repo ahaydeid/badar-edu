@@ -36,13 +36,14 @@ export default function SiswaDetailPage() {
         <>
             <div className="w-full max-w-7xl mx-auto pb-6 px-2 space-y-10">
                 {/* BACK BUTTON */}
-                <Link
-                    href="/master-data/siswa"
-                    className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
+                <button
+                    type="button"
+                    onClick={() => window.history.back()}
+                    className="inline-flex cursor-pointer items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Kembali
-                </Link>
+                </button>
 
                 {/* HEADER */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

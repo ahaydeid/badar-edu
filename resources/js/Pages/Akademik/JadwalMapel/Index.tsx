@@ -53,19 +53,25 @@ export default function Index(): React.ReactElement {
         <>
             <div className="min-h-screen pb-4">
                 <h1 className="text-center text-2xl font-extrabold pb-4 mb-4 bg-gray-50">
-                    Jadwal Mengajar Mapel
+                    Jadwal Mengajar
                 </h1>
 
                 <div className="mx-auto max-w-7xl px-6">
-                    <div className="grid grid-cols-3 gap-4">
-                        {(days || []).map((day: DayRow) => (
-                            <JadwalHariCard
-                                key={`day-${day.id ?? "x"}-${day.nama}`}
-                                day={day}
-                                list={jadwalMap.get(day.id) ?? []}
-                            />
-                        ))}
-                    </div>
+                    {(jadwals || []).length === 0 ? (
+                        <div className="py-10 text-center text-gray-500">
+                            Belum ada jadwal yang diatur
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-4">
+                            {(days || []).map((day: DayRow) => (
+                                <JadwalHariCard
+                                    key={`day-${day.id ?? "x"}-${day.nama}`}
+                                    day={day}
+                                    list={jadwalMap.get(day.id) ?? []}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </>

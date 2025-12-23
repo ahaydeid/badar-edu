@@ -82,10 +82,11 @@ export default function CalendarGrid({ currentMonth, today, events }: Props) {
                     let className =
                         "relative rounded-lg p-2 text-lg font-medium transition-all border border-gray-300 text-center ";
 
-                    if (isRedDay) {
+                    if (isToday) {
+                        className +=
+                            "bg-sky-500 text-white font-bold border-sky-600";
+                    } else if (isRedDay) {
                         className += "bg-red-500 text-white border-red-600";
-                    } else if (isToday) {
-                        className += "bg-sky-500 text-white font-bold border-sky-600";
                     } else {
                         className += "bg-white text-gray-700 hover:shadow-sm";
                     }

@@ -56,10 +56,10 @@ export default function SiswaTable({ data, loading, onEdit }) {
                             <th className="p-3 text-center">Tgl Lahir</th>
                             <th className="p-3 text-center">Rombel</th>
                             <th className="p-3">Alamat</th>
-                            <th className="p-3 text-center">Maps</th>
                             <th className="p-3 text-center">HP</th>
                             <th className="p-3">Ayah</th>
                             <th className="p-3">Ibu</th>
+                            <th className="p-3 text-center">Maps</th>
                             <th className="p-3 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -139,17 +139,6 @@ export default function SiswaTable({ data, loading, onEdit }) {
                                             .filter(Boolean)
                                             .join(", ") || "-"}
                                     </td>
-
-                                    <td className="py-2 px-3 text-center">
-                                        <button
-                                            onClick={() => openMapsModal(s)}
-                                            className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs flex items-center gap-1 mx-auto"
-                                        >
-                                            <MapPin className="w-4 h-4" />
-                                            Buka
-                                        </button>
-                                    </td>
-
                                     <td className="py-2 px-3 text-center">
                                         {s.hp ?? "-"}
                                     </td>
@@ -159,7 +148,15 @@ export default function SiswaTable({ data, loading, onEdit }) {
                                     <td className="py-2 px-3">
                                         {s.ibu_nama ?? "-"}
                                     </td>
-
+                                    <td className="py-2 px-3 text-center">
+                                        <button
+                                            onClick={() => openMapsModal(s)}
+                                            className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-xs flex items-center gap-1 mx-auto"
+                                        >
+                                            <MapPin className="w-4 h-4" />
+                                            Buka
+                                        </button>
+                                    </td>
                                     <td className="py-2 px-3 text-center">
                                         <div className="flex justify-center gap-2">
                                             <Link

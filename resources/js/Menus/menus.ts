@@ -111,7 +111,6 @@ export const panelMenu: MenuItem[] = [
                 permission: "absen.siswa.view",
             },
 
-            // ==== KELAS BINAAN → PERBAIKAN DATA SISWA PATH ====
             {
                 name: "Kelas Binaan",
                 icon: GraduationCap,
@@ -140,7 +139,7 @@ export const panelMenu: MenuItem[] = [
                 ],
             },
             {
-                name: "Jadwal Semua Kelas",
+                name: "Jadwal Kelas",
                 icon: CalendarClock,
                 path: "/jadwal-semua-kelas",
                 permission: "kalender.view",
@@ -322,9 +321,8 @@ export const panelMenu: MenuItem[] = [
                 path: "/master-data",
                 permission: "master.view",
                 children: [
-                    { name: "Guru", path: "/master-data/guru" },
+                    { name: "Guru & Pegawai", path: "/master-data/guru" },
                     { name: "Siswa", path: "/master-data/siswa" },
-                    { name: "Staff & Pegawai", path: "/master-data/staff" },
                     {
                         name: "Jadwal Ajar",
                         path: "/master-data/jadwal-ajar",
