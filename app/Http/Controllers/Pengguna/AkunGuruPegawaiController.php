@@ -9,6 +9,12 @@ class AkunGuruPegawaiController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Pengguna/Akun/GuruPegawai/Index');
+        return inertia('Pengguna/Akun/GuruPegawai/Index', [
+            'users' => \App\Models\User::with('profile')
+                ->with('roles')
+                ->orderBy('username')
+                ->get(),
+        ]);
     }
+
 }

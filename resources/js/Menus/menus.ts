@@ -210,33 +210,41 @@ export const panelMenu: MenuItem[] = [
                 name: "Dashboard Kedisiplinan",
                 icon: ShieldCheck,
                 path: "/kedisiplinan",
+                permission: "kedisipinan.view",
             },
             {
                 name: "Perlu Tindakan",
                 icon: AlertTriangle,
                 path: "/kedisiplinan/perlu-tindakan",
+                permission: "kedisipinan.view",
             },
             {
                 name: "Data Siswa",
                 icon: Users,
                 path: "/kedisiplinan/siswa",
+                permission: "kedisipinan.view",
             },
             {
                 name: "Riwayat Sanksi",
                 icon: FileWarning,
                 path: "/kedisiplinan/riwayat-sanksi",
+                permission: "kedisipinan.view",
             },
             {
                 name: "Master Kedisiplinan",
                 icon: Settings,
+                path: "/kedisiplinan",
+                permission: "kedisipinan.view",
                 children: [
                     {
                         name: "Jenis Pelanggaran",
                         path: "/kedisiplinan/master/jenis-pelanggaran",
+                        permission: "kedisipinan.view",
                     },
                     {
                         name: "Jenis Sanksi",
                         path: "/kedisiplinan/master/jenis-sanksi",
+                        permission: "kedisipinan.view",
                     },
                 ],
             },
@@ -304,7 +312,7 @@ export const panelMenu: MenuItem[] = [
                 name: "Akun",
                 icon: Users2,
                 path: "/akun",
-                permission: "",
+                permission: "pengguna.view",
                 children: [
                     {
                         name: "Guru & Pegawai",
@@ -337,16 +345,33 @@ export const panelMenu: MenuItem[] = [
                 name: "Master Data",
                 icon: Layers,
                 path: "/master-data",
-                permission: "master.view",
+                permission: "master-data.view",
                 children: [
-                    { name: "Guru & Pegawai", path: "/master-data/guru" },
-                    { name: "Siswa", path: "/master-data/siswa" },
+                    {
+                        name: "Guru & Pegawai",
+                        path: "/master-data/guru",
+                        permission: "master-data.guru.view",
+                    },
+                    {
+                        name: "Siswa",
+                        path: "/master-data/siswa",
+                        permission: "master-data.siswa.view",
+                    },
                     {
                         name: "Jadwal Ajar",
                         path: "/master-data/jadwal-ajar",
+                        permission: "master-data.jadwal-ajar.view",
                     },
-                    { name: "Rombel", path: "/master-data/rombel" },
-                    { name: "Alumni", path: "/master-data/alumni" },
+                    {
+                        name: "Rombel",
+                        path: "/master-data/rombel",
+                        permission: "master-data.rombel.view",
+                    },
+                    {
+                        name: "Alumni",
+                        path: "/master-data/alumni",
+                        permission: "master-data.alumni.view",
+                    },
                 ],
             },
         ],
@@ -364,42 +389,66 @@ export const panelMenu: MenuItem[] = [
                 path: "/konfigurasi",
                 permission: "konfigurasi.view",
                 children: [
-                    { name: "Jurusan", path: "/konfigurasi/jurusan" },
-
-                    { name: "Mata Pelajaran", path: "/konfigurasi/mapel" },
+                    {
+                        name: "Jurusan",
+                        path: "/konfigurasi/jurusan",
+                        permission: "konfigurasi.jurusan.view",
+                    },
+                    {
+                        name: "Mata Pelajaran",
+                        path: "/konfigurasi/mapel",
+                        permission: "konfigurasi.mapel.view",
+                    },
                     {
                         name: "Jadwal",
                         path: "/konfigurasi/jadwal",
+                        permission: "konfigurasi.jadwal.view",
                         children: [
-                            { name: "Hari", path: "/konfigurasi/jadwal/hari" },
-                            { name: "Jam", path: "/konfigurasi/jadwal/jam" },
+                            {
+                                name: "Hari",
+                                path: "/konfigurasi/jadwal/hari",
+                                permission: "konfigurasi.jadwal.view",
+                            },
+                            {
+                                name: "Jam",
+                                path: "/konfigurasi/jadwal/jam",
+                                permission: "konfigurasi.jadwal.view",
+                            },
                             {
                                 name: "Semester",
                                 path: "/konfigurasi/jadwal/semester",
+                                permission: "konfigurasi.jadwal.view",
                             },
                         ],
                     },
                     {
                         name: "Kalender Akademik",
                         path: "/konfigurasi/kalender-akademik",
+                        permission: "konfigurasi.kalender-akademik.view",
                         children: [
                             {
                                 name: "Giat Khusus",
                                 path: "/konfigurasi/kalender-akademik/giat-khusus",
+                                permission:
+                                    "konfigurasi.kalender-akademik.view",
                             },
                             {
                                 name: "Giat Tahunan",
                                 path: "/konfigurasi/kalender-akademik/giat-tahunan",
+                                permission:
+                                    "konfigurasi.kalender-akademik.view",
                             },
                         ],
                     },
                     {
                         name: "Titik Absensi",
                         path: "/konfigurasi/titik-absen",
+                        permission: "konfigurasi.view",
                     },
                     {
                         name: "Role",
                         path: "/konfigurasi/role",
+                        permission: "konfigurasi.role.view",
                     },
                 ],
             },

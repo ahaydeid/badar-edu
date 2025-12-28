@@ -26,6 +26,7 @@ export default function GuruTable({ data, loading, onEdit }) {
                             <tr className="bg-sky-100 text-gray-700 h-12">
                                 <th className="p-3 text-center">No</th>
                                 <th className="p-3 text-center">Nama</th>
+                                <th className="p-3 text-center">Kode Guru</th>
                                 <th className="p-3 text-center">JK</th>
                                 <th className="p-3 text-center">
                                     Tempat Lahir
@@ -104,6 +105,10 @@ export default function GuruTable({ data, loading, onEdit }) {
 
                                                 <span>{g.nama}</span>
                                             </div>
+                                        </td>
+
+                                        <td className="py-2 px-3 text-center font-medium text-gray-700">
+                                            {g.kode_guru ?? "-"}
                                         </td>
 
                                         <td className="py-2 px-3 text-center">

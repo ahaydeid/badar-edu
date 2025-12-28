@@ -40,6 +40,12 @@ export default function Sidebar({ isOpen, onToggle }) {
                     const filteredChildren = filterMenuByPermission(
                         item.children!
                     );
+
+                    // 🔥 SECTION: kalau tidak ada child, HILANG
+                    if (item.section && filteredChildren.length === 0) {
+                        return null;
+                    }
+
                     const allowedSelf = hasPermission(item.permission);
                     const allowedByChildren = filteredChildren.length > 0;
 

@@ -1,6 +1,17 @@
 import { Head, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
-import { MoreVertical, Settings, LogOut } from "lucide-react";
+import {
+    MoreVertical,
+    Settings,
+    LogOut,
+    User,
+    FileText,
+    GraduationCap,
+    BookOpen,
+    Award,
+    Briefcase,
+    Pencil,
+} from "lucide-react";
 
 export default function Profile() {
     const { auth } = usePage<any>().props;
@@ -21,12 +32,21 @@ export default function Profile() {
         .filter(Boolean)
         .join(" ");
 
+    const formatTanggal = (date?: string) => {
+        if (!date) return "-";
+        return new Date(date).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+        });
+    };
+
     return (
         <>
             <Head title="Profil Guru" />
 
-            <div className="max-w-6xl mx-auto px-6 py-6">
-                <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <div className="max-w-6xl mx-auto p-2">
+                <div className="bg-white border border-gray-200 rounded-lg hover:shadow-sm">
                     {/* HEADER */}
                     <div className="flex items-start gap-6 p-6 border-b border-gray-200">
                         <img
@@ -46,8 +66,18 @@ export default function Profile() {
                             <h1 className="text-xl font-semibold text-gray-900">
                                 {namaLengkap}
                             </h1>
-                            <div className="text-sm text-gray-500 mt-1">
+                            <div className=" text-gray-500 mt-1">
                                 Kode Guru: {u?.kode_guru || "-"}
+                            </div>
+                            <div className="flex gap-2 mt-1">
+                                {(auth?.roles ?? []).map((role: string) => (
+                                    <span
+                                        key={role}
+                                        className=" px-2 py-0.5 text-white bg-sky-600"
+                                    >
+                                        {role}
+                                    </span>
+                                ))}
                             </div>
                         </div>
 
@@ -57,7 +87,7 @@ export default function Profile() {
                                 onClick={() => setOpen(!open)}
                                 className="p-2 border border-gray-300 rounded-md hover:bg-gray-50"
                             >
-                                <MoreVertical
+                                <Settings
                                     size={18}
                                     className="text-gray-600"
                                 />
@@ -65,8 +95,8 @@ export default function Profile() {
 
                             {open && (
                                 <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-md shadow-md z-50">
-                                    <button className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm hover:bg-gray-50">
-                                        <Settings
+                                    <button className="w-full flex items-center gap-2 text-left px-4 py-2  hover:bg-gray-50">
+                                        <Pencil
                                             size={16}
                                             className="text-gray-600"
                                         />
@@ -74,7 +104,7 @@ export default function Profile() {
                                     </button>
                                     <button
                                         onClick={logout}
-                                        className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                                        className="w-full flex items-center gap-2 text-left px-4 py-2  text-red-600 hover:bg-gray-50"
                                     >
                                         <LogOut size={16} />
                                         Keluar
@@ -85,7 +115,7 @@ export default function Profile() {
                     </div>
 
                     {/* TABS */}
-                    <div className="px-6 pt-4 border-b border-gray-200 flex gap-8 text-sm">
+                    <div className="px-6 pt-3 border-b border-gray-200 flex gap-6 ">
                         <button
                             onClick={() => setTab("profil")}
                             className={`pb-3 ${
@@ -109,17 +139,21 @@ export default function Profile() {
                     </div>
 
                     {/* CONTENT */}
-                    <div className="p-6 space-y-8">
+                    <div className="p-6 space-y-4">
                         {tab === "profil" && (
                             <>
-                                <section className="border border-gray-200 rounded-lg p-6">
-                                    <h3 className="text-xs font-semibold text-gray-500 mb-5 tracking-wide">
+                                <section className="border border-gray-200 rounded-lg p-4 bg-white">
+                                    <h3 className="flex items-center gap-2 text- font-semibold text-sky-600 mb-3 tracking-wide">
+                                        <User
+                                            size={20}
+                                            className="text-sky-600"
+                                        />
                                         IDENTITAS
                                     </h3>
-                                    <div className="grid grid-cols-4 gap-6 text-sm">
+                                    <div className="grid grid-cols-4 gap-x-4 gap-y-4 text-base">
                                         <Item
                                             label="Nama Lengkap"
-                                            value={namaLengkap}
+                                            value={ u?.nama}
                                         />
                                         <Item
                                             label="Gelar Depan"
@@ -143,16 +177,22 @@ export default function Profile() {
                                         />
                                         <Item
                                             label="Tanggal Lahir"
-                                            value={u?.tanggal_lahir || "-"}
+                                            value={formatTanggal(
+                                                u?.tanggal_lahir
+                                            )}
                                         />
                                     </div>
                                 </section>
 
-                                <section className="border border-gray-200 rounded-lg p-6">
-                                    <h3 className="text-xs font-semibold text-gray-500 mb-5 tracking-wide">
+                                <section className="border border-gray-200 rounded-lg p-4 bg-white">
+                                    <h3 className="flex items-center gap-2 text- font-semibold text-sky-600 mb-3 tracking-wide">
+                                        <FileText
+                                            size={20}
+                                            className="text-sky-600"
+                                        />
                                         ADMINISTRATIF
                                     </h3>
-                                    <div className="grid grid-cols-4 gap-6 text-sm">
+                                    <div className="grid grid-cols-4 gap-x-4 gap-y-4 text-base">
                                         <Item
                                             label="NIP"
                                             value={u?.nip || "-"}
@@ -175,16 +215,20 @@ export default function Profile() {
                                         />
                                         <Item
                                             label="TMT Kerja"
-                                            value={u?.tmt_kerja || "-"}
+                                            value={formatTanggal(u?.tmt_kerja)}
                                         />
                                     </div>
                                 </section>
 
-                                <section className="border border-gray-200 rounded-lg p-6 bg-linear-to-br from-white to-gray-50">
-                                    <h3 className="text-xs font-semibold text-gray-500 mb-5 tracking-wide">
+                                <section className="border border-gray-200 rounded-lg p-4 bg-linear-to-br from-white to-gray-50">
+                                    <h3 className="flex items-center gap-2 text- font-semibold text-sky-600 mb-3 tracking-wide">
+                                        <GraduationCap
+                                            size={20}
+                                            className="text-sky-600"
+                                        />
                                         AKADEMIK
                                     </h3>
-                                    <div className="grid grid-cols-4 gap-6 text-sm">
+                                    <div className="grid grid-cols-4 gap-x-4 gap-y-4 text-base">
                                         <Item
                                             label="Jenjang"
                                             value={u?.jenjang || "-"}
@@ -204,11 +248,15 @@ export default function Profile() {
 
                         {tab === "tugas" && (
                             <>
-                                <section className="border border-gray-200 rounded-lg p-6">
-                                    <h3 className="text-xs font-semibold text-gray-500 mb-5 tracking-wide">
+                                <section className="border border-gray-200 rounded-lg p-4 bg-white">
+                                    <h3 className="flex items-center gap-2 text- font-semibold text-sky-600 mb-3 tracking-wide">
+                                        <BookOpen
+                                            size={20}
+                                            className="text-sky-600"
+                                        />
                                         MENGAJAR
                                     </h3>
-                                    <div className="grid grid-cols-4 gap-6 text-sm">
+                                    <div className="grid grid-cols-4 gap-x-4 gap-y-4 text-base">
                                         <Item
                                             label="Mata Pelajaran"
                                             value={u?.mengajar || "-"}
@@ -230,11 +278,15 @@ export default function Profile() {
                                     </div>
                                 </section>
 
-                                <section className="border border-gray-200 rounded-lg p-6 bg-linear-to-br from-white to-blue-50/40">
-                                    <h3 className="text-xs font-semibold text-gray-500 mb-5 tracking-wide">
+                                <section className="border border-gray-200 rounded-lg p-4 bg-linear-to-br from-white to-blue-50/40">
+                                    <h3 className="flex items-center gap-2 text- font-semibold text-sky-600 mb-3 tracking-wide">
+                                        <Briefcase
+                                            size={20}
+                                            className="text-sky-600"
+                                        />
                                         TUGAS TAMBAHAN
                                     </h3>
-                                    <div className="grid grid-cols-4 gap-6 text-sm">
+                                    <div className="grid grid-cols-4 gap-x-4 gap-y-4 text-base">
                                         <Item
                                             label="Tugas Tambahan"
                                             value={u?.tugas_tambahan || "-"}
@@ -243,25 +295,29 @@ export default function Profile() {
                                             label="Jam Tugas Tambahan"
                                             value={
                                                 u?.jam_tugas_tambahan
-                                                    ? `${u.jam_tugas_tambahan} Jam`
+                                                    ? `${u?.jam_tugas_tambahan} Jam`
                                                     : "-"
                                             }
                                         />
                                     </div>
                                 </section>
 
-                                <section className="border border-gray-200 rounded-lg p-6">
-                                    <h3 className="text-xs font-semibold text-gray-500 mb-4 tracking-wide">
+                                <section className="border border-gray-200 rounded-lg p-4 bg-white">
+                                    <h3 className="flex items-center gap-2 text- font-semibold text-sky-600 mb-3 tracking-wide">
+                                        <Award
+                                            size={20}
+                                            className="text-sky-600"
+                                        />
                                         KOMPETENSI
                                     </h3>
-                                    <div className="flex flex-wrap gap-2 text-sm">
+                                    <div className="flex flex-wrap gap-2 ">
                                         {(u?.kompetensi
                                             ? u.kompetensi.split(",")
                                             : []
                                         ).map((k: string) => (
                                             <span
                                                 key={k}
-                                                className="px-3 py-1 rounded-full border border-gray-300 bg-white text-gray-700"
+                                                className="px-2.5 py-0.5 rounded-md border border-gray-300 bg-gray-50 text-gray-700"
                                             >
                                                 {k.trim()}
                                             </span>
@@ -280,7 +336,7 @@ export default function Profile() {
 function Item({ label, value }: { label: string; value: string }) {
     return (
         <div>
-            <div className="text-xs text-gray-400 mb-1">{label}</div>
+            <div className="text- text-gray-400 mb-1">{label}</div>
             <div className="font-medium text-gray-900">{value}</div>
         </div>
     );
