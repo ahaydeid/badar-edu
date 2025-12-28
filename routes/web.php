@@ -78,17 +78,19 @@ Route::middleware(['auth'])->group(function () use ($ud) {
 
     // HARI INI (sebelumnya cuma auth, sekarang pakai permission)
     Route::get('/hari-ini', $ud)
-        ->middleware(['permission:hari-ini.view']);
+    ->middleware(['permission:hari-ini.view']);
 
     // PROFILE (sebelumnya cuma auth, sekarang pakai permission)
     Route::get('/profile', [ProfileController::class, 'index'])
         ->name('profile');
 
     // HARI INI (payung absensi_guru.view)
-    Route::middleware(['permission:absensi.guru.view'])->group(function () {
+    Route::middleware(['permission:absensi_guru.view'])->group(function () {
         Route::get('/absensi-guru', [AbsensiGuruController::class, 'index']);
-        Route::get('/kelas-berlangsung', [KelasBerlangsungController::class, 'index']);
-    });
+        });
+
+        Route::get('/kelas-berlangsung', [KelasBerlangsungController::class, 'index'])
+            ->middleware(['permission:kelas-berlangsung.view']);
 
     // PENGUMUMAN: view vs manage
     Route::prefix('pengumuman')->group(function () {
@@ -118,37 +120,43 @@ Route::middleware(['auth'])->group(function () use ($ud) {
     });
 
     // AKADEMIK UMUM (payung absen.siswa.view)
-    Route::middleware(['permission:absen.siswa.view'])->group(function () use ($ud) {
-        Route::get('/jadwal-mapel', [JadwalGuruController::class, 'index']);
+    // AKADEMIK + ABSENSI SISWA + KELAS BINAAN + LMS + RENCANA AJAR (dipisah permission per domain)
+    Route::get('/jadwal-mapel', [JadwalGuruController::class, 'index'])
+        ->middleware(['permission:jadwal.mapel.view']);
 
-        Route::get('/absensi-siswa', [AbsensiSiswaController::class, 'index']);
-        Route::get('/absensi-siswa/{kelas}', [AbsensiSiswaController::class, 'kelas']);
-        Route::get('/absensi-siswa/detail/{jadwal}/{siswa}', [AbsensiSiswaController::class, 'detail'])->name('absensi-siswa.detail');
-
-        Route::prefix('kelas-binaan')->group(function () use ($ud) {
-            Route::get('/jadwal-kelas', [JadwalKelasController::class, 'index']);
-            Route::get('/absensi-siswa', [AbsensiKelasController::class, 'index']);
-            Route::get('/absensi-siswa/detail/{siswa}', [AbsensiKelasController::class, 'detail']);
-            Route::get('/progres-siswa', $ud);
-            Route::get('/data-siswa', [DataSiswaController::class, 'index']);
-            Route::get('/siswa/{id}', [SiswaController::class, 'show']);
-            Route::get('/rapor-siswa', $ud);
-        });
-
-        Route::get('/kalender-akademik', [KalendarAkademikController::class, 'index']);
-
-        Route::get('/jadwal-semua-kelas', [JadwalSemuaKelasController::class, 'index']);
-        Route::get('/jadwal-semua-kelas/{kelas}', [JadwalSemuaKelasController::class, 'show']);
-
-        Route::get('/lms-materi', $ud);
-        Route::get('/lms-tugas', $ud);
-
-        Route::prefix('rencana-ajar')->group(function () use ($ud) {
-            Route::get('/', $ud);
-            Route::get('/modul', $ud);
-            Route::get('/silabus', $ud);
-        });
+    Route::prefix('absensi-siswa')->middleware(['permission:absensi.siswa.view'])->group(function () {
+        Route::get('/', [AbsensiSiswaController::class, 'index']);
+        Route::get('/{kelas}', [AbsensiSiswaController::class, 'kelas']);
+        Route::get('/detail/{jadwal}/{siswa}', [AbsensiSiswaController::class, 'detail'])->name('absensi-siswa.detail');
     });
+
+    Route::prefix('kelas-binaan')->middleware(['permission:kelas.binaan.view'])->group(function () use ($ud) {
+        Route::get('/jadwal-kelas', [JadwalKelasController::class, 'index']);
+        Route::get('/absensi-siswa', [AbsensiKelasController::class, 'index']);
+        Route::get('/absensi-siswa/detail/{siswa}', [AbsensiKelasController::class, 'detail']);
+        Route::get('/progres-siswa', $ud);
+        Route::get('/data-siswa', [DataSiswaController::class, 'index']);
+        Route::get('/siswa/{id}', [SiswaController::class, 'show']);
+        Route::get('/rapor-siswa', $ud);
+    });
+
+    Route::get('/kalender-akademik', [KalendarAkademikController::class, 'index'])
+        ->middleware(['permission:kalender.akademik.view']);
+
+    Route::prefix('jadwal-semua-kelas')->middleware(['permission:jadwal.semua-kelas.view'])->group(function () {
+        Route::get('/', [JadwalSemuaKelasController::class, 'index']);
+        Route::get('/{kelas}', [JadwalSemuaKelasController::class, 'show']);
+    });
+
+    Route::get('/lms-materi', $ud)->middleware(['permission:lms.materi.view']);
+    Route::get('/lms-tugas', $ud)->middleware(['permission:lms.tugas.view']);
+
+    Route::prefix('rencana-ajar')->middleware(['permission:rencana-ajar.view'])->group(function () use ($ud) {
+        Route::get('/', $ud);
+        Route::get('/modul', $ud);
+        Route::get('/silabus', $ud);
+    });
+
 
     // NILAI (pakai nilai.view)
     Route::middleware(['permission:nilai.view'])->group(function () {
@@ -157,74 +165,115 @@ Route::middleware(['auth'])->group(function () use ($ud) {
         Route::get('/penilaian/{kelas}/{penilaian}', [PenilaianController::class, 'subPenilaian'])->name('penilaian.sub');
     });
 
-    // PENGGUNA + MASTER DATA + PPDB + PAYROLL (pakai master.view)
-    Route::middleware(['permission:master.view'])->group(function () use ($ud) {
+    // PENGGUNA
+    Route::middleware(['permission:pengguna.view'])->group(function () use ($ud) {
+         Route::get('/akun/guru-pegawai', [AkunGuruPegawaiController::class, 'index'])
+             ->middleware(['permission:guru-pegawai.view'])
+             ->name('guru-pegawai.index');
+         Route::get('/akun/siswa', [AkunSiswaController::class, 'index'])
+             ->middleware(['permission:siswa.view'])
+             ->name('siswa.index');
+         Route::get('/rfid', $ud)
+             ->middleware(['permission:rfid.register.view']);
+     });
 
-        Route::get('/akun/guru-pegawai', [AkunGuruPegawaiController::class, 'index'])->name('guru-pegawai.index');
-        Route::get('/akun/siswa', [AkunSiswaController::class, 'index'])->name('siswa.index');
-        Route::get('/rfid', $ud);
+     // MASTER DATA
+     Route::prefix('master-data')->group(function () use ($ud) {
+         Route::get('/', $ud)->middleware(['permission:master-data.view']);
+ 
+         Route::get('/guru', [GuruController::class, 'index'])
+             ->middleware(['permission:master-data.guru.view']);
+         Route::get('/guru/{guru}', [GuruController::class, 'show'])
+             ->middleware(['permission:master-data.guru.view']);
+         Route::get('/guru/{guru}/edit', [GuruController::class, 'edit'])
+             ->middleware(['permission:master-data.guru.view']);
+         Route::post('/guru', [GuruController::class, 'store'])
+             ->middleware(['permission:master-data.guru.view']);
+         Route::put('/guru/{guru}', [GuruController::class, 'update'])
+             ->middleware(['permission:master-data.guru.view']);
+         Route::delete('/guru/{guru}', [GuruController::class, 'destroy'])
+             ->middleware(['permission:master-data.guru.view']);
+ 
+         Route::get('/siswa', [SiswaController::class, 'index'])
+             ->middleware(['permission:master-data.siswa.view']);
+         Route::get('/siswa/{id}', [SiswaController::class, 'show'])
+             ->middleware(['permission:master-data.siswa.view']);
+         Route::post('/siswa', [SiswaController::class, 'store'])
+             ->middleware(['permission:master-data.siswa.view']);
+         Route::get('/siswa/{id}/edit', [SiswaController::class, 'edit'])
+             ->middleware(['permission:master-data.siswa.view']);
+         Route::put('/siswa/{id}', [SiswaController::class, 'update'])
+             ->middleware(['permission:master-data.siswa.view']);
+         Route::delete('/siswa/{id}', [SiswaController::class, 'destroy'])
+             ->middleware(['permission:master-data.siswa.view']);
+ 
+         Route::post('/siswa/import', [SiswaController::class, 'import'])
+             ->middleware(['permission:master-data.siswa.view']);
+ 
+         Route::get('/jadwal-ajar', [JadwalController::class, 'index'])
+             ->middleware(['permission:master-data.jadwal-ajar.view']);
+ 
+         Route::get('/rombel', [KelasController::class, 'index'])
+             ->middleware(['permission:master-data.rombel.view']);
+ 
+         Route::get('/alumni', $ud)
+             ->middleware(['permission:master-data.alumni.view']);
+     });
 
-        Route::prefix('master-data')->group(function () use ($ud) {
-            Route::get('/', $ud);
+    // PPDB + PAYROLL (pakai master.view)
+    Route::prefix('ppdb')->group(function () {
+        Route::get('/pengaturan', [PengaturanController::class, 'index'])
+            ->middleware(['permission:ppdb.settings.view']);
+        Route::get('/pendaftaran', [PendaftaranController::class, 'index'])
+            ->middleware(['permission:ppdb.pendaftaran.view']);
+        Route::get('/verifikasi', [VerifikasiController::class, 'index'])
+            ->middleware(['permission:ppdb.verifikasi.view']);
+        Route::get('/daftar-ulang', [DaftarUlangController::class, 'index'])
+            ->middleware(['permission:ppdb.daftarulang.view']);
+    });
 
-            Route::get('/guru', [GuruController::class, 'index']);
-            Route::get('/guru/{guru}', [GuruController::class, 'show']);
-            Route::get('/guru/{guru}/edit', [GuruController::class, 'edit']);
-            Route::post('/guru', [GuruController::class, 'store']);
-            Route::put('/guru/{guru}', [GuruController::class, 'update']);
-            Route::delete('/guru/{guru}', [GuruController::class, 'destroy']);
-
-            Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
-            Route::get('/siswa/{id}', [SiswaController::class, 'show'])->name('siswa.show');
-            Route::post('/siswa', [SiswaController::class, 'store'])->name('siswa.store');
-            Route::get('/siswa/{id}/edit', [SiswaController::class, 'edit'])->name('siswa.edit');
-            Route::put('/siswa/{id}', [SiswaController::class, 'update'])->name('siswa.update');
-            Route::delete('/siswa/{id}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
-
-            Route::post('/siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
-
-            Route::get('/jadwal-ajar', [JadwalController::class, 'index'])->name('jadwal.index');
-            Route::get('/rombel', [KelasController::class, 'index'])->name('kelas.index');
-
-            Route::get('/alumni', $ud);
-        });
-
-        Route::prefix('ppdb')->name('ppdb.')->group(function () {
-            Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
-            Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran.index');
-            Route::get('/verifikasi', [VerifikasiController::class, 'index'])->name('verifikasi.index');
-            Route::get('/daftar-ulang', [DaftarUlangController::class, 'index'])->name('daftarulang.index');
-        });
-
-        Route::prefix('payroll')->group(function () use ($ud) {
-            Route::get('/', $ud);
-            Route::get('/run', $ud);
-            Route::get('/slip', $ud);
-        });
+    Route::prefix('payroll')->group(function () use ($ud) {
+        Route::get('/', $ud);
+        Route::get('/run', $ud);
+        Route::get('/slip', $ud);
     });
 
     // KONFIGURASI (pakai konfigurasi.view)
     Route::middleware(['permission:konfigurasi.view'])->group(function () use ($ud) {
         Route::prefix('konfigurasi')->group(function () use ($ud) {
 
-            Route::prefix('jadwal')->group(function () use ($ud) {
-                Route::get('/', $ud);
-                Route::get('/hari', [HariController::class, 'index'])->name('hari.index');
-                Route::get('/jam', [JamController::class, 'index'])->name('jam.index');
-                Route::get('/semester', [SemesterController::class, 'index'])->name('semester.index');
-            });
-
-            Route::prefix('kalender-akademik')->group(function () use ($ud) {
-                Route::get('/', $ud);
-                Route::get('/giat-khusus', [KegiatanKhususController::class, 'index'])->name('kegiatan-khusus.index');
-                Route::get('/giat-tahunan', [KegiatanTahunanController::class, 'index'])->name('kegiatan-tahunan.index');
-            });
-
-            Route::get('/jurusan', [JurusanController::class, 'index'])->name('jurusan.index');
-            Route::get('/mapel', [MapelController::class, 'index'])->name('mapel.index');
-            Route::get('/titik-absen', $ud);
-            Route::get('/role', [RoleController::class, 'index'])->name('role.index');
+        Route::prefix('jadwal')->group(function () use ($ud) {
+            Route::get('/', $ud)->middleware(['permission:konfigurasi.jadwal.view']);
+            Route::get('/hari', [HariController::class, 'index'])
+                ->middleware(['permission:konfigurasi.jadwal.view']);
+            Route::get('/jam', [JamController::class, 'index'])
+                ->middleware(['permission:konfigurasi.jadwal.view']);
+            Route::get('/semester', [SemesterController::class, 'index'])
+                ->middleware(['permission:konfigurasi.jadwal.view']);
         });
+
+        Route::prefix('kalender-akademik')->group(function () use ($ud) {
+            Route::get('/', $ud)
+                ->middleware(['permission:konfigurasi.kalender-akademik.view']);
+            Route::get('/giat-khusus', [KegiatanKhususController::class, 'index'])
+                ->middleware(['permission:konfigurasi.kalender-akademik.view']);
+            Route::get('/giat-tahunan', [KegiatanTahunanController::class, 'index'])
+                ->middleware(['permission:konfigurasi.kalender-akademik.view']);
+            });
+
+            Route::get('/jurusan', [JurusanController::class, 'index'])
+                ->middleware(['permission:konfigurasi.jurusan.view']);
+
+            Route::get('/mapel', [MapelController::class, 'index'])
+                ->middleware(['permission:konfigurasi.mapel.view']);
+
+            Route::get('/titik-absen', $ud)
+                ->middleware(['permission:konfigurasi.view']);
+
+            Route::get('/role', [RoleController::class, 'index'])
+                ->middleware(['permission:konfigurasi.role.view']);
+        });
+
     });
 
     // KEDISIPLINAN (sebelumnya cuma auth, sekarang pakai permission)

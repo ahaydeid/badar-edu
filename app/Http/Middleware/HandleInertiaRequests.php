@@ -48,8 +48,9 @@ class HandleInertiaRequests extends Middleware
                     'jam_tugas_tambahan' => $profile?->jam_tugas_tambahan,
                     'kompetensi' => $profile?->kompetensi,
                 ] : null,
+                'roles' => $request->user()?->getRoleNames(),
+                'permissions' => $user ? $user->getAllPermissions()->pluck('name')->toArray() : [],
             ],
-
 
         ];
     }

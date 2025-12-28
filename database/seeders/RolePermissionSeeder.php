@@ -10,7 +10,7 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $allPermissions = [
+        $permissions = [
             // Core
             'dashboard.view',
             'profile.view',
@@ -24,22 +24,18 @@ class RolePermissionSeeder extends Seeder
             'pengumuman.view',
             'pengumuman.manage',
 
-            // Akademik (granular)
+            // Akademik
             'jadwal-mapel.view',
             'absensi-siswa.view',
+            'nilai.view',
             'kelas-binaan.view',
             'kalender-akademik.view',
             'rencana-ajar.view',
             'lms-materi.view',
             'lms-tugas.view',
-
-            // Khusus admin (akademik)
             'jadwal-semua-kelas.view',
 
-            // Nilai
-            'nilai.view',
-
-            // Pengguna
+            // Pengguna / Akun
             'pengguna.view',
             'guru-pegawai.view',
             'siswa.view',
@@ -64,8 +60,10 @@ class RolePermissionSeeder extends Seeder
             'payroll.run',
             'payroll.slip',
 
+            // Kedisiplinan
+            'kedisiplinan.view',
+
             // Konfigurasi
-            'konfigurasi.view',
             'konfigurasi.jurusan.view',
             'konfigurasi.mapel.view',
             'konfigurasi.jadwal.view',
@@ -73,39 +71,36 @@ class RolePermissionSeeder extends Seeder
             'konfigurasi.role.view',
         ];
 
-        foreach ($allPermissions as $name) {
-            Permission::firstOrCreate(['name' => $name, 'guard_name' => 'web']);
+        foreach ($permissions as $name) {
+            Permission::firstOrCreate([
+                'name' => $name,
+                'guard_name' => 'web',
+            ]);
         }
 
         $superadmin = Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web']);
         $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $guru = Role::firstOrCreate(['name' => 'guru', 'guard_name' => 'web']);
 
-        $superadmin->syncPermissions(Permission::query()->pluck('name')->all());
+        // SUPERADMIN: semua permission
+        $superadmin->syncPermissions(Permission::pluck('name')->all());
 
+        // ADMIN
         $admin->syncPermissions([
-            // Akademik admin
+            'dashboard.view',
+            'profile.view',
+
+            'pengumuman.view',
+            'pengumuman.manage',
+
             'kalender-akademik.view',
             'jadwal-semua-kelas.view',
 
-            // PPDB
-            'ppdb.settings.view',
-            'ppdb.pendaftaran.view',
-            'ppdb.verifikasi.view',
-            'ppdb.daftarulang.view',
-
-            // Payroll
-            'payroll.view',
-            'payroll.run',
-            'payroll.slip',
-
-            // Pengguna
             'pengguna.view',
             'guru-pegawai.view',
             'siswa.view',
             'rfid.register.view',
 
-            // Master Data
             'master-data.view',
             'master-data.guru.view',
             'master-data.siswa.view',
@@ -113,8 +108,17 @@ class RolePermissionSeeder extends Seeder
             'master-data.rombel.view',
             'master-data.alumni.view',
 
-            // Konfigurasi
-            'konfigurasi.view',
+            'ppdb.settings.view',
+            'ppdb.pendaftaran.view',
+            'ppdb.verifikasi.view',
+            'ppdb.daftarulang.view',
+
+            'payroll.view',
+            'payroll.run',
+            'payroll.slip',
+
+            'kedisiplinan.view',
+
             'konfigurasi.jurusan.view',
             'konfigurasi.mapel.view',
             'konfigurasi.jadwal.view',
@@ -122,7 +126,11 @@ class RolePermissionSeeder extends Seeder
             'konfigurasi.role.view',
         ]);
 
+        // GURU
         $guru->syncPermissions([
+            'dashboard.view',
+            'profile.view',
+
             'jadwal-mapel.view',
             'absensi-siswa.view',
             'kelas-binaan.view',
@@ -131,8 +139,15 @@ class RolePermissionSeeder extends Seeder
             'lms-materi.view',
             'lms-tugas.view',
 
-            // Nilai
             'nilai.view',
         ]);
+
+        // Assign role contoh (opsional)
+        if ($user = \App\Models\User::find(1)) {
+            $user->assignRole('superadmin');
+        }
+        if ($user = \App\Models\User::find(2)) {
+            $user->assignRole('guru');
+        }
     }
 }

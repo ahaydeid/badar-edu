@@ -1,8 +1,9 @@
 import { Link, usePage } from "@inertiajs/react";
-import { Bell, UserCircle } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useState } from "react";
 import PengumumanModal from "./PengumumanModal";
 import PengumumanList from "./PengumumanList";
+import Avatar from "./Avatar";
 
 export default function Topbar() {
     const { auth, topAnnouncements = [] } = usePage<any>().props;
@@ -71,18 +72,11 @@ export default function Topbar() {
                                 : ""}
                         </span>
 
-                        {user?.foto ? (
-                            <img
-                                src={
-                                    user.foto.startsWith("http")
-                                        ? user.foto
-                                        : `/storage/${user.foto}`
-                                }
-                                className="w-7 h-7 rounded-full object-cover"
-                            />
-                        ) : (
-                            <UserCircle className="w-7 h-7 text-gray-700" />
-                        )}
+                        <Avatar
+                            name={user?.nama}
+                            photo={user?.foto}
+                            size="small"
+                        />
                     </Link>
                 </div>
             </header>

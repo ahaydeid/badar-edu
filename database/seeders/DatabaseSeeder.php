@@ -28,10 +28,7 @@ class DatabaseSeeder extends Seeder
 
             // AUTH & RBAC
             UsersSeeder::class,
-            RolesSeeder::class,
-            PermissionsSeeder::class,
-            PermissionRoleSeeder::class,
-            RoleUserSeeder::class,
+            RolePermissionSeeder::class,
             RfidCardSeeder::class,
 
             // PAYROLL

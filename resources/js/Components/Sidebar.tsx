@@ -14,11 +14,20 @@ export default function Sidebar({ isOpen, onToggle }) {
     const { url } = usePage();
     const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
 
-    const permissions: string[] = [];
+    // const permissions: string[] = [];
+    const { auth } = usePage().props as any;
+    const permissions: string[] = auth?.permissions ?? [];
 
+    // const hasPermission = (permission?: string) => {
+    //     if (!permission) return true;
+    //     if (!permissions || permissions.length === 0) return true;
+    //     return permissions.includes(permission);
+    // };
     const hasPermission = (permission?: string) => {
         if (!permission) return true;
-        if (!permissions || permissions.length === 0) return true;
+
+        if (auth?.roles?.includes("superadmin")) return true;
+
         return permissions.includes(permission);
     };
 

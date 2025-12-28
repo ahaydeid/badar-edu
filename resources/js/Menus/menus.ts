@@ -99,56 +99,68 @@ export const panelMenu: MenuItem[] = [
                 name: "Jadwal",
                 icon: Calendar,
                 path: "/jadwal-mapel",
-                permission: "jadwal.view",
+                permission: "jadwal-mapel.view",
             },
             {
                 name: "Absensi Siswa",
                 icon: ClipboardList,
                 path: "/absensi-siswa",
-                permission: "absen.siswa.view",
+                permission: "absensi-siswa.view",
             },
             {
                 name: "Nilai Siswa",
                 icon: BarChart3,
                 path: "/penilaian",
-                permission: "absen.siswa.view",
+                permission: "nilai.view",
             },
-
             {
                 name: "Kelas Binaan",
                 icon: GraduationCap,
                 path: "/kelas-binaan",
-                permission: "kelas_binaan.view",
+                permission: "kelas-binaan.view",
                 children: [
                     {
                         name: "Jadwal Kelas",
                         path: "/kelas-binaan/jadwal-kelas",
+                        permission: "kelas-binaan.view",
                     },
                     {
                         name: "Absensi Siswa",
                         path: "/kelas-binaan/absensi-siswa",
+                        permission: "kelas-binaan.view",
                     },
                     {
                         name: "Progres Siswa",
                         path: "/kelas-binaan/progres-siswa",
+                        permission: "kelas-binaan.view",
                     },
-                    { name: "Data Siswa", path: "/kelas-binaan/data-siswa" },
-                    { name: "Rapor Siswa", path: "/kelas-binaan/rapor-siswa" },
+                    {
+                        name: "Data Siswa",
+                        path: "/kelas-binaan/data-siswa",
+                        permission: "kelas-binaan.view",
+                    },
+                    {
+                        name: "Rapor Siswa",
+                        path: "/kelas-binaan/rapor-siswa",
+                        permission: "kelas-binaan.view",
+                    },
                 ],
             },
             {
                 name: "Rencana Ajar",
                 icon: Upload,
                 path: "/rencana-ajar",
-                permission: "modul.view",
+                permission: "rencana-ajar.view",
                 children: [
                     {
                         name: "Modul Ajar",
                         path: "/rencana-ajar/modul",
+                        permission: "rencana-ajar.view",
                     },
                     {
                         name: "Silabus",
                         path: "/rencana-ajar/silabus",
+                        permission: "rencana-ajar.view",
                     },
                 ],
             },
@@ -156,14 +168,13 @@ export const panelMenu: MenuItem[] = [
                 name: "Jadwal Kelas",
                 icon: CalendarClock,
                 path: "/jadwal-semua-kelas",
-                permission: "kalender.view",
+                permission: "jadwal-semua-kelas.view",
             },
-
             {
                 name: "Kalender Akademik",
                 icon: CalendarDays,
                 path: "/kalender-akademik",
-                permission: "kalender.view",
+                permission: "kalender-akademik.view",
             },
         ],
     },
