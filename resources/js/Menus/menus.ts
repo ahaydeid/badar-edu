@@ -16,17 +16,12 @@ import {
     Megaphone,
     Settings,
     CalendarClock,
-    Loader2Icon,
-    Loader2,
-    Loader,
-    LoaderPinwheelIcon,
     Users,
-    FileCheck,
     ShieldCheck,
     AlertTriangle,
-    MessageSquareHeart,
     FileWarning,
-    UsersRound,
+    Radio,
+    BarChart3,
 } from "lucide-react";
 
 export type MenuItem = {
@@ -37,6 +32,7 @@ export type MenuItem = {
     permission?: string;
     children?: MenuItem[];
     spin?: boolean;
+    live?: boolean;
 };
 
 export const panelMenu: MenuItem[] = [
@@ -63,8 +59,9 @@ export const panelMenu: MenuItem[] = [
         children: [
             {
                 name: "Kelas Berlangsung",
-                icon: Loader,
-                spin: true,
+                icon: Radio,
+                spin: false,
+                live: true,
                 path: "/kelas-berlangsung",
                 permission: "kelas-berlangsung.view",
             },
@@ -105,9 +102,15 @@ export const panelMenu: MenuItem[] = [
                 permission: "jadwal.view",
             },
             {
-                name: "Absen Siswa",
+                name: "Absensi Siswa",
                 icon: ClipboardList,
                 path: "/absensi-siswa",
+                permission: "absen.siswa.view",
+            },
+            {
+                name: "Nilai Siswa",
+                icon: BarChart3,
+                path: "/penilaian",
                 permission: "absen.siswa.view",
             },
 
@@ -121,20 +124,31 @@ export const panelMenu: MenuItem[] = [
                         name: "Jadwal Kelas",
                         path: "/kelas-binaan/jadwal-kelas",
                     },
-                    { name: "Absensi Kelas", path: "/kelas-binaan/absensi" },
+                    {
+                        name: "Absensi Siswa",
+                        path: "/kelas-binaan/absensi-siswa",
+                    },
+                    {
+                        name: "Progres Siswa",
+                        path: "/kelas-binaan/progres-siswa",
+                    },
                     { name: "Data Siswa", path: "/kelas-binaan/data-siswa" },
                     { name: "Rapor Siswa", path: "/kelas-binaan/rapor-siswa" },
                 ],
             },
             {
-                name: "Modul Ajar",
+                name: "Rencana Ajar",
                 icon: Upload,
-                path: "/modul-ajar",
+                path: "/rencana-ajar",
                 permission: "modul.view",
                 children: [
                     {
-                        name: "Upload Modul Ajar",
-                        path: "/modul-ajar/upload",
+                        name: "Modul Ajar",
+                        path: "/rencana-ajar/modul",
+                    },
+                    {
+                        name: "Silabus",
+                        path: "/rencana-ajar/silabus",
                     },
                 ],
             },
@@ -217,7 +231,6 @@ export const panelMenu: MenuItem[] = [
             },
         ],
     },
-
     // ================================================================
     // SECTION: PPDB
     // ================================================================
@@ -225,46 +238,28 @@ export const panelMenu: MenuItem[] = [
         section: "PPDB",
         children: [
             {
-                name: "Pendaftaran",
-                icon: ClipboardList,
-                path: "/ppdb/pendaftaran",
-                permission: "ppdb.pendaftaran.view",
-            },
-            {
-                name: "Data Pendaftar",
-                icon: Users,
-                path: "/ppdb/pendaftar",
-                permission: "ppdb.pendaftar.view",
-            },
-            {
-                name: "Verifikasi Berkas",
-                icon: FileCheck,
-                path: "/ppdb/verifikasi-berkas",
-                permission: "ppdb.verifikasi.view",
-            },
-            {
-                name: "Seleksi & Penilaian",
-                icon: ClipboardCheck,
-                path: "/ppdb/seleksi",
-                permission: "ppdb.seleksi.view",
-            },
-            {
-                name: "Pengumuman",
-                icon: Megaphone,
-                path: "/ppdb/pengumuman-kelulusan",
-                permission: "ppdb.pengumuman.view",
-            },
-            {
-                name: "Daftar Ulang",
-                icon: Layers,
-                path: "/ppdb/penempatan-rombel",
-                permission: "ppdb.daftarulang.view",
-            },
-            {
                 name: "Pengaturan PPDB",
                 icon: Settings,
                 path: "/ppdb/pengaturan",
                 permission: "ppdb.settings.view",
+            },
+            {
+                name: "Pendaftaran Masuk",
+                icon: Users,
+                path: "/ppdb/pendaftaran",
+                permission: "ppdb.pendaftaran.view",
+            },
+            {
+                name: "Verifikasi & Seleksi",
+                icon: ClipboardCheck,
+                path: "/ppdb/verifikasi",
+                permission: "ppdb.verifikasi.view",
+            },
+            {
+                name: "Daftar Ulang",
+                icon: Layers,
+                path: "/ppdb/daftar-ulang",
+                permission: "ppdb.daftarulang.view",
             },
         ],
     },
@@ -298,7 +293,19 @@ export const panelMenu: MenuItem[] = [
                 name: "Akun",
                 icon: Users2,
                 path: "/akun",
-                permission: "akun.view",
+                permission: "",
+                children: [
+                    {
+                        name: "Guru & Pegawai",
+                        path: "/akun/guru-pegawai",
+                        permission: "guru-pegawai.view",
+                    },
+                    {
+                        name: "Siswa",
+                        path: "/akun/siswa",
+                        permission: "siswa.view",
+                    },
+                ],
             },
             {
                 name: "Registrasi Kartu",

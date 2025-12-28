@@ -8,4 +8,5 @@ export type MenuItem = {
     permission?: string;
     children?: MenuItem[];
     spin?: boolean;
+    live?: boolean;
 };

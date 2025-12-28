@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('guru', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_guru')->unique();
             $table->string('nama');
             $table->string('foto')->nullable();
             $table->string('nuptk')->nullable();
@@ -34,6 +35,7 @@ return new class extends Migration
             $table->text('kompetensi')->nullable();
             $table->timestamps();
         });
+
     }
 
     public function down(): void

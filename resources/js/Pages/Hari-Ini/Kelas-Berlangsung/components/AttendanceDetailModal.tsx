@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-type AttendanceRow = {
+export type AttendanceRow = {
     id: number;
     nama: string;
     jamMasuk: string;
@@ -12,33 +12,15 @@ type Props = {
     open: boolean;
     onClose: () => void;
     kelas: string;
+    data: AttendanceRow[];
 };
 
-const dummyData: AttendanceRow[] = [
-    {
-        id: 1,
-        nama: "Ahmad Fauzi",
-        jamMasuk: "07:00",
-        jamPulang: "14:00",
-        status: "Hadir",
-    },
-    {
-        id: 2,
-        nama: "Siti Aisyah",
-        jamMasuk: "07:15",
-        jamPulang: "14:00",
-        status: "Terlambat",
-    },
-    {
-        id: 3,
-        nama: "Budi Santoso",
-        jamMasuk: "-",
-        jamPulang: "-",
-        status: "Alfa",
-    },
-];
-
-export default function AttendanceDetailModal({ open, onClose, kelas }: Props) {
+export default function AttendanceDetailModal({
+    open,
+    onClose,
+    kelas,
+    data,
+}: Props) {
     if (!open) return null;
 
     return (
@@ -55,7 +37,8 @@ export default function AttendanceDetailModal({ open, onClose, kelas }: Props) {
                     {/* Header */}
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold text-slate-800">
-                             Detail Kehadiran <span className="text-sky-600">{kelas}</span> 
+                            Detail Kehadiran{" "}
+                            <span className="text-sky-600">{kelas}</span>
                         </h2>
                     </div>
 
@@ -76,29 +59,42 @@ export default function AttendanceDetailModal({ open, onClose, kelas }: Props) {
                                     <th className="border border-white bg-sky-100 px-3 py-2">
                                         Jam Pulang
                                     </th>
-                                    <th className="border border-white bg-sky-100 px-3 py-2">Status</th>
+                                    <th className="border border-white bg-sky-100 px-3 py-2">
+                                        Status
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {dummyData.map((row, i) => (
-                                    <tr key={row.id}>
-                                        <td className="border border-gray-100 px-3 py-2 text-center">
-                                            {i + 1}
-                                        </td>
-                                        <td className="border border-gray-100 px-3 py-2">
-                                            {row.nama}
-                                        </td>
-                                        <td className="border border-gray-100 px-3 py-2 text-center">
-                                            {row.jamMasuk}
-                                        </td>
-                                        <td className="border border-gray-100 px-3 py-2 text-center">
-                                            {row.jamPulang}
-                                        </td>
-                                        <td className="border border-gray-100 px-3 py-2 text-center font-medium">
-                                            {row.status}
+                                {data.length === 0 ? (
+                                    <tr>
+                                        <td
+                                            colSpan={5}
+                                            className="text-center py-6 text-gray-400"
+                                        >
+                                            Tidak ada data
                                         </td>
                                     </tr>
-                                ))}
+                                ) : (
+                                    data.map((row, i) => (
+                                        <tr key={row.id}>
+                                            <td className="border border-gray-100 px-3 py-2 text-center">
+                                                {i + 1}
+                                            </td>
+                                            <td className="border border-gray-100 px-3 py-2">
+                                                {row.nama}
+                                            </td>
+                                            <td className="border border-gray-100 px-3 py-2 text-center">
+                                                {row.jamMasuk}
+                                            </td>
+                                            <td className="border border-gray-100 px-3 py-2 text-center">
+                                                {row.jamPulang}
+                                            </td>
+                                            <td className="border border-gray-100 px-3 py-2 text-center font-medium">
+                                                {row.status}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
                     </div>

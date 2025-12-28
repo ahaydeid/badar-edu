@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent } from "react";
-import LokasiAbsenModal from "./LokasiAbsenModal";
+import LokasiAbsenModal from "./components/LokasiAbsenModal";
 import { usePage } from "@inertiajs/react";
 import { MapPin } from "lucide-react";
 

@@ -4,8 +4,9 @@ import { useState } from "react";
 import PengumumanModal from "./PengumumanModal";
 import PengumumanList from "./PengumumanList";
 
-export default function Topbar({ role = "Admin", name = "Ahadi" }) {
-    const { topAnnouncements = [] } = usePage<any>().props;
+export default function Topbar() {
+    const { auth, topAnnouncements = [] } = usePage<any>().props;
+    const user = auth?.user;
 
     const [openList, setOpenList] = useState(false);
     const [active, setActive] = useState<any>(null);
@@ -17,11 +18,6 @@ export default function Topbar({ role = "Admin", name = "Ahadi" }) {
             <header className="w-full h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
                 {/* kiri */}
                 <div className="flex items-center gap-3">
-                    {/* <img
-                        src="/img/logo-albadar.png"
-                        alt="Logo Al Badar"
-                        className="w-9 h-9 object-contain"
-                    /> */}
                     <div className="flex flex-col leading-tight">
                         <span className="text-lg font-semibold text-gray-600">
                             SMKS Al Badar Balaraja
@@ -32,6 +28,7 @@ export default function Topbar({ role = "Admin", name = "Ahadi" }) {
                         </span>
                     </div>
                 </div>
+
                 {/* kanan */}
                 <div className="flex items-center gap-4 relative">
                     <button
@@ -51,7 +48,6 @@ export default function Topbar({ role = "Admin", name = "Ahadi" }) {
                             <div className="px-4 py-3 border-b border-gray-200 font-semibold text-sky-600 text-center">
                                 Pengumuman
                             </div>
-
                             <div className="max-h-100 overflow-y-auto">
                                 <PengumumanList
                                     items={topAnnouncements}
@@ -69,14 +65,28 @@ export default function Topbar({ role = "Admin", name = "Ahadi" }) {
                         className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded"
                     >
                         <span className="text-sm text-gray-700">
-                           {name}
+                            {user?.nama}
+                            {user?.gelar_belakang
+                                ? `, ${user.gelar_belakang}`
+                                : ""}
                         </span>
-                        <UserCircle className="w-6 h-6 text-gray-700" />
+
+                        {user?.foto ? (
+                            <img
+                                src={
+                                    user.foto.startsWith("http")
+                                        ? user.foto
+                                        : `/storage/${user.foto}`
+                                }
+                                className="w-7 h-7 rounded-full object-cover"
+                            />
+                        ) : (
+                            <UserCircle className="w-7 h-7 text-gray-700" />
+                        )}
                     </Link>
                 </div>
             </header>
 
-            {/* MODAL DI LUAR TOPBAR */}
             <PengumumanModal
                 open={!!active}
                 data={active}

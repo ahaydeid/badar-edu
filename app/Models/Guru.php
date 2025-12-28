@@ -9,6 +9,7 @@ class Guru extends Model
     protected $table = 'guru';
 
     protected $fillable = [
+        'kode_guru',
         'nama',
         'foto',
         'nuptk',
@@ -32,6 +33,7 @@ class Guru extends Model
         'total_jjm',
         'kompetensi',
     ];
+
 
 
     public function absensi()

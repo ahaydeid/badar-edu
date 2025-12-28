@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HariIni;
 
+use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
 use App\Models\Semester;
 use Carbon\Carbon;

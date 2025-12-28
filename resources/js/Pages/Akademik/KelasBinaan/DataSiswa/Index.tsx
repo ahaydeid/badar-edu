@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { usePage, Link } from "@inertiajs/react";
-import { ChevronLeft, ChevronRight, Eye, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, User } from "lucide-react";
+import ModalFoto from "./components/ModalFoto";
 
 export default function Index() {
     const { siswa, kelas } = usePage<any>().props;
@@ -8,6 +9,10 @@ export default function Index() {
     const [searchTerm, setSearchTerm] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useState(1);
+
+    const [openFoto, setOpenFoto] = useState(false);
+    const [fotoAktif, setFotoAktif] = useState<string | null>(null);
+    const [namaAktif, setNamaAktif] = useState<string | null>(null);
 
     const filtered = useMemo(() => {
         const q = searchTerm.toLowerCase();
@@ -58,7 +63,6 @@ export default function Index() {
                     </div>
                 </div>
             </div>
-
             {/* TABLE */}
             <div className="rounded border border-gray-200 bg-white">
                 <div className="w-full overflow-x-auto">
@@ -70,7 +74,9 @@ export default function Index() {
                                 <th className="p-3 text-center">JK</th>
                                 <th className="p-3 text-center">NIPD</th>
                                 <th className="p-3 text-center">NISN</th>
-                                <th className="p-3 text-center">Status Kedisiplinan</th>
+                                <th className="p-3 text-center">
+                                    Status Kedisiplinan
+                                </th>
                                 <th className="p-3 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -91,9 +97,39 @@ export default function Index() {
                                         <td className="p-3 text-center">
                                             {s.no}
                                         </td>
-                                        <td className="p-3 font-medium">
-                                            {s.nama}
+                                        <td className="p-3">
+                                            <div className="flex items-center gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFotoAktif(
+                                                            s.foto ?? null
+                                                        );
+                                                        setNamaAktif(
+                                                            s.nama ?? null
+                                                        );
+                                                        setOpenFoto(true);
+                                                    }}
+                                                    className="w-8 h-8 rounded-full bg-gray-200 cursor-pointer overflow-hidden shrink-0 flex items-center justify-center hover:ring-2 hover:ring-sky-400"
+                                                    title="Lihat foto"
+                                                >
+                                                    {s.foto ? (
+                                                        <img
+                                                            src={`/storage/${s.foto}`}
+                                                            alt={s.nama}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <User className="w-4 h-4 text-gray-500" />
+                                                    )}
+                                                </button>
+
+                                                <span className="font-medium">
+                                                    {s.nama}
+                                                </span>
+                                            </div>
                                         </td>
+
                                         <td className="p-3 text-center">
                                             {s.jenis_kelamin}
                                         </td>
@@ -124,7 +160,6 @@ export default function Index() {
                     </table>
                 </div>
             </div>
-
             {/* PAGINATION */}
             <div className="flex justify-end items-center gap-3">
                 <button
@@ -147,6 +182,13 @@ export default function Index() {
                     <ChevronRight className="h-4 w-4" />
                 </button>
             </div>
+            <ModalFoto
+                open={openFoto}
+                foto={fotoAktif}
+                nama={namaAktif}
+                onClose={() => setOpenFoto(false)}
+            />
+            ;
         </div>
     );
 }

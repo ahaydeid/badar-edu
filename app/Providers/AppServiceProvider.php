@@ -21,24 +21,26 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
    public function boot(): void
-{
-    Inertia::share([
-        'auth' => [
-            'user' => fn () => Auth::user(),
-            'menus' => fn () => \App\Support\MenuBuilder::build(),
-        ],
+    {
+        Inertia::share([
+            'auth' => [
+                'user' => fn () => Auth::user(),
+                'menus' => fn () => \App\Support\MenuBuilder::build(),
+            ],
 
-        'topAnnouncements' => fn () =>
-            Pengumuman::query()
-                ->orderByDesc('tanggal_mulai')
-                ->limit(10)
-                ->get([
-                    'id',
-                    'judul',
-                    'isi',
-                    'tanggal_mulai',
-                    'is_active',
-                ]),
-    ]);
-}
+            'topAnnouncements' => fn () =>
+                Pengumuman::query()
+                    ->orderByDesc('tanggal_mulai')
+                    ->limit(10)
+                    ->get([
+                        'id',
+                        'judul',
+                        'isi',
+                        'tanggal_mulai',
+                        'is_active',
+                    ]),
+        ]);
+    }
+
+    
 }

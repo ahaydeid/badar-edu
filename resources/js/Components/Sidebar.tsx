@@ -100,10 +100,21 @@ export default function Sidebar({ isOpen, onToggle }) {
 
             // WRAPPER ICON FIXED → size konsisten
             const renderIcon = Icon ? (
-                <div className="size-5 shrink-0 flex items-center justify-center">
+                <div className="relative size-5 shrink-0 flex items-center justify-center">
                     <Icon
                         className={`size-5 ${item.spin ? "animate-spin" : ""}`}
                     />
+
+                    {item.live && (
+                        <span className="absolute -top-1 -right-1">
+                            <span className="relative flex h-3 w-3">
+                                <span className="absolute inset-0 animate-ping rounded-full bg-red-500 opacity-75" />
+                                <span className="absolute inset-0 flex items-center justify-center">
+                                    <span className="h-2 w-2 rounded-full bg-red-500" />
+                                </span>
+                            </span>
+                        </span>
+                    )}
                 </div>
             ) : null;
 

@@ -22,11 +22,11 @@ class DataSiswaController extends Controller
             ->get([
                 'id',
                 'nama',
+                'foto',
                 'jenis_kelamin',
                 'nipd',
                 'nisn',
             ]);
-
         return Inertia::render('Akademik/KelasBinaan/DataSiswa/Index', [
             'kelas' => [
                 'id'   => $kelas->id,

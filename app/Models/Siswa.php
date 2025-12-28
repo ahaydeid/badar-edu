@@ -71,20 +71,19 @@ class Siswa extends Model
         'jarak_rumah_ke_sekolah_km',
     ];
 
-    /**
-     * Relasi ke orang tua / wali siswa
-     */
     public function wali()
     {
         return $this->hasMany(WaliSiswa::class, 'siswa_id');
     }
 
-    /**
-     * Relasi rombel (kelas saat ini)
-     * FK: siswa.rombel_saat_ini → kelas.id
-     */
+
     public function rombel()
     {
         return $this->belongsTo(Kelas::class, 'rombel_saat_ini');
     }
+    public function absenHarian()
+{
+    return $this->hasMany(AbsenHarianSiswa::class, 'siswa_id');
+}
+
 }

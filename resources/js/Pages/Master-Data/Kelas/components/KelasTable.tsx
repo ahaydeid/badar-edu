@@ -1,5 +1,10 @@
 import { Link } from "@inertiajs/react";
-import { Plus, ChevronLeft, ChevronRight, Eye, Pencil } from "lucide-react";
+import {
+    Plus,
+    ChevronLeft,
+    ChevronRight,
+    Settings2,
+} from "lucide-react";
 
 type Props = {
     data: any[];
@@ -40,7 +45,7 @@ export default function KelasTable({
 
                 <div className="flex items-center justify-between gap-4">
                     <h1 className="text-xl font-semibold text-gray-800">
-                        Master Rombel (Kelas)
+                        Master Kelas (Rombel)
                     </h1>
 
                     <div className="flex text-sm items-center gap-3">
@@ -77,6 +82,7 @@ export default function KelasTable({
                                 <th className="p-3">Nama</th>
                                 <th className="p-3 text-center">Tingkat</th>
                                 <th className="p-3">Jurusan</th>
+                                <th className="p-3">Jumlah Siswa</th>
                                 <th className="p-3">Wali Kelas</th>
                                 <th className="p-3 text-center">Aksi</th>
                             </tr>
@@ -107,6 +113,10 @@ export default function KelasTable({
                                         <td className="p-3">
                                             {k.jurusan?.nama}
                                         </td>
+                                        <td className="p-3 text-center font-bold">
+                                            {k.jumlah_siswa}
+                                        </td>
+
                                         <td className="p-3">
                                             {k.wali ? k.wali.nama : "-"}
                                         </td>
@@ -116,16 +126,8 @@ export default function KelasTable({
                                                     href={`/rombel/${k.id}`}
                                                     className="px-3 py-2 bg-sky-500 text-white rounded-md text-xs flex items-center gap-1"
                                                 >
-                                                    <Eye className="w-4 h-4" />
-                                                    Detail
-                                                </Link>
-
-                                                <Link
-                                                    href={`/rombel/${k.id}/edit`}
-                                                    className="px-3 py-2 bg-amber-500 text-white rounded-md text-xs flex items-center gap-1"
-                                                >
-                                                    <Pencil className="w-4 h-4" />
-                                                    Edit
+                                                    <Settings2 className="w-4 h-4" />
+                                                    Kelola
                                                 </Link>
                                             </div>
                                         </td>

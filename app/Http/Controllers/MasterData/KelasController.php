@@ -15,6 +15,9 @@ class KelasController extends Controller
                 'jurusan:id,nama',
                 'wali:id,nama',
             ])
+            ->withCount([
+                'siswa as jumlah_siswa'
+            ])
             ->orderBy('tingkat')
             ->orderBy('nama')
             ->get(),
