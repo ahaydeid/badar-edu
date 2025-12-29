@@ -19,15 +19,36 @@ function Login() {
 
     return (
         <>
-            <div className="min-h-screen flex flex-col items-center justify-between pt-18">
-                <div className="w-[880px] h-[520px] bg-white rounded-xl shadow-lg overflow-hidden grid grid-cols-2">
+            <div className="min-h-screen flex flex-col items-center justify-between px-4 py-8">
+                <div
+                    className="
+                    w-full
+                    max-w-[880px]
+                    bg-white
+                    rounded-xl
+                    shadow-lg
+                    overflow-hidden
+                    grid
+                    grid-cols-1
+                    md:grid-cols-2
+                    md:h-[520px]
+                "
+                >
                     <div
-                        className="flex items-center justify-center bg-purple-200 bg-no-repeat bg-center bg-cover"
+                        className="
+                            hidden
+                            md:flex
+                            items-center
+                            justify-center
+                            bg-purple-200
+                            bg-no-repeat
+                            bg-center
+                            bg-cover
+                        "
                         style={{ backgroundImage: "url('/img/bg-login.webp')" }}
                     />
 
-                    {/* RIGHT PANEL (FORM) */}
-                    <div className="px-14 flex flex-col justify-center">
+                    <div className="px-6 md:px-14 flex flex-col justify-center py-10 md:py-0">
                         <h1 className="text-2xl font-semibold text-purple-700 mb-2">
                             <span className="text-gray-700">Badar</span>{" "}
                             Education
@@ -116,7 +137,8 @@ function Login() {
                         </form>
                     </div>
                 </div>
-                <footer className="text-center text-xs text-gray-400">
+
+                <footer className="text-center text-xs text-gray-400 mt-6">
                     Created By{" "}
                     <a
                         href="https://ahadi.my.id"
