@@ -6,15 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\Siswa;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class DataSiswaController extends Controller
 {
     public function index()
     {
-        // ASUMSI LOGIN SEMENTARA
-        $guruId = 17;
+        $guruId = Auth::user()->profile_id;
 
-        // Ambil kelas binaan wali
+        // Ambil kelas binaan wali sesuai guru login
         $kelas = Kelas::where('wali_guru_id', $guruId)->firstOrFail();
 
         $siswa = Siswa::where('rombel_saat_ini', $kelas->id)
@@ -27,6 +27,7 @@ class DataSiswaController extends Controller
                 'nipd',
                 'nisn',
             ]);
+
         return Inertia::render('Akademik/KelasBinaan/DataSiswa/Index', [
             'kelas' => [
                 'id'   => $kelas->id,

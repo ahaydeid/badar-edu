@@ -91,7 +91,7 @@ export default function DashboardSekolah() {
 
     return (
         <>
-            <Head title="Dashboard" />
+            <Head title="Dashboard - BADU Suites | Badar Education" />
 
             <div className="space-y-6">
                 {/* Top Cards */}

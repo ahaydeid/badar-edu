@@ -1,18 +1,31 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\GuruMapel;
 
+use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
 use App\Models\Hari;
 use App\Models\Semester;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class JadwalGuruController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $guruId = 3;
+        // AMBIL USER LOGIN
+        $user = $request->user();
+
+        // AMBIL GURU DARI POLYMORPHIC PROFILE
+        if (!$user || $user->profile_type !== 'App\\Models\\Guru' || !$user->profile_id) {
+            return Inertia::render('Akademik/JadwalMapel/Index', [
+                'days' => [],
+                'jadwals' => [],
+            ]);
+        }
+
+        $guruId = $user->profile_id;
 
         $today = Carbon::today();
 
@@ -27,14 +40,14 @@ class JadwalGuruController extends Controller
             ]);
         }
 
-        $rawJadwals = Jadwal::with(['kelas','jam'])
+        $rawJadwals = Jadwal::with(['kelas', 'jam'])
             ->where('guru_id', $guruId)
             ->where('semester_id', $semesterId)
             ->get();
 
         $jadwals = $rawJadwals
             ->filter(fn ($j) => $j->hari_id && $j->kelas_id && $j->mapel_id)
-            ->groupBy(fn ($j) => $j->hari_id.'-'.$j->kelas_id.'-'.$j->mapel_id)
+            ->groupBy(fn ($j) => $j->hari_id . '-' . $j->kelas_id . '-' . $j->mapel_id)
             ->map(function ($group) {
                 $first = $group->first();
 
@@ -61,7 +74,7 @@ class JadwalGuruController extends Controller
         $days = Hari::orderBy('hari_ke')
             ->whereIn('id', $hariIds)
             ->where('nama', '!=', 'Minggu')
-            ->get(['id','nama'])
+            ->get(['id', 'nama'])
             ->toArray();
 
         return Inertia::render('Akademik/JadwalMapel/Index', [

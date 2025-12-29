@@ -7,17 +7,45 @@ use App\Models\Jadwal;
 use App\Models\Kelas;
 use App\Models\Semester;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class JadwalKelasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $guruId = 17;
+        // AMBIL USER LOGIN
+        $user = $request->user();
 
+        // VALIDASI: HARUS GURU
+        if (!$user || $user->profile_type !== 'App\\Models\\Guru' || !$user->profile_id) {
+            return Inertia::render(
+                'Akademik/KelasBinaan/JadwalKelas/Index',
+                [
+                    'jadwal' => [],
+                    'kelas'  => '-',
+                    'wali'   => '-',
+                ]
+            );
+        }
+
+        $guruId = $user->profile_id;
+
+        // AMBIL KELAS BINAAN BERDASARKAN WALI GURU LOGIN
         $kelas = Kelas::with('wali')
             ->where('wali_guru_id', $guruId)
-            ->firstOrFail();
+            ->first();
+
+        if (!$kelas) {
+            return Inertia::render(
+                'Akademik/KelasBinaan/JadwalKelas/Index',
+                [
+                    'jadwal' => [],
+                    'kelas'  => '-',
+                    'wali'   => '-',
+                ]
+            );
+        }
 
         $today = Carbon::today();
 

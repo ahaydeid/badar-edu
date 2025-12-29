@@ -46,7 +46,7 @@ export default function Index({ users }) {
                                                 {u.roles.map((r) => (
                                                     <span
                                                         key={r.name}
-                                                        className="px-3 py-1 text-xs bg-sky-600 text-white"
+                                                        className="px-3 py-1 text-xs bg-gray-50 rounded-full text-gray-700 border border-gray-400"
                                                     >
                                                         {r.name}
                                                     </span>

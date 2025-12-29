@@ -22,13 +22,13 @@ use App\Http\Controllers\HariIni\KelasBerlangsungController;
 // Guru Mapel
 use App\Http\Controllers\GuruMapel\AbsensiSiswaController;
 use App\Http\Controllers\GuruMapel\PenilaianController;
+use App\Http\Controllers\GuruMapel\JadwalGuruController;
 
 // Kelas Binaan
 use App\Http\Controllers\KelasBinaan\JadwalKelasController;
 use App\Http\Controllers\KelasBinaan\DataSiswaController;
 use App\Http\Controllers\KelasBinaan\AbsensiKelasController;
 
-use App\Http\Controllers\JadwalGuruController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\KalendarAkademikController;
@@ -115,8 +115,6 @@ Route::middleware(['auth'])->group(function () use ($ud) {
             ->name('pengumuman.destroy');
     });
 
-    // AKADEMIK UMUM (payung absen.siswa.view)
-    // AKADEMIK + ABSENSI SISWA + KELAS BINAAN + LMS + RENCANA AJAR (dipisah permission per domain)
     Route::get('/jadwal-mapel', [JadwalGuruController::class, 'index'])
         ->middleware(['permission:jadwal-mapel.view']);
 
@@ -126,15 +124,23 @@ Route::middleware(['auth'])->group(function () use ($ud) {
         Route::get('/detail/{jadwal}/{siswa}', [AbsensiSiswaController::class, 'detail'])->name('absensi-siswa.detail');
     });
 
-    Route::prefix('kelas-binaan')->middleware(['permission:kelas-binaan.view'])->group(function () use ($ud) {
-        Route::get('/jadwal-kelas', [JadwalKelasController::class, 'index']);
-        Route::get('/absensi-siswa', [AbsensiKelasController::class, 'index']);
-        Route::get('/absensi-siswa/detail/{siswa}', [AbsensiKelasController::class, 'detail']);
-        Route::get('/progres-siswa', $ud);
-        Route::get('/data-siswa', [DataSiswaController::class, 'index']);
-        Route::get('/siswa/{id}', [SiswaController::class, 'show']);
-        Route::get('/rapor-siswa', $ud);
+    Route::prefix('kelas-binaan')->group(function () use ($ud) {
+        Route::get('/jadwal-kelas', [JadwalKelasController::class, 'index'])
+            ->middleware('permission:kelas-binaan.jadwal.view');
+        Route::get('/absensi-siswa', [AbsensiKelasController::class, 'index'])
+            ->middleware('permission:kelas-binaan.absensi.view');
+        Route::get('/absensi-siswa/detail/{siswa}', [AbsensiKelasController::class, 'detail'])
+            ->middleware('permission:kelas-binaan.absensi.detail');
+        Route::get('/progres-siswa', $ud)
+            ->middleware('permission:kelas-binaan.progres.view');
+        Route::get('/data-siswa', [DataSiswaController::class, 'index'])
+            ->middleware('permission:kelas-binaan.siswa.view');
+        Route::get('/siswa/{id}', [SiswaController::class, 'show'])
+            ->middleware('permission:kelas-binaan.siswa.detail');
+        Route::get('/rapor-siswa', $ud)
+            ->middleware('permission:kelas-binaan.rapor.view');
     });
+
 
     Route::get('/kalender-akademik', [KalendarAkademikController::class, 'index'])
         ->middleware(['permission:kalender-akademik.view']);
@@ -233,11 +239,17 @@ Route::middleware(['auth'])->group(function () use ($ud) {
             ->middleware(['permission:ppdb.daftarulang.view']);
     });
 
-    Route::prefix('payroll')->group(function () use ($ud) {
-        Route::get('/', $ud);
-        Route::get('/run', $ud);
-        Route::get('/slip', $ud);
-    });
+    Route::prefix('payroll')
+        ->middleware(['permission:payroll.view'])
+        ->group(function () use ($ud) {
+
+            Route::get('/run', $ud)
+                ->middleware(['permission:payroll.run']);
+
+            Route::get('/slip', $ud)
+                ->middleware(['permission:payroll.slip']);
+        });
+
 
     // KONFIGURASI (pakai konfigurasi.view)
    Route::prefix('konfigurasi')

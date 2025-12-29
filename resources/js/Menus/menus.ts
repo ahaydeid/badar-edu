@@ -122,30 +122,31 @@ export const panelMenu: MenuItem[] = [
                     {
                         name: "Jadwal Kelas",
                         path: "/kelas-binaan/jadwal-kelas",
-                        permission: "kelas-binaan.view",
+                        permission: "kelas-binaan.jadwal.view",
                     },
                     {
                         name: "Absensi Siswa",
                         path: "/kelas-binaan/absensi-siswa",
-                        permission: "kelas-binaan.view",
+                        permission: "kelas-binaan.absensi.view",
                     },
                     {
                         name: "Progres Siswa",
                         path: "/kelas-binaan/progres-siswa",
-                        permission: "kelas-binaan.view",
+                        permission: "kelas-binaan.progres.view",
                     },
                     {
                         name: "Data Siswa",
                         path: "/kelas-binaan/data-siswa",
-                        permission: "kelas-binaan.view",
+                        permission: "kelas-binaan.siswa.view",
                     },
                     {
                         name: "Rapor Siswa",
                         path: "/kelas-binaan/rapor-siswa",
-                        permission: "kelas-binaan.view",
+                        permission: "kelas-binaan.rapor.view",
                     },
                 ],
             },
+
             {
                 name: "Rencana Ajar",
                 icon: Upload,
@@ -290,13 +291,20 @@ export const panelMenu: MenuItem[] = [
         section: "Administrasi",
         children: [
             {
-                name: "Payrol",
+                name: "Payroll",
                 icon: WalletCards,
-                path: "/payroll",
                 permission: "payroll.view",
                 children: [
-                    { name: "Jalankan Payroll", path: "/payroll/run" },
-                    { name: "Slip Gaji", path: "/payroll/slip" },
+                    {
+                        name: "Jalankan Payroll",
+                        path: "/payroll/run",
+                        permission: "payroll.run",
+                    },
+                    {
+                        name: "Slip Gaji",
+                        path: "/payroll/slip",
+                        permission: "payroll.slip",
+                    },
                 ],
             },
         ],
