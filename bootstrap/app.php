@@ -29,7 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
         'role' => RoleMiddleware::class,
 
         // 'permission' => PermissionMiddleware::class,
-        'permission' => \App\Http\Middleware\PermissionOrSuperadmin::class,
+
+        //Ini yang terakhir
+        // 'permission' => \App\Http\Middleware\PermissionOrSuperadmin::class,
 
         'role_or_permission' => RoleOrPermissionMiddleware::class,
     ]);
