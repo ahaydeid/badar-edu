@@ -117,11 +117,11 @@ export default function RoleTable({
                                                 </Link>
 
                                                 <Link
-                                                    href={`/role/${r.id}/edit`}
+                                                    href={`/konfigurasi/role/${r.id}/permissions`}
                                                     className="px-3 py-2 bg-amber-500 text-white rounded-md text-xs flex items-center gap-1"
                                                 >
                                                     <Pencil className="w-4 h-4" />
-                                                    Edit
+                                                    Edit Permission
                                                 </Link>
                                             </div>
                                         </td>

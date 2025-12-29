@@ -284,8 +284,14 @@ Route::middleware(['auth'])->group(function () use ($ud) {
         Route::get('/titik-absen', $ud)
             ->middleware(['permission:konfigurasi.view']);
 
+        // Konfigurasi Role
         Route::get('/role', [RoleController::class, 'index'])
             ->middleware(['permission:konfigurasi.role.view']);
+        Route::get('/role/{role}/permissions', [RoleController::class, 'editPermissions'])
+            ->middleware(['permission:konfigurasi.role.edit']);
+        Route::post('/role/{role}/permissions', [RoleController::class, 'updatePermissions'])
+            ->middleware(['permission:konfigurasi.role.edit']);
+
     });
 
 
