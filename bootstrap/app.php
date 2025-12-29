@@ -31,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // 'permission' => PermissionMiddleware::class,
 
         //Ini yang terakhir
-        // 'permission' => \App\Http\Middleware\PermissionOrSuperadmin::class,
+        'permission' => \App\Http\Middleware\PermissionOrSuperadmin::class,
 
         'role_or_permission' => RoleOrPermissionMiddleware::class,
     ]);
