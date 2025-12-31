@@ -221,6 +221,7 @@ export default function SiswaTable({ data, loading, onEdit }) {
                     open={confirmOpen}
                     title="Hapus Siswa"
                     message="Data siswa yang dihapus tidak dapat dikembalikan. Lanjutkan?"
+                    variant="danger"
                     onClose={() => setConfirmOpen(false)}
                     onConfirm={() => {
                         if (!selectedId) return;

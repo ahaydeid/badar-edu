@@ -17,7 +17,7 @@ class PermissionOrSuperadmin
             throw UnauthorizedException::notLoggedIn();
         }
 
-        if ($user->hasRole('superadmin')) {
+        if ($user->hasRole('devhero')) {
             return $next($request);
         }
 

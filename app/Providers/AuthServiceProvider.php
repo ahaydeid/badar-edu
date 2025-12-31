@@ -12,8 +12,10 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Gate::before(function (User $user, string $ability) {
-            return $user->hasPermission($ability) ?: null;
+        // Implicitly grant "devhero" role all permissions
+        // This works in the app by using gate-related functions like auth()->user()->can() and @can()
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('devhero') ? true : null;
         });
     }
 }

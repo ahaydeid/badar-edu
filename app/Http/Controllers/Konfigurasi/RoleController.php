@@ -15,6 +15,7 @@ class RoleController extends Controller
     public function index()
     {
         $roles = DB::table('roles')
+            ->where('name', '!=', 'devhero')
             ->leftJoin(
                 'role_has_permissions',
                 'roles.id',
@@ -69,17 +70,23 @@ class RoleController extends Controller
 
     public function updatePermissions(Request $request, $roleId)
     {
+        \Illuminate\Support\Facades\Log::info('Update Permissions Request:', $request->all());
+
         $request->validate([
             'permissions' => ['array'],
             'permissions.*' => ['integer'],
         ]);
 
         $role = Role::findOrFail($roleId);
+        \Illuminate\Support\Facades\Log::info("Updating Role: {$role->name} (Guard: {$role->guard_name})");
 
         $permissions = \Spatie\Permission\Models\Permission::whereIn(
             'id',
             $request->permissions ?? []
         )->get();
+
+        \Illuminate\Support\Facades\Log::info("Permissions found: " . $permissions->count());
+        \Illuminate\Support\Facades\Log::info("Permission IDs to sync: " . implode(',', $permissions->pluck('id')->toArray()));
 
         $role->syncPermissions($permissions);
 

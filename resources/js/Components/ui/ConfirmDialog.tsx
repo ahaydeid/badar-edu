@@ -9,6 +9,7 @@ type Props = {
     confirmText?: string;
     cancelText?: string;
     loading?: boolean;
+    variant?: "primary" | "danger";
     onConfirm: () => void;
     onClose: () => void;
 };
@@ -20,6 +21,7 @@ export default function ConfirmDialog({
     confirmText = "Ya, Lanjutkan",
     cancelText = "Batal",
     loading = false,
+    variant = "primary", // Default to Primary (Blue/Sky)
     onConfirm,
     onClose,
 }: Props) {
@@ -45,7 +47,9 @@ export default function ConfirmDialog({
                     >
                         {/* ICON FLOAT */}
                         <motion.div
-                            className="absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-amber-500 text-white shadow-lg"
+                            className={`absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full text-white shadow-lg ${
+                                variant === "danger" ? "bg-red-500" : "bg-sky-500"
+                            }`}
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{
                                 scale: 1,
@@ -84,7 +88,11 @@ export default function ConfirmDialog({
                             <button
                                 onClick={onConfirm}
                                 disabled={loading}
-                                className="rounded-lg bg-rose-600 px-4 py-2 text-sm text-white hover:bg-rose-700 disabled:opacity-60"
+                                className={`rounded-lg px-4 py-2 text-sm text-white disabled:opacity-60 transition-colors ${
+                                    variant === "danger"
+                                        ? "bg-rose-600 hover:bg-rose-700"
+                                        : "bg-sky-600 hover:bg-sky-700"
+                                }`}
                             >
                                 {loading ? "Memproses..." : confirmText}
                             </button>

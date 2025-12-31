@@ -117,7 +117,7 @@ export const panelMenu: MenuItem[] = [
                 name: "Kelas Binaan",
                 icon: GraduationCap,
                 path: "/kelas-binaan",
-                permission: "kelas-binaan.view",
+                // permission: "kelas-binaan.view", // Removed per request
                 children: [
                     {
                         name: "Jadwal Kelas",
@@ -151,7 +151,7 @@ export const panelMenu: MenuItem[] = [
                 name: "Rencana Ajar",
                 icon: Upload,
                 path: "/rencana-ajar",
-                permission: "rencana-ajar.view",
+                // permission: "rencana-ajar.view", // Removed per request
                 children: [
                     {
                         name: "Modul Ajar",
@@ -190,13 +190,13 @@ export const panelMenu: MenuItem[] = [
                 name: "Materi",
                 icon: ClipboardList,
                 path: "/lms-materi",
-                permission: "absen.siswa.view",
+                permission: "lms.materi.view",
             },
             {
                 name: "Tugas",
                 icon: NotebookPen,
                 path: "/lms-tugas",
-                permission: "tugas.view",
+                permission: "lms.tugas.view",
             },
         ],
     },
@@ -235,7 +235,7 @@ export const panelMenu: MenuItem[] = [
                 name: "Master Kedisiplinan",
                 icon: Settings,
                 path: "/kedisiplinan",
-                permission: "kedisipinan.view",
+                permission: "kedisiplinan.view",
                 children: [
                     {
                         name: "Jenis Pelanggaran",
@@ -320,7 +320,7 @@ export const panelMenu: MenuItem[] = [
                 name: "Akun",
                 icon: Users2,
                 path: "/akun",
-                permission: "pengguna.view",
+                // permission: "pengguna.view", // Removed per request
                 children: [
                     {
                         name: "Guru & Pegawai",
@@ -353,7 +353,7 @@ export const panelMenu: MenuItem[] = [
                 name: "Master Data",
                 icon: Layers,
                 path: "/master-data",
-                permission: "master-data.view",
+                // permission: "master-data.view", // Removed per request
                 children: [
                     {
                         name: "Guru & Pegawai",
@@ -395,7 +395,7 @@ export const panelMenu: MenuItem[] = [
                 name: "Konfigurasi",
                 icon: Settings,
                 path: "/konfigurasi",
-                permission: "konfigurasi.view",
+                // permission: "konfigurasi.view", // Removed per request
                 children: [
                     {
                         name: "Jurusan",

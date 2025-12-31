@@ -15,23 +15,26 @@ class DataSiswaController extends Controller
         $guruId = Auth::user()->profile_id;
 
         // Ambil kelas binaan wali sesuai guru login
-        $kelas = Kelas::where('wali_guru_id', $guruId)->firstOrFail();
+        $kelas = Kelas::where('wali_guru_id', $guruId)->first();
 
-        $siswa = Siswa::where('rombel_saat_ini', $kelas->id)
-            ->orderBy('nama')
-            ->get([
-                'id',
-                'nama',
-                'foto',
-                'jenis_kelamin',
-                'nipd',
-                'nisn',
-            ]);
+        $siswa = [];
+        if ($kelas) {
+            $siswa = Siswa::where('rombel_saat_ini', $kelas->id)
+                ->orderBy('nama')
+                ->get([
+                    'id',
+                    'nama',
+                    'foto',
+                    'jenis_kelamin',
+                    'nipd',
+                    'nisn',
+                ]);
+        }
 
         return Inertia::render('Akademik/KelasBinaan/DataSiswa/Index', [
-            'kelas' => [
-                'id'   => $kelas->id,
-                'nama' => $kelas->nama,
+            'kelas' => $kelas ?: [
+                'id'   => null,
+                'nama' => '-',
             ],
             'siswa' => $siswa,
         ]);

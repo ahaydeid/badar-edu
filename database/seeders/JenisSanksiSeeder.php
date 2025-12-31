@@ -9,62 +9,54 @@ class JenisSanksiSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('jenis_sanksi')->insert([
+        $jenisSanksi = [
             [
-                'kode' => 'BK',
-                'nama' => 'Pembinaan BK',
-                'level' => 0,
-                'min_poin' => 50,
-                'durasi_hari' => 14,
-                'keterangan' => 'Pembinaan oleh guru BK',
-                'aktif' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'kode' => 'ORTU',
-                'nama' => 'Pemanggilan Orang Tua',
-                'level' => 0,
-                'min_poin' => 75,
-                'durasi_hari' => 0,
-                'keterangan' => 'Pemanggilan orang tua/wali ke sekolah',
-                'aktif' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'kode' => 'SP-1',
+                'kode' => 'SP1',
                 'nama' => 'Surat Peringatan 1',
                 'level' => 1,
-                'min_poin' => 100,
-                'durasi_hari' => 90,
-                'keterangan' => 'Surat peringatan pertama',
+                'min_poin' => 25,
+                'durasi_hari' => 30,
+                'keterangan' => 'Peringatan pertama untuk siswa yang melakukan pelanggaran',
                 'aktif' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
-                'kode' => 'SP-2',
+                'kode' => 'SP2',
                 'nama' => 'Surat Peringatan 2',
                 'level' => 2,
-                'min_poin' => 150,
-                'durasi_hari' => 90,
-                'keterangan' => 'Surat peringatan kedua',
+                'min_poin' => 50,
+                'durasi_hari' => 60,
+                'keterangan' => 'Peringatan kedua, orang tua dipanggil ke sekolah',
                 'aktif' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
-                'kode' => 'SP-3',
+                'kode' => 'SP3',
                 'nama' => 'Surat Peringatan 3',
                 'level' => 3,
-                'min_poin' => 200,
+                'min_poin' => 75,
                 'durasi_hari' => 90,
-                'keterangan' => 'Surat peringatan ketiga',
+                'keterangan' => 'Peringatan ketiga, siswa terancam skorsing',
                 'aktif' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
-        ]);
+            [
+                'kode' => 'SKORS',
+                'nama' => 'Skorsing',
+                'level' => 4,
+                'min_poin' => 100,
+                'durasi_hari' => 7,
+                'keterangan' => 'Siswa tidak boleh masuk sekolah selama 7 hari',
+                'aktif' => true,
+            ],
+            [
+                'kode' => 'DO',
+                'nama' => 'Drop Out (Dikeluarkan)',
+                'level' => 5,
+                'min_poin' => 150,
+                'durasi_hari' => 0,
+                'keterangan' => 'Siswa dikeluarkan dari sekolah',
+                'aktif' => true,
+            ],
+        ];
+
+        DB::table('jenis_sanksi')->insert($jenisSanksi);
     }
 }

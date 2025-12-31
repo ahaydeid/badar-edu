@@ -14,53 +14,74 @@ class AbsensiKelasController extends Controller
 {
     public function index()
     {
-       $waliKelasId = Auth::user()->profile_id;
+        $waliKelasId = Auth::user()->profile_id;
         $today = now();
 
         $semester = Semester::whereDate('tanggal_mulai', '<=', $today)
             ->whereDate('tanggal_selesai', '>=', $today)
-            ->firstOrFail();
+            ->first();
 
-        $kelas = Kelas::where('wali_guru_id', $waliKelasId)->firstOrFail();
+        $kelas = Kelas::where('wali_guru_id', $waliKelasId)->first();
 
-        $siswa = Siswa::where('rombel_saat_ini', $kelas->id)
-            ->orderBy('nama')
-            ->get();
+        $siswa = collect();
+        if ($kelas) {
+            $siswa = Siswa::where('rombel_saat_ini', $kelas->id)
+                ->orderBy('nama')
+                ->get();
 
-        $rekap = AbsenHarianSiswa::selectRaw("
-                siswa_id,
-                SUM(status_id = 1) as hadir,
-                SUM(status_id = 2) as terlambat,
-                SUM(status_id = 3) as sakit,
-                SUM(status_id = 4) as izin,
-                SUM(status_id = 5) as alfa
-            ")
-            ->where('kelas_id', $kelas->id)
-            ->whereBetween('tanggal', [
-                $semester->tanggal_mulai,
-                $semester->tanggal_selesai
-            ])
-            ->groupBy('siswa_id')
-            ->get()
-            ->keyBy('siswa_id');
+            // Hanya hitung rekap jika semester ditemukan
+            if ($semester) {
+                $rekap = AbsenHarianSiswa::selectRaw("
+                        siswa_id,
+                        SUM(status_id = 1) as hadir,
+                        SUM(status_id = 2) as terlambat,
+                        SUM(status_id = 3) as sakit,
+                        SUM(status_id = 4) as izin,
+                        SUM(status_id = 5) as alfa
+                    ")
+                    ->where('kelas_id', $kelas->id)
+                    ->whereBetween('tanggal', [
+                        $semester->tanggal_mulai,
+                        $semester->tanggal_selesai
+                    ])
+                    ->groupBy('siswa_id')
+                    ->get()
+                    ->keyBy('siswa_id');
 
-        $siswa = $siswa->map(function ($s) use ($rekap) {
-            $r = $rekap[$s->id] ?? null;
+                $siswa = $siswa->map(function ($s) use ($rekap) {
+                    $r = $rekap[$s->id] ?? null;
 
-            return [
-                'id'        => $s->id,
-                'nama'      => $s->nama,
-                'foto'      => $s->foto,
-                'hadir'     => $r->hadir ?? 0,
-                'terlambat' => $r->terlambat ?? 0,
-                'sakit'     => $r->sakit ?? 0,
-                'izin'      => $r->izin ?? 0,
-                'alfa'      => $r->alfa ?? 0,
-            ];
-        });
+                    return [
+                        'id'        => $s->id,
+                        'nama'      => $s->nama,
+                        'foto'      => $s->foto,
+                        'hadir'     => $r->hadir ?? 0,
+                        'terlambat' => $r->terlambat ?? 0,
+                        'sakit'     => $r->sakit ?? 0,
+                        'izin'      => $r->izin ?? 0,
+                        'alfa'      => $r->alfa ?? 0,
+                    ];
+                });
+            } else {
+                // Semester tidak ditemukan (misal: hari libur/antar semester)
+                $siswa = $siswa->map(fn($s) => [
+                    'id'        => $s->id,
+                    'nama'      => $s->nama,
+                    'foto'      => $s->foto,
+                    'hadir'     => 0,
+                    'terlambat' => 0,
+                    'sakit'     => 0,
+                    'izin'      => 0,
+                    'alfa'      => 0,
+                ]);
+            }
+        }
 
         return inertia('Akademik/KelasBinaan/AbsensiKelas/Index', [
-            'kelas' => $kelas,
+            'kelas' => $kelas ?: [
+                'id'   => null,
+                'nama' => '-',
+            ],
             'siswa' => $siswa,
         ]);
     }
@@ -72,9 +93,13 @@ class AbsensiKelasController extends Controller
 
         $semester = Semester::whereDate('tanggal_mulai', '<=', $today)
             ->whereDate('tanggal_selesai', '>=', $today)
-            ->firstOrFail();
+            ->first();
 
-        $kelas = Kelas::where('wali_guru_id', $waliKelasId)->firstOrFail();
+        $kelas = Kelas::where('wali_guru_id', $waliKelasId)->first();
+
+        if (!$semester || !$kelas) {
+            return collect();
+        }
 
         return AbsenHarianSiswa::with('status')
             ->where('siswa_id', $siswaId)

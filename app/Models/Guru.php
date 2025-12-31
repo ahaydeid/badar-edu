@@ -42,8 +42,13 @@ class Guru extends Model
     }
 
     public function jadwal()
-{
-    return $this->hasMany(Jadwal::class, 'guru_id');
-}
+    {
+        return $this->hasMany(Jadwal::class, 'guru_id');
+    }
+
+    public function user()
+    {
+        return $this->morphOne(User::class, 'profile');
+    }
 
 }

@@ -86,4 +86,9 @@ class Siswa extends Model
     return $this->hasMany(AbsenHarianSiswa::class, 'siswa_id');
 }
 
+    public function user()
+    {
+        return $this->morphOne(User::class, 'profile');
+    }
+
 }

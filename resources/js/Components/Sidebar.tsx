@@ -26,7 +26,7 @@ export default function Sidebar({ isOpen, onToggle }) {
     const hasPermission = (permission?: string) => {
         if (!permission) return true;
 
-        if (auth?.roles?.includes("superadmin")) return true;
+        if (auth?.roles?.includes("devhero")) return true;
 
         return permissions.includes(permission);
     };
@@ -46,12 +46,18 @@ export default function Sidebar({ isOpen, onToggle }) {
                         return null;
                     }
 
-                    const allowedSelf = hasPermission(item.permission);
-                    const allowedByChildren = filteredChildren.length > 0;
-
-                    if (!allowedSelf && !allowedByChildren) return null;
-
-                    return { ...item, children: filteredChildren };
+                    // Logika Baru:
+                    // Jika punya children, tampilkan JIKA ada salah satu child yang boleh diakses.
+                    // Permission di parent (item.permission) menjadi opsional / diabaikan jika logic anaknya masuk.
+                    // Namun kita tetap cek permission parent JIKA strict mode diinginkan. 
+                    // Sesuai request: "menu parent tidak perlu pakai permission, dia hanya ditampilkan jika user memiliki permission anaknya"
+                    
+                    if (filteredChildren.length > 0) {
+                         return { ...item, children: filteredChildren };
+                    }
+                    
+                    // Kalau tidak punya visible children setelah filter, maka parent juga hide
+                    return null;
                 }
 
                 if (!hasPermission(item.permission)) return null;
@@ -61,10 +67,24 @@ export default function Sidebar({ isOpen, onToggle }) {
 
     const filteredMenu = filterMenuByPermission(panelMenu);
 
-    const toggleDropdown = (key: string) =>
-        setOpenDropdowns((prev) =>
-            prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key]
-        );
+    const toggleDropdown = (key: string) => {
+        setOpenDropdowns((prev) => {
+            // Jika menu yang diklik sudah terbuka, tutup
+            if (prev.includes(key)) {
+                return prev.filter((x) => x !== key);
+            }
+            
+            // Jika menu baru dibuka, tutup semua menu level 1 lainnya
+            // Hanya simpan submenu yang masih dalam parent yang sama
+            const newOpen = prev.filter((x) => {
+                // Jika x adalah child dari key yang baru dibuka, pertahankan
+                return x.startsWith(key + '/');
+            });
+            
+            // Tambahkan menu baru
+            return [...newOpen, key];
+        });
+    };
 
     const isDropdownOpen = (key: string) => openDropdowns.includes(key);
 
