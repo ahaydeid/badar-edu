@@ -6,39 +6,25 @@ type PenilaianRingkas = {
     nama: string;
 };
 
-type Kelas = {
+type KelasItem = {
     id: number;
-    nama: string;
-    siswa: number;
+    mapel_id: number;
+    nama_kelas: string;
+    nama_mapel: string;
+    siswa_count: number;
     penilaian: PenilaianRingkas[];
 };
 
-export default function Index() {
+type Props = {
+    listKelas: KelasItem[];
+}
+
+export default function Index({ listKelas = [] }: Props) {
     const [search, setSearch] = useState("");
 
-    const kelas: Kelas[] = [
-        {
-            id: 1,
-            nama: "12 MPLB 1",
-            siswa: 36,
-            penilaian: [{ nama: "Tugas Projek" }, { nama: "Tugas Akhir" }],
-        },
-        {
-            id: 2,
-            nama: "12 MPLB 2",
-            siswa: 34,
-            penilaian: [{ nama: "Tugas Projek" }, { nama: "Tugas Akhir" }],
-        },
-        {
-            id: 3,
-            nama: "12 MPLB 3",
-            siswa: 34,
-            penilaian: [{ nama: "Tugas Projek" }, { nama: "Tugas Akhir" }],
-        },
-    ];
-
-    const filtered = kelas.filter((k) =>
-        k.nama.toLowerCase().includes(search.toLowerCase())
+    const filtered = listKelas.filter((k) =>
+        k.nama_kelas.toLowerCase().includes(search.toLowerCase()) || 
+        k.nama_mapel.toLowerCase().includes(search.toLowerCase())
     );
 
     return (
@@ -70,18 +56,21 @@ export default function Index() {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {filtered.map((k) => (
                         <Link
-                            key={k.id}
-                            href={`/penilaian/${k.id}`}
+                            key={`${k.id}-${k.mapel_id}`}
+                            href={`/penilaian/${k.id}?mapel=${k.mapel_id}`}
                             className="block rounded-lg border border-gray-200 bg-white p-4 hover:border-gray-300 transition"
                         >
                             {/* HEADER CARD */}
                             <div className="flex items-center justify-between">
                                 <div className="text-base font-semibold text-gray-800">
-                                    {k.nama}
+                                    {k.nama_kelas}
+                                    <span className="block text-xs font-normal text-gray-500 mt-0.5">
+                                        {k.nama_mapel}
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-sm text-gray-500">
                                     <Users className="h-4 w-4" />
-                                    {k.siswa} siswa
+                                    {k.siswa_count} siswa
                                 </div>
                             </div>
 
@@ -97,6 +86,11 @@ export default function Index() {
                                         {p.nama}
                                     </div>
                                 ))}
+                                {k.penilaian.length === 0 && (
+                                     <div className="col-span-2 text-xs text-gray-400 italic">
+                                        Belum ada penilaian
+                                     </div>
+                                )}
                             </div>
                         </Link>
                     ))}

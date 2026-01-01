@@ -1,8 +1,10 @@
 // resources/js/Pages/Master-Data/Guru/Index.tsx
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { usePage, router } from "@inertiajs/react";
 import { PageProps as InertiaPageProps } from "@inertiajs/core";
+import Toast from "@/Components/ui/Toast";
+import { useUiFeedback } from "@/hooks/useUiFeedback";
 import {
     UserPlus,
     Upload,
@@ -18,10 +20,15 @@ type GuruRow = any;
 
 type PageProps = {
     guru: GuruRow[];
+    flash?: {
+        success?: string;
+        error?: string;
+    };
 };
 
 export default function Index() {
-    const { guru } = usePage<PageProps & InertiaPageProps>().props;
+    const { props } = usePage<PageProps & InertiaPageProps>();
+    const { guru } = props;
 
     const [searchTerm, setSearchTerm] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -32,6 +39,18 @@ export default function Index() {
     const [editId, setEditId] = useState<number | null>(null);
     const [editInitial, setEditInitial] = useState<any>(null);
 
+    // Toast Handling
+    const { toast, showToast } = useUiFeedback();
+
+    useEffect(() => {
+        if (props.flash?.success) {
+            showToast(props.flash.success, 'success');
+        }
+        if (props.flash?.error) {
+            showToast(props.flash.error, 'error');
+        }
+    }, [props.flash]);
+
     const filtered = useMemo(() => {
         const q = searchTerm.toLowerCase();
         return guru.filter(
@@ -40,14 +59,6 @@ export default function Index() {
                 (r.nip ?? "").toLowerCase().includes(q)
         );
     }, [guru, searchTerm]);
-
-    const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
-    const start = (page - 1) * rowsPerPage;
-    const paginated = filtered.slice(start, start + rowsPerPage);
-    const numbered = paginated.map((r, i) => ({
-        ...r,
-        no: start + i + 1,
-    }));
 
     async function handleOpenEdit(id: number) {
         const res = await fetch(`/master-data/guru/${id}/edit`, {
@@ -62,8 +73,17 @@ export default function Index() {
         setOpenForm(true);
     }
 
+    const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+    const start = (page - 1) * rowsPerPage;
+    const paginated = filtered.slice(start, start + rowsPerPage);
+    const numbered = paginated.map((r, i) => ({
+        ...r,
+        no: start + i + 1,
+    }));
+
     return (
         <>
+            <Toast open={toast.open} message={toast.message} type={toast.type} />
             <div className="w-full space-y-6">
                 <div className="space-y-4">
                     <div className="flex items-center text-sm gap-2 flex-wrap">

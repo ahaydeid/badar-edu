@@ -17,14 +17,14 @@ class RoleSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles
-        $superadmin = Role::create(['name' => 'devhero', 'guard_name' => 'web']);
-        $admin = Role::create(['name' => 'Admin', 'guard_name' => 'web']);
-        $guru = Role::create(['name' => 'Guru', 'guard_name' => 'web']);
-        $waliKelas = Role::create(['name' => 'Wali Kelas', 'guard_name' => 'web']);
-        $siswa = Role::create(['name' => 'Siswa', 'guard_name' => 'web']);
-        $kurikulum = Role::create(['name' => 'Kurikulum', 'guard_name' => 'web']);
-        $kesiswaan = Role::create(['name' => 'Kesiswaan', 'guard_name' => 'web']);
-        $tataUsaha = Role::create(['name' => 'Tata Usaha', 'guard_name' => 'web']);
+        $superadmin = Role::firstOrCreate(['name' => 'devhero', 'guard_name' => 'web']);
+        $admin = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
+        $guru = Role::firstOrCreate(['name' => 'Guru', 'guard_name' => 'web']);
+        $waliKelas = Role::firstOrCreate(['name' => 'Wali Kelas', 'guard_name' => 'web']);
+        $siswa = Role::firstOrCreate(['name' => 'Siswa', 'guard_name' => 'web']);
+        $kurikulum = Role::firstOrCreate(['name' => 'Kurikulum', 'guard_name' => 'web']);
+        $kesiswaan = Role::firstOrCreate(['name' => 'Kesiswaan', 'guard_name' => 'web']);
+        $tataUsaha = Role::firstOrCreate(['name' => 'Tata Usaha', 'guard_name' => 'web']);
 
         // Super Admin: semua permission (untuk developer/IT)
         // $superadmin->givePermissionTo(Permission::all()); // BYPASS via AuthServiceProvider

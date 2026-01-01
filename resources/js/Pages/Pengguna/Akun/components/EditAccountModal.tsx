@@ -3,15 +3,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check } from "lucide-react";
 import { useEffect, useState } from "react"; // Added useState
 import Toast from "@/Components/ui/Toast"; // Added Import
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 
 export default function EditAccountModal({ open, user, allRoles, onClose }) {
-    const { data, setData, put, processing, reset } = useForm<{
+    const { data, setData, put, delete: destroy, processing, reset } = useForm<{
         roles: string[];
         status: string;
     }>({
         roles: [],
         status: "aktif",
     });
+
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
     const [toast, setToast] = useState<{ open: boolean; message: string; type: "success" | "error" }>({
         open: false,
@@ -36,8 +39,7 @@ export default function EditAccountModal({ open, user, allRoles, onClose }) {
         }
     }, [user]);
     
-    // safe guard
-    if (!user) return null;
+
 
     const handleToggleRole = (roleName) => {
         if (data.roles.includes(roleName)) {
@@ -71,7 +73,31 @@ export default function EditAccountModal({ open, user, allRoles, onClose }) {
         });
     };
 
+    const handleDelete = () => {
+        // Safe access (user should be present if clicked)
+        destroy(`/akun/${user?.id}`, {
+            onSuccess: () => {
+                setConfirmDeleteOpen(false); // Close confirm dialog
+                setToast({ open: true, message: "Akun berhasil dihapus!", type: "success" });
+                setTimeout(() => {
+                    setToast((prev) => ({ ...prev, open: false }));
+                    onClose();
+                }, 1500);
+            },
+            onError: (errors) => {
+                setConfirmDeleteOpen(false); // Close confirm on error too? Or keep open? Maybe keep open to retry?
+                // Usually close if we show toast.
+                const msg = Object.values(errors)[0] || "Gagal menghapus akun.";
+                setToast({ open: true, message: String(msg), type: "error" });
+            }
+        });
+    };
+
+    // safe guard
+    if (!user) return null;
+
     return (
+        <>
         <AnimatePresence>
             {open && (
                 <motion.div
@@ -121,7 +147,9 @@ export default function EditAccountModal({ open, user, allRoles, onClose }) {
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-500">Kode Guru</p>
+                                            <p className="text-sm text-gray-500">
+                                                {user.profile_type?.includes("Siswa") ? "NISN" : "Kode Guru"}
+                                            </p>
                                             <p className="font-mono text-sm font-medium text-gray-700">
                                                 {user.username}
                                             </p>
@@ -194,22 +222,31 @@ export default function EditAccountModal({ open, user, allRoles, onClose }) {
                                 </div>
                             </div>
                             
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
                                 <button
                                     type="button"
-                                    onClick={onClose}
-                                    disabled={processing}
-                                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
+                                    onClick={() => setConfirmDeleteOpen(true)}
+                                    className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 px-3 py-2 rounded transition-colors"
                                 >
-                                    Batal
+                                    Hapus Akun
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="px-6 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-                                >
-                                    {processing ? "Menyimpan..." : "Simpan Perubahan"}
-                                </button>
+                                <div className="flex gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={onClose}
+                                        disabled={processing}
+                                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="px-6 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                                    >
+                                        {processing ? "Menyimpan..." : "Simpan Perubahan"}
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </motion.div>
@@ -217,5 +254,18 @@ export default function EditAccountModal({ open, user, allRoles, onClose }) {
             )}
             <Toast open={toast.open} message={toast.message} type={toast.type} />
         </AnimatePresence>
+
+        <ConfirmDialog
+            open={confirmDeleteOpen}
+            onClose={() => setConfirmDeleteOpen(false)}
+            onConfirm={handleDelete}
+            title="Hapus Akun?"
+            message="Apakah Anda yakin ingin menghapus akun ini secara permanen? Data yang dihapus tidak dapat dikembalikan."
+            confirmText="Ya, Hapus Akun"
+            cancelText="Batal"
+            variant="danger"
+            loading={processing}
+        />
+        </>
     );
 }

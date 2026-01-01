@@ -1,13 +1,15 @@
-import { Head, Link } from "@inertiajs/react";
-import { ArrowLeft, Plus } from "lucide-react";
-import { useState } from "react";
+import { Head, Link, usePage } from "@inertiajs/react";
+import { ArrowLeft, Plus, Calculator } from "lucide-react";
+import { useState, useEffect } from "react";
 import TambahPenilaianModal from "./components/TambahPenilaianModal";
+import { useUiFeedback } from "@/hooks/useUiFeedback";
+import Toast from "@/Components/ui/Toast";
 
 type SubNilai = {
     id: number;
     nama: string;
     dinilai: number;
-    belum: number;
+    // belum calculated in runtime
 };
 
 type Penilaian = {
@@ -17,63 +19,71 @@ type Penilaian = {
     sub: SubNilai[];
 };
 
-export default function Detail() {
+type Props = {
+    kelas: string;
+    kelasId: number;
+    mapelId: number;
+    totalSiswa: number;
+    penilaians: Penilaian[];
+};
+
+export default function Detail({ kelas, kelasId, mapelId, totalSiswa, penilaians }: Props) {
     const [openTambah, setOpenTambah] = useState(false);
 
-    const kelasId = 1;
-    const kelas = "12 MPLB 1";
+    // Toast Handling
+    const { toast, showToast } = useUiFeedback();
+    const { props } = usePage<any>();
 
-    const penilaian: Penilaian[] = [
-        {
-            id: 1,
-            nama: "Tugas Projek",
-            deskripsi: "Penilaian tugas berbasis projek.",
-            sub: [
-                {
-                    id: 1,
-                    nama: "Membuat Halaman Responsif",
-                    dinilai: 20,
-                    belum: 16,
-                },
-            ],
-        },
-        {
-            id: 2,
-            nama: "Tugas Akhir",
-            deskripsi: "Penilaian akhir semester.",
-            sub: [],
-        },
-    ];
+    useEffect(() => {
+        if (props.flash?.success) {
+            showToast(props.flash.success, 'success');
+        }
+        if (props.flash?.error) {
+            showToast(props.flash.error, 'error');
+        }
+    }, [props.flash]);
 
     return (
-        <>
+        <div className="max-w-7xl px-4 space-y-6">
             <Head title={`Penilaian ${kelas}`} />
+            <Toast open={toast.open} message={toast.message} type={toast.type} />
 
             <div className="max-w-7xl space-y-6 px-4">
-                <button
-                    type="button"
-                    onClick={() => window.history.back()}
+                <Link
+                    href="/penilaian"
                     className="inline-flex cursor-pointer items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Kembali
-                </button>
+                </Link>
                 {/* HEADER */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-semibold">{kelas}</h1>
+                    <div>
+                        <h1 className="text-xl font-semibold">{kelas}</h1>
+                        <p className="text-sm text-gray-500">{totalSiswa} siswa terdaftar</p>
+                    </div>
 
-                    <button
-                        onClick={() => setOpenTambah(true)}
-                        className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
-                    >
-                        <Plus className="h-4 w-4" />
-                        Tambah Penilaian
-                    </button>
+                    <div className="flex gap-2">
+                        <Link
+                            href={`/penilaian/${kelasId}/hitung`}
+                            className="inline-flex items-center gap-2 rounded-md bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:shadow-sm"
+                        >
+                            <Calculator className="h-4 w-4" />
+                            Hitung Penilaian
+                        </Link>
+                        <button
+                            onClick={() => setOpenTambah(true)}
+                            className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 shadow-sm"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Tambah Penilaian
+                        </button>
+                    </div>
                 </div>
 
                 {/* LIST PENILAIAN */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {penilaian.map((p) => (
+                    {penilaians.map((p) => (
                         <Link
                             key={p.id}
                             href={`/penilaian/${kelasId}/${p.id}`}
@@ -91,7 +101,9 @@ export default function Detail() {
 
                             <div className="space-y-2">
                                 {p.sub.length > 0 ? (
-                                    p.sub.map((s) => (
+                                    p.sub.map((s) => {
+                                        const belum  = totalSiswa - s.dinilai;
+                                        return (
                                         <div
                                             key={s.id}
                                             className="rounded-md border border-gray-200 px-3 py-2"
@@ -101,16 +113,16 @@ export default function Detail() {
                                             </div>
                                             <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
                                                 <span className="flex items-center gap-1">
-                                                    <span className="h-2 w-2 rounded-full bg-green-500" />
-                                                    Dinilai {s.dinilai}
+                                                    <span className="h-2 w-2 bg-green-500" />
+                                                    Dinilai: <span className="font-semibold">{s.dinilai}</span>
                                                 </span>
                                                 <span className="flex items-center gap-1">
-                                                    <span className="h-2 w-2 rounded-full bg-red-500" />
-                                                    Blm Dinilai {s.belum}
+                                                    <span className="h-2 w-2 bg-red-500" />
+                                                    Belum Dinilai: <span className="font-semibold">{belum}</span>
                                                 </span>
                                             </div>
                                         </div>
-                                    ))
+                                    )})
                                 ) : (
                                     <div className="rounded-md border border-dashed border-gray-300 px-3 py-3 text-sm text-gray-400">
                                         Belum ada sub penilaian
@@ -119,14 +131,21 @@ export default function Detail() {
                             </div>
                         </Link>
                     ))}
+                    {penilaians.length === 0 && (
+                        <div className="col-span-full py-12 text-center text-gray-500">
+                            Belum ada penilaian dibuat. Silakan tambah penilaian baru.
+                        </div>
+                    )}
                 </div>
             </div>
 
             <TambahPenilaianModal
                 open={openTambah}
                 mode="baru"
+                kelasId={kelasId}
+                mapelId={mapelId}
                 onClose={() => setOpenTambah(false)}
             />
-        </>
+        </div>
     );
 }

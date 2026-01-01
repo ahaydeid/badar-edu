@@ -11,14 +11,30 @@ function Login() {
     });
 
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     function submit(e: FormEvent) {
         e.preventDefault();
-        post("/login");
+        setIsLoading(true);
+
+        setTimeout(() => {
+            post("/login", {
+                onError: () => setIsLoading(false),
+                onFinish: () => setIsLoading(false),
+            });
+        }, 3000);
     }
 
     return (
         <>
+            {isLoading && (
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600 mb-4"></div>
+                    <p className="text-purple-700 font-medium text-lg animate-pulse">
+                        Tunggu Sebentar...
+                    </p>
+                </div>
+            )}
             <div className="min-h-screen flex flex-col items-center justify-between px-4 py-8">
                 <div
                     className="

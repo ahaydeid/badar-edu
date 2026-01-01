@@ -1,5 +1,6 @@
 import { Head, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 import {
     MoreVertical,
     Settings,
@@ -19,6 +20,7 @@ export default function Profile() {
 
     const [tab, setTab] = useState<"profil" | "tugas">("profil");
     const [open, setOpen] = useState(false);
+    const [confirmLogout, setConfirmLogout] = useState(false);
 
     function logout() {
         router.post("/logout");
@@ -103,7 +105,7 @@ export default function Profile() {
                                         Edit Data
                                     </button>
                                     <button
-                                        onClick={logout}
+                                        onClick={() => setConfirmLogout(true)}
                                         className="w-full flex items-center gap-2 text-left px-4 py-2  text-red-600 hover:bg-gray-50"
                                     >
                                         <LogOut size={16} />
@@ -329,6 +331,17 @@ export default function Profile() {
                     </div>
                 </div>
             </div>
+
+            <ConfirmDialog
+                open={confirmLogout}
+                title="Keluar Aplikasi?"
+                message="Anda yakin ingin keluar dari sesi ini? Anda harus login kembali untuk mengakses aplikasi."
+                confirmText="Ya, Keluar"
+                cancelText="Batal"
+                variant="danger"
+                onClose={() => setConfirmLogout(false)}
+                onConfirm={logout}
+            />
         </>
     );
 }

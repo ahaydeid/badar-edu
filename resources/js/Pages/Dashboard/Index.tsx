@@ -14,18 +14,6 @@ import {
     Cell,
 } from "recharts";
 
-const stats = [
-    { label: "Total Siswa", value: 759, icon: Users, color: "bg-[#f5365c]" },
-    {
-        label: "Total Guru",
-        value: 48,
-        icon: GraduationCap,
-        color: "bg-[#fb6340]",
-    },
-    { label: "Rombel", value: 14, icon: School, color: "bg-[#11cdef]" },
-    { label: "Mapel", value: 18, icon: BookOpen, color: "bg-[#8965e0]" },
-];
-
 const kehadiran = [
     { minggu: "Minggu 1", hadir: 82 },
     { minggu: "Minggu 2", hadir: 78 },
@@ -73,7 +61,26 @@ const absenSiswa = [
     { name: "Alpha", value: 11, color: "#f5365c" },
 ];
 
-export default function DashboardSekolah() {
+interface DashboardProps {
+    totalSiswa: number;
+    totalGuru: number;
+    totalRombel: number;
+    totalMapel: number;
+}
+
+export default function DashboardSekolah({ totalSiswa, totalGuru, totalRombel, totalMapel }: DashboardProps) {
+    const stats = [
+        { label: "Total Siswa", value: totalSiswa, icon: Users, color: "bg-[#f5365c]" },
+        {
+            label: "Total Guru",
+            value: totalGuru,
+            icon: GraduationCap,
+            color: "bg-[#fb6340]",
+        },
+        { label: "Rombel", value: totalRombel, icon: School, color: "bg-[#11cdef]" },
+        { label: "Mapel", value: totalMapel, icon: BookOpen, color: "bg-[#8965e0]" },
+    ];
+
     const latestAttendance = kehadiran[kehadiran.length - 1]?.hadir ?? 0;
 
     const getBarColor = (persen: number) => {

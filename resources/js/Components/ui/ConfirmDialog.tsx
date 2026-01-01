@@ -9,7 +9,7 @@ type Props = {
     confirmText?: string;
     cancelText?: string;
     loading?: boolean;
-    variant?: "primary" | "danger";
+    variant?: "primary" | "danger" | "warning";
     onConfirm: () => void;
     onClose: () => void;
 };
@@ -48,7 +48,8 @@ export default function ConfirmDialog({
                         {/* ICON FLOAT */}
                         <motion.div
                             className={`absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full text-white shadow-lg ${
-                                variant === "danger" ? "bg-red-500" : "bg-sky-500"
+                                variant === "danger" ? "bg-red-500" : 
+                                variant === "warning" ? "bg-amber-500" : "bg-sky-500"
                             }`}
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{
@@ -88,9 +89,11 @@ export default function ConfirmDialog({
                             <button
                                 onClick={onConfirm}
                                 disabled={loading}
-                                className={`rounded-lg px-4 py-2 text-sm text-white disabled:opacity-60 transition-colors ${
+                                className={`rounded-lg cursor-pointer px-4 py-2 text-sm text-white disabled:opacity-60 transition-colors ${
                                     variant === "danger"
                                         ? "bg-rose-600 hover:bg-rose-700"
+                                        : variant === "warning"
+                                        ? "bg-amber-600 hover:bg-amber-700"
                                         : "bg-sky-600 hover:bg-sky-700"
                                 }`}
                             >

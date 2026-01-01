@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { X, User } from "lucide-react";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
+import Toast from "@/Components/ui/Toast";
 import { router } from "@inertiajs/react";
 
 type Props = {
@@ -80,6 +82,10 @@ export default function TambahGuru({
     const [form, setForm] = useState<FormState>(emptyForm());
     const [preview, setPreview] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    
+    // Confirm & Toast
+    const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
+    const [toast, setToast] = useState({ open: false, message: "", type: "success" as "success" | "error" });
 
     useEffect(() => {
         if (!open) return;
@@ -126,7 +132,12 @@ export default function TambahGuru({
     }
 
     function handleSubmit() {
+        setConfirmSaveOpen(true);
+    }
+    
+    function handleConfirmSave() {
         setSubmitting(true);
+        setConfirmSaveOpen(false); // Close confirm dialog immediately, show loading in form button
 
         const data = new FormData();
 
@@ -138,21 +149,29 @@ export default function TambahGuru({
             data.append(key, (value ?? "") as any);
         });
 
+        const options = {
+            forceFormData: true,
+            onFinish: () => setSubmitting(false),
+            onSuccess: () => {
+                setToast({ open: true, message: editId ? "Data guru berhasil diperbarui" : "Data guru berhasil ditambahkan", type: "success" });
+                setTimeout(() => {
+                    setToast(prev => ({ ...prev, open: false }));
+                    onClose();
+                }, 2000);
+            },
+            onError: (errors: any) => {
+                 setToast({ open: true, message: "Gagal menyimpan data. Periksa input anda.", type: "error" });
+                 setTimeout(() => setToast(prev => ({ ...prev, open: false })), 3000);
+            }
+        };
+
         if (editId) {
             data.append("_method", "PUT");
-            router.post(`/master-data/guru/${editId}`, data, {
-                forceFormData: true,
-                onFinish: () => setSubmitting(false),
-                onSuccess: () => onClose(),
-            });
+            router.post(`/master-data/guru/${editId}`, data, options);
             return;
         }
 
-        router.post("/master-data/guru", data, {
-            forceFormData: true,
-            onFinish: () => setSubmitting(false),
-            onSuccess: () => onClose(),
-        });
+        router.post("/master-data/guru", data, options);
     }
 
     if (!open) return null;
@@ -370,6 +389,19 @@ export default function TambahGuru({
                     </div>
                 </div>
             </div>
+            
+             <ConfirmDialog
+                open={confirmSaveOpen}
+                onClose={() => setConfirmSaveOpen(false)}
+                onConfirm={handleConfirmSave}
+                title={editId ? "Simpan Perubahan?" : "Tambah Data Guru?"}
+                message="Pastikan data yang dimasukkan sudah benar."
+                confirmText={editId ? "Ya, Simpan" : "Ya, Tambah"}
+                cancelText="Batal"
+                variant="primary" 
+            />
+
+            <Toast open={toast.open} message={toast.message} type={toast.type} />
         </div>
     );
 }

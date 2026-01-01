@@ -1,62 +1,82 @@
-import { Head } from "@inertiajs/react";
-import { useState } from "react";
+import { Head, Link } from "@inertiajs/react";
+import { useState, useMemo } from "react";
+import DetailPendaftarModal from "./components/DetailPendaftarModal";
+import Toast from "@/Components/ui/Toast";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Pendaftar = {
     id: number;
     no_pendaftaran: string;
     nama: string;
     nik: string;
+    nisn?: string; // Optional since not all candidates might have it
     asalSekolah: string;
     jurusan: string;
     gelombang: string;
     tanggalDaftar: string;
-    status:
-        | "Menunggu Verifikasi"
-        | "Perlu Perbaikan"
-        | "Ditolak"
-        | "Terverifikasi";
+    status: string;
 };
 
-export default function Index() {
+type Props = {
+    pendaftars?: Pendaftar[]; // Now expecting full array
+};
+
+export default function Index({ pendaftars = [] }: Props) { // Default to empty array
     const [filterStatus, setFilterStatus] = useState<string>("");
     const [search, setSearch] = useState<string>("");
+    const [selectedPendaftar, setSelectedPendaftar] = useState<Pendaftar | null>(null);
 
-    const data: Pendaftar[] = [
-        {
-            id: 1,
-            no_pendaftaran: "PPDB-2025-001",
-            nama: "Ahmad Fauzi",
-            nik: "327xxxxxxxxx",
-            asalSekolah: "SMP Negeri 1",
-            jurusan: "TBSM",
-            gelombang: "Gelombang 1",
-            tanggalDaftar: "2025-06-10",
-            status: "Menunggu Verifikasi",
-        },
-        {
-            id: 2,
-            no_pendaftaran: "PPDB-2025-002",
-            nama: "Siti Nurhaliza",
-            nik: "327xxxxxxxxx",
-            asalSekolah: "SMP Negeri 3",
-            jurusan: "MPLB",
-            gelombang: "Gelombang 1",
-            tanggalDaftar: "2025-06-11",
-            status: "Perlu Perbaikan",
-        },
-    ];
-
-    const filtered = data.filter((d) => {
-        const matchStatus = filterStatus ? d.status === filterStatus : true;
-        const q = search.toLowerCase();
-        const matchSearch = q
-            ? d.no_pendaftaran.toLowerCase().includes(q) ||
-              d.nama.toLowerCase().includes(q) ||
-              d.nik.toLowerCase().includes(q) ||
-              d.asalSekolah.toLowerCase().includes(q)
-            : true;
-        return matchStatus && matchSearch;
+    // Client-side Pagination State
+    const [page, setPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [toastState, setToastState] = useState({
+        open: false,
+        message: "",
+        type: "success" as "success" | "error"
     });
+
+    const showToast = (message: string, type: "success" | "error") => {
+        setToastState({ open: true, message, type });
+        setTimeout(() => setToastState(p => ({ ...p, open: false })), 3000);
+    };
+
+    // Client-side Filtering
+    const filteredData = useMemo(() => {
+        let data = pendaftars;
+
+        if (filterStatus) {
+            data = data.filter(p => p.status === filterStatus);
+        }
+
+        if (search) {
+            const q = search.toLowerCase();
+            data = data.filter(p => 
+                p.nama.toLowerCase().includes(q) ||
+                p.no_pendaftaran.toLowerCase().includes(q) ||
+                (p.nik && p.nik.includes(q)) ||
+                (p.nisn && p.nisn.includes(q)) ||
+                (p.jurusan && p.jurusan.toLowerCase().includes(q))
+            );
+        }
+
+        return data;
+    }, [pendaftars, filterStatus, search]);
+
+    // Client-side Pagination Logic
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+    const start = (page - 1) * rowsPerPage;
+    const paginatedData = filteredData.slice(start, start + rowsPerPage);
+
+    // Reset page on filter change
+    const onSearchChange = (val: string) => {
+        setSearch(val);
+        setPage(1);
+    };
+
+    const onFilterStatusChange = (val: string) => {
+        setFilterStatus(val);
+        setPage(1);
+    };
 
     return (
         <>
@@ -73,33 +93,53 @@ export default function Index() {
 
                 {/* FILTER & SEARCH */}
                 <div className="bg-white rounded-sm border border-gray-200 p-4 flex items-end justify-between gap-4">
-                    <div>
-                        <label className="text-xs text-gray-500 block mb-1">
-                            Status
-                        </label>
-                        <select
-                            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                        >
-                            <option value="">Semua</option>
-                            <option value="Menunggu Verifikasi">
-                                Menunggu Verifikasi
-                            </option>
-                            <option value="Perlu Perbaikan">
-                                Perlu Perbaikan
-                            </option>
-                            <option value="Ditolak">Ditolak</option>
-                            <option value="Terverifikasi">Terverifikasi</option>
-                        </select>
+                    <div className="flex items-center gap-4">
+                        <div>
+                            <label className="text-xs text-gray-500 block mb-1">
+                                Status
+                            </label>
+                            <select
+                                className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                value={filterStatus}
+                                onChange={(e) => onFilterStatusChange(e.target.value)}
+                            >
+                                <option value="">Semua</option>
+                                <option value="Menunggu Verifikasi">
+                                    Menunggu Verifikasi
+                                </option>
+                                <option value="Perlu Perbaikan">
+                                    Perlu Perbaikan
+                                </option>
+                                <option value="Ditolak">Ditolak</option>
+                                <option value="Terverifikasi">Terverifikasi</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label className="text-xs text-gray-500 block mb-1">
+                                Jumlah
+                            </label>
+                            <select
+                                className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                value={rowsPerPage}
+                                onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setPage(1);
+                                }}
+                            >
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className="w-64 text-right">
                         <input
                             type="text"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Cari..."
+                            onChange={(e) => onSearchChange(e.target.value)}
+                            placeholder="Cari (Nama, No Daf, NIK, Jurusan)..."
                             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                         />
                     </div>
@@ -111,10 +151,7 @@ export default function Index() {
                         <thead className="bg-sky-50 text-xs uppercase text-gray-600">
                             <tr>
                                 <th className="px-6 py-3 text-left">No</th>
-                                <th className="px-6 py-3 text-left">
-                                    No Pendaftaran
-                                </th>
-                                <th className="px-6 py-3 text-left">Nama</th>
+                                <th className="px-6 py-3 text-left">Siswa</th>
                                 <th className="px-6 py-3 text-left">NIK</th>
                                 <th className="px-6 py-3 text-left">
                                     Asal Sekolah
@@ -131,13 +168,13 @@ export default function Index() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {filtered.map((p, i) => (
+                            {paginatedData.map((p, i) => (
                                 <tr key={p.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-3">{i + 1}</td>
+                                    <td className="px-6 py-3">{start + i + 1}</td>
                                     <td className="px-6 py-3">
-                                        {p.no_pendaftaran}
+                                        <div className="font-medium text-gray-900">{p.nama}</div>
+                                        <div className="text-xs text-gray-400 font-mono mt-0.5">{p.no_pendaftaran}</div>
                                     </td>
-                                    <td className="px-6 py-3">{p.nama}</td>
                                     <td className="px-6 py-3">{p.nik}</td>
                                     <td className="px-6 py-3">
                                         {p.asalSekolah}
@@ -153,16 +190,19 @@ export default function Index() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-3 text-right">
-                                        <button className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
-                                            Lihat Detail
+                                        <button 
+                                            onClick={() => setSelectedPendaftar(p)}
+                                            className="inline-flex items-center rounded-md border border-gray-300 text-white bg-sky-600 px-3 py-1.5 text-sm cursor-pointer hover:bg-sky-700 hover:text-white"
+                                        >
+                                            Validasi
                                         </button>
                                     </td>
                                 </tr>
                             ))}
-                            {filtered.length === 0 && (
+                            {paginatedData.length === 0 && (
                                 <tr>
                                     <td
-                                        colSpan={10}
+                                        colSpan={9}
                                         className="px-6 py-6 text-center text-gray-500"
                                     >
                                         Tidak ada data
@@ -172,7 +212,47 @@ export default function Index() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* PAGINATION */}
+                 <div className="flex justify-between items-center mt-4">
+                    <span className="text-sm text-gray-600">
+                        Menampilkan {paginatedData.length} dari {filteredData.length} data
+                    </span>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                            className="p-2 border rounded-lg bg-white disabled:opacity-50 hover:bg-gray-50"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <span className="px-4 py-2 text-gray-700 text-sm">
+                            {page} dari {totalPages}
+                        </span>
+                        <button
+                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                            className="p-2 border rounded-lg bg-white disabled:opacity-50 hover:bg-gray-50"
+                        >
+                             <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
             </div>
+
+
+            <DetailPendaftarModal
+                open={!!selectedPendaftar}
+                data={selectedPendaftar}
+                onClose={() => setSelectedPendaftar(null)}
+                onSuccess={showToast}
+            />
+
+            <Toast 
+                open={toastState.open}
+                message={toastState.message}
+                type={toastState.type}
+            />
         </>
     );
 }

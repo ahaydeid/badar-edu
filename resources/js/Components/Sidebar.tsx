@@ -89,7 +89,7 @@ export default function Sidebar({ isOpen, onToggle }) {
     const isDropdownOpen = (key: string) => openDropdowns.includes(key);
 
     const isActive = (path: string) =>
-        url === path || url.startsWith(path + "/");
+        url === path || url.startsWith(path + "/") || url.startsWith(path + "?");
 
     const renderMenu = (items: MenuItem[], level = 1) =>
         items.map((item) => {

@@ -38,17 +38,23 @@ class AkunGuruPegawaiController extends Controller
         $modelClass = $request->user_type === 'guru_pegawai' ? \App\Models\Guru::class : \App\Models\Siswa::class;
         $profile = $modelClass::findOrFail($request->user_id);
 
-        if ($profile->user()->exists()) {
-             return back()->withErrors(['user_id' => 'Pengguna ini sudah memiliki akun.']);
-        }
-
-        // Generate Username
-        $baseUsername = strtolower(str_replace(' ', '.', $profile->nama));
-        $username = $baseUsername;
-        $counter = 1;
-        while (\App\Models\User::where('username', $username)->exists()) {
-            $username = $baseUsername . $counter;
-            $counter++;
+        if ($request->user_type === 'siswa') {
+            $username = $profile->nisn;
+            if (empty($username)) {
+                 return back()->withErrors(['user_id' => 'Siswa ini tidak memiliki NISN. Gagal membuat akun.']);
+            }
+            if (\App\Models\User::where('username', $username)->exists()) {
+                 return back()->withErrors(['user_id' => "Username/NISN ($username) sudah digunakan oleh akun lain."]);
+            }
+        } else {
+             // Generate Username for Guru/Pegawai (simple logic: first name lowercased + random number)
+            $baseUsername = strtolower(str_replace(' ', '.', $profile->nama));
+            $username = $baseUsername;
+            $counter = 1;
+            while (\App\Models\User::where('username', $username)->exists()) {
+                $username = $baseUsername . $counter;
+                $counter++;
+            }
         }
 
         // Map status to DB ENUM
@@ -99,4 +105,15 @@ class AkunGuruPegawaiController extends Controller
         return back()->with('success', 'Data user berhasil diperbarui.');
     }
 
+    public function destroy(\Illuminate\Http\Request $request, \App\Models\User $user)
+    {
+        // Optional: Prevent deleting self or specific roles if needed
+        if ($user->hasRole('devhero')) {
+             return back()->withErrors(['message' => 'Cannot delete restricted account.']);
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'Akun berhasil dihapus.');
+    }
 }

@@ -20,44 +20,50 @@ type PPDBAktif = {
     jurusan: string;
     kuota: number;
     status: string;
+    deskripsi?: string;
+    // Raw fields for editing
+    id?: number;
+    start_date_raw?: string;
+    end_date_raw?: string;
+    committee_name?: string;
+    jurusans_raw?: any[];
 };
 
-export default function Index() {
+type KuotaJurusan = {
+    jurusan: string;
+    kuota: number;
+    terisi: number;
+};
+
+type Props = {
+    ppdbAktifList: PPDBAktif[]; // Renamed and array type
+    kuota: KuotaJurusan[];
+    history: HistoryPPDB[];
+    allJurusans: { id: number; nama: string; kode: string }[];
+};
+
+export default function Index({ ppdbAktifList, kuota, history, allJurusans }: Props) {
     const [openModal, setOpenModal] = useState(false);
+    const [editData, setEditData] = useState<any>(null); // Use proper type if possible
 
-    type KuotaJurusan = {
-        jurusan: string;
-        kuota: number;
-        terisi: number;
+    const handleEdit = (item: PPDBAktif) => {
+        setEditData({
+            id: item.id,
+            tahun_ajaran: item.tahun,
+            gelombang: item.gelombang,
+            status: item.status,
+            start_date: item.start_date_raw,
+            end_date: item.end_date_raw,
+            committee_name: item.committee_name || '',
+            jurusans: item.jurusans_raw || []
+        });
+        setOpenModal(true);
     };
 
-    const ppdbAktif: PPDBAktif = {
-        tahun: "2025/2026",
-        gelombang: "Gelombang 1",
-        periode: "01 Jun 2025 – 30 Jun 2025",
-        jurusan: "MPLB, TBSM, TKR, TBG",
-        kuota: 240,
-        status: "Aktif",
+    const handleAdd = () => {
+        setEditData(null);
+        setOpenModal(true);
     };
-
-    const kuota: KuotaJurusan[] = [
-        { jurusan: "MPLB", kuota: 60, terisi: 45 },
-        { jurusan: "TBSM", kuota: 60, terisi: 52 },
-        { jurusan: "TKR", kuota: 60, terisi: 58 },
-        { jurusan: "TBG", kuota: 60, terisi: 40 },
-    ];
-
-    const history: HistoryPPDB[] = [
-        {
-            id: 1,
-            tahun: "2024/2025",
-            gelombang: "Gelombang 1",
-            periode: "01 Jun 2024 – 30 Jun 2024",
-            jurusan: "MPLB, TBSM, TKR, TBG",
-            kuota: 240,
-            status: "Arsip",
-        },
-    ];
 
     return (
         <>
@@ -69,71 +75,93 @@ export default function Index() {
                         <h1 className="text-xl font-semibold">
                             Pengaturan PPDB
                         </h1>
-                        <p className="text-sm text-gray-500">
-                            Manajemen periode dan gelombang PPDB
-                        </p>
                     </div>
 
                     <button
-                        onClick={() => setOpenModal(true)}
+                        onClick={handleAdd}
                         className="rounded-md bg-blue-600 cursor-pointer px-4 py-2 text-sm text-white"
                     >
                         + Tambah PPDB
                     </button>
                 </div>
-                {/* PPDB AKTIF */}
-                <div className="rounded-sm border border-blue-200 bg-blue-50 px-4 py-3 relative">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h2 className="text-sm font-semibold text-blue-700">
-                                PPDB Aktif
-                            </h2>
-                            <p className="text-xs text-blue-600">
-                                {ppdbAktif.tahun} · {ppdbAktif.gelombang}
-                            </p>
-                        </div>
-                        <span className="flex items-center gap-2 text-xs font-medium text-gray-700">
-                            <span className="relative flex h-3 w-3 items-center justify-center">
-                                <span className="absolute h-full w-full rounded-full bg-green-500 opacity-60 animate-ping" />
-                                <span className="relative h-2 w-2 rounded-full bg-green-600" />
-                            </span>
-                            {ppdbAktif.status}
-                        </span>
-                    </div>
+                {/* PPDB AKTIF LIST */}
+                {ppdbAktifList.length > 0 ? (
+                    <div className="flex flex-col gap-4">
+                        {ppdbAktifList.map((ppdb, index) => (
+                            <div key={ppdb.id || index} className="rounded-sm border border-sky-200 bg-sky-50 px-4 py-3 relative">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-sm font-semibold text-gray-700">
+                                            PPDB Aktif
+                                        </h2>
+                                        <p className="text-xs text-gray-600">
+                                            {ppdb.tahun} · {ppdb.gelombang}
+                                        </p>
+                                    </div>
+                                    <span className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                                        <span className="relative flex h-3 w-3 items-center justify-center">
+                                            <span className="absolute h-full w-full rounded-full bg-green-500 opacity-60 animate-ping" />
+                                            <span className="relative h-2 w-2 rounded-full bg-green-600" />
+                                        </span>
+                                        {ppdb.status}
+                                    </span>
+                                </div>
 
-                    <div className="mt-2 grid grid-cols-1 md:grid-cols-4 gap-2 text-sm text-gray-700">
-                        <div>
-                            <span className="text-xs text-gray-500">
-                                Periode
-                            </span>
-                            <div>{ppdbAktif.periode}</div>
-                        </div>
-                        <div>
-                            <span className="text-xs text-gray-500">
-                                Jurusan
-                            </span>
-                            <div>{ppdbAktif.jurusan}</div>
-                        </div>
-                        <div>
-                            <span className="text-xs text-gray-500">
-                                Total Kuota
-                            </span>
-                            <div>{ppdbAktif.kuota}</div>
-                        </div>
-                    </div>
+                                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 text-sm text-gray-700">
+                                    <div>
+                                        <span className="text-xs text-gray-500 block mb-1">
+                                            Periode
+                                        </span>
+                                        <div className="font-medium">{ppdb.periode}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-500 block mb-1">
+                                            Jurusan
+                                        </span>
+                                        <div className="font-medium">{ppdb.jurusan}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-500 block mb-1">
+                                            Total Kuota
+                                        </span>
+                                        <div className="font-medium">{ppdb.kuota} Siswa</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-500 block mb-1">
+                                            Ketua Panitia
+                                        </span>
+                                        <div className="font-medium truncate" title={ppdb.committee_name || ''}>{ppdb.committee_name || '-'}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-500 block mb-1">
+                                            Deskripsi
+                                        </span>
+                                        <div className="truncate font-medium" title={ppdb.deskripsi}>{ppdb.deskripsi || '-'}</div>
+                                    </div>
+                                </div>
 
-                    {/* BUTTON KELOLA */}
-                    <div className="absolute bottom-3 right-4">
-                        <button className="inline-flex items-center gap-1.5 rounded-md bg-sky-500 px-3 py-1.5 text-xs text-white cursor-pointer hover:bg-blue-600">
-                            <Settings2 className="h-4 w-4" />
-                            Kelola
-                        </button>
+                                {/* BUTTON KELOLA */}
+                                <div className="mt-4 flex justify-end border-t border-blue-200/50 pt-3">
+                                    <button 
+                                        onClick={() => handleEdit(ppdb)}
+                                        className="inline-flex items-center gap-1.5 rounded-md bg-sky-500 px-4 py-2 text-xs font-medium text-white cursor-pointer hover:bg-sky-600 transition-colors shadow-sm"
+                                    >
+                                        <Settings2 className="h-4 w-4" />
+                                        Kelola
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                </div>
+                ) : (
+                    <div className="rounded-sm border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500">
+                        Tidak ada periode PPDB yang aktif saat ini. Silakan buat periode baru.
+                    </div>
+                )}
                 {/* KUOTA */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     {kuota.map((k) => {
-                        const persen = Math.round((k.terisi / k.kuota) * 100);
+                        const persen = checkPersen(k.terisi, k.kuota); // Prevent NaN
                         return (
                             <div
                                 key={k.jurusan}
@@ -223,8 +251,15 @@ export default function Index() {
 
             <TambahPPDBModal
                 open={openModal}
+                editData={editData}
                 onClose={() => setOpenModal(false)}
+                allJurusans={allJurusans}
             />
         </>
     );
+}
+
+function checkPersen(terisi: number, kuota: number) {
+    if (kuota === 0) return 0;
+    return Math.round((terisi / kuota) * 100);
 }

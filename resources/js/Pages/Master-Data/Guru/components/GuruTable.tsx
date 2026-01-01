@@ -2,11 +2,40 @@ import { useState } from "react";
 import { Link, router } from "@inertiajs/react";
 import { Eye, Pencil, Trash2, User } from "lucide-react";
 import ModalFoto from "./ModalFoto";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
+import Toast from "@/Components/ui/Toast";
 
 export default function GuruTable({ data, loading, onEdit }) {
     const [openFoto, setOpenFoto] = useState(false);
     const [fotoAktif, setFotoAktif] = useState<string | null>(null);
     const [namaAktif, setNamaAktif] = useState<string | null>(null);
+
+    // Confirm & Toast State
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [toast, setToast] = useState({ open: false, message: "", type: "success" as "success" | "error" });
+
+    const handleDeleteClick = (id: number) => {
+        setDeleteId(id);
+        setConfirmDeleteOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (!deleteId) return;
+        router.delete(`/master-data/guru/${deleteId}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setConfirmDeleteOpen(false);
+                setToast({ open: true, message: "Data guru berhasil dihapus", type: "success" });
+                setTimeout(() => setToast(prev => ({ ...prev, open: false })), 3000);
+            },
+            onError: (errors) => {
+                setConfirmDeleteOpen(false);
+                setToast({ open: true, message: "Gagal menghapus data guru", type: "error" });
+                setTimeout(() => setToast(prev => ({ ...prev, open: false })), 3000);
+            }
+        });
+    };
 
     function formatDateShort(dateString) {
         if (!dateString) return "-";
@@ -165,15 +194,7 @@ export default function GuruTable({ data, loading, onEdit }) {
                                                 </Link>
 
                                                 <button
-                                                    onClick={() =>
-                                                        router.delete(
-                                                            `/master-data/guru/${g.id}`,
-                                                            {
-                                                                preserveScroll:
-                                                                    true,
-                                                            }
-                                                        )
-                                                    }
+                                                    onClick={() => handleDeleteClick(g.id)}
                                                     className="px-3 py-2 bg-rose-500 text-white rounded-md text-xs flex items-center gap-1"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -195,6 +216,19 @@ export default function GuruTable({ data, loading, onEdit }) {
                 nama={namaAktif}
                 onClose={() => setOpenFoto(false)}
             />
+
+            <ConfirmDialog
+                open={confirmDeleteOpen}
+                onClose={() => setConfirmDeleteOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Hapus Data Guru?"
+                message="Apakah Anda yakin ingin menghapus data guru ini secara permanen?"
+                confirmText="Ya, Hapus"
+                cancelText="Batal"
+                variant="danger"
+            />
+
+            <Toast open={toast.open} message={toast.message} type={toast.type} />
         </>
     );
 }

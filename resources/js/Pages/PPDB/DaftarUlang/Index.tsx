@@ -1,6 +1,7 @@
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { useState } from "react";
 import DaftarUlangModal from "./components/DaftarUlangModal";
+import Toast from "@/Components/ui/Toast";
 
 type DaftarUlang = {
     id: number;
@@ -8,47 +9,30 @@ type DaftarUlang = {
     nama: string;
     jurusan: string;
     asal_sekolah: string;
-    status: "Belum" | "Proses" | "Selesai";
 };
 
-export default function Index() {
+type Props = {
+    pendaftars?: DaftarUlang[];
+};
+
+export default function Index({ pendaftars = [] }: Props) {
     const [selected, setSelected] = useState<DaftarUlang | null>(null);
     const [openModal, setOpenModal] = useState(false);
     const [search, setSearch] = useState<string>("");
+    const [toastState, setToastState] = useState({
+        open: false,
+        message: "",
+        type: "success" as "success" | "error"
+    });
 
-    const data: DaftarUlang[] = [
-        {
-            id: 1,
-            no_pendaftaran: "PPDB-2025-001",
-            nama: "Ahmad Fauzi",
-            jurusan: "TKR",
-            asal_sekolah: "SMP Negeri 1",
-            status: "Belum",
-        },
-        {
-            id: 2,
-            no_pendaftaran: "PPDB-2025-002",
-            nama: "Siti Aisyah",
-            jurusan: "MPLB",
-            asal_sekolah: "SMP Negeri 3",
-            status: "Proses",
-        },
-    ];
-
-    const filtered = data.filter((d) => {
+    const filtered = (pendaftars || []).filter((d) => {
         const q = search.toLowerCase();
         return q
             ? d.no_pendaftaran.toLowerCase().includes(q) ||
                   d.nama.toLowerCase().includes(q) ||
-                  d.asal_sekolah.toLowerCase().includes(q)
+                  d.asal_sekolah?.toLowerCase().includes(q) // Optional check
             : true;
     });
-
-    const statusColor = (status: DaftarUlang["status"]) => {
-        if (status === "Selesai") return "bg-green-600";
-        if (status === "Proses") return "bg-yellow-500";
-        return "bg-gray-400";
-    };
 
     const openDetail = (row: DaftarUlang) => {
         setSelected(row);
@@ -58,6 +42,11 @@ export default function Index() {
     const closeDetail = () => {
         setSelected(null);
         setOpenModal(false);
+    };
+
+    const showToast = (message: string, type: "success" | "error") => {
+        setToastState({ open: true, message, type });
+        setTimeout(() => setToastState(p => ({ ...p, open: false })), 3000);
     };
 
     return (
@@ -91,18 +80,12 @@ export default function Index() {
                         <thead className="bg-sky-50 text-xs uppercase text-gray-600">
                             <tr>
                                 <th className="px-4 py-3 text-left">No</th>
-                                <th className="px-4 py-3 text-left">
-                                    No Pendaftaran
-                                </th>
-                                <th className="px-4 py-3 text-left">Nama</th>
+                                <th className="px-4 py-3 text-left">Siswa</th>
                                 <th className="px-4 py-3 text-left">Jurusan</th>
                                 <th className="px-4 py-3 text-left">
                                     Asal Sekolah
                                 </th>
-                                <th className="px-4 py-3 text-center">
-                                    Status
-                                </th>
-                                <th className="px-4 py-3 text-right">Aksi</th>
+                                <th className="px-4 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -110,29 +93,17 @@ export default function Index() {
                                 <tr key={d.id} className="hover:bg-gray-50">
                                     <td className="px-4 py-3">{i + 1}</td>
                                     <td className="px-4 py-3">
-                                        {d.no_pendaftaran}
-                                    </td>
-                                    <td className="px-4 py-3 font-medium">
-                                        {d.nama}
+                                        <div className="font-medium text-gray-900">{d.nama}</div>
+                                        <div className="text-xs text-gray-400 font-mono mt-0.5">{d.no_pendaftaran}</div>
                                     </td>
                                     <td className="px-4 py-3">{d.jurusan}</td>
                                     <td className="px-4 py-3">
                                         {d.asal_sekolah}
                                     </td>
                                     <td className="px-4 py-3 text-center">
-                                        <span className="inline-flex items-center gap-2 text-xs">
-                                            <span
-                                                className={`h-2 w-2 rounded-full ${statusColor(
-                                                    d.status
-                                                )}`}
-                                            />
-                                            {d.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-right">
                                         <button
                                             onClick={() => openDetail(d)}
-                                            className="text-blue-600 hover:underline text-xs"
+                                            className="inline-flex items-center cursor-pointer rounded-md bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-sky-700 transition-colors"
                                         >
                                             Detail
                                         </button>
@@ -142,7 +113,7 @@ export default function Index() {
                             {filtered.length === 0 && (
                                 <tr>
                                     <td
-                                        colSpan={7}
+                                        colSpan={5}
                                         className="px-4 py-6 text-center text-gray-500"
                                     >
                                         Tidak ada data
@@ -159,6 +130,13 @@ export default function Index() {
                 open={openModal}
                 data={selected}
                 onClose={closeDetail}
+                onSuccess={showToast}
+            />
+
+            <Toast 
+                open={toastState.open}
+                message={toastState.message}
+                type={toastState.type}
             />
         </>
     );

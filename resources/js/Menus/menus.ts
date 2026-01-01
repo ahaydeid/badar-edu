@@ -22,6 +22,7 @@ import {
     FileWarning,
     Radio,
     BarChart3,
+    Building2,
 } from "lucide-react";
 
 export type MenuItem = {
@@ -234,7 +235,7 @@ export const panelMenu: MenuItem[] = [
             {
                 name: "Master Kedisiplinan",
                 icon: Settings,
-                path: "/kedisiplinan",
+                path: "/kedisiplinan/master",
                 permission: "kedisiplinan.view",
                 children: [
                     {
@@ -280,6 +281,12 @@ export const panelMenu: MenuItem[] = [
                 icon: Layers,
                 path: "/ppdb/daftar-ulang",
                 permission: "ppdb.daftarulang.view",
+            },
+            {
+                name: "Siswa Baru",
+                icon: GraduationCap,
+                path: "/ppdb/siswa-baru",
+                permission: "ppdb.siswabaru.view",
             },
         ],
     },
@@ -397,6 +404,11 @@ export const panelMenu: MenuItem[] = [
                 path: "/konfigurasi",
                 // permission: "konfigurasi.view", // Removed per request
                 children: [
+                    {
+                        name: "Profil Sekolah",
+                        path: "/konfigurasi/profile-sekolah",
+                        permission: "konfigurasi.view",
+                    },
                     {
                         name: "Jurusan",
                         path: "/konfigurasi/jurusan",
