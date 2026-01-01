@@ -30,6 +30,7 @@ class PermissionSeeder extends Seeder
             // Jadwal & Absensi Guru Mapel
             'jadwal-mapel.view',
             'absensi-siswa.view',
+            'absensi-siswa.manage',
 
             // Kelas Binaan
             'kelas-binaan.jadwal.view',
@@ -51,47 +52,68 @@ class PermissionSeeder extends Seeder
             'lms.tugas.view',
 
             // Rencana Ajar
-
+            'rencana-ajar.view',
+            'rencana-ajar.manage',
 
             // Nilai/Penilaian
             'nilai.view',
+            'nilai.manage',
 
-            // Pengguna
-
+            // Pengguna (Akun)
             'guru-pegawai.view',
+            'guru-pegawai.manage',
             'siswa.view',
+            'siswa.manage',
             'rfid.register.view',
+            'rfid.register.manage',
 
             // Master Data
-
             'master-data.guru.view',
+            'master-data.guru.manage',
             'master-data.siswa.view',
+            'master-data.siswa.manage',
             'master-data.jadwal-ajar.view',
+            'master-data.jadwal-ajar.manage',
             'master-data.rombel.view',
+            'master-data.rombel.manage',
             'master-data.alumni.view',
+            'master-data.alumni.manage',
 
             // PPDB
             'ppdb.settings.view',
+            'ppdb.settings.manage',
             'ppdb.pendaftaran.view',
+            'ppdb.pendaftaran.manage',
             'ppdb.verifikasi.view',
+            'ppdb.verifikasi.manage',
             'ppdb.daftarulang.view',
+            'ppdb.daftarulang.manage',
+            'ppdb.siswabaru.view',
+            'ppdb.siswabaru.manage',
 
             // Payroll
-
+            'payroll.view',
             'payroll.run',
             'payroll.slip',
 
             // Konfigurasi
-
+            'konfigurasi.view',
+            'konfigurasi.manage',
             'konfigurasi.jadwal.view',
+            'konfigurasi.jadwal.manage',
             'konfigurasi.kalender-akademik.view',
+            'konfigurasi.kalender-akademik.manage',
             'konfigurasi.jurusan.view',
+            'konfigurasi.jurusan.manage',
             'konfigurasi.mapel.view',
+            'konfigurasi.mapel.manage',
             'konfigurasi.role.view',
             'konfigurasi.role.edit',
+            'konfigurasi.role.manage',
 
             // Kedisiplinan
             'kedisiplinan.view',
+            'kedisiplinan.manage',
         ];
 
         foreach ($permissions as $permission) {

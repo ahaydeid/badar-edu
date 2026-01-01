@@ -37,7 +37,9 @@ class RoleSeeder extends Seeder
             'dashboard.view',
             'jadwal-mapel.view',
             'absensi-siswa.view',
+            'absensi-siswa.manage',
             'nilai.view',
+            'nilai.manage',
             'pengumuman.view',
             'kalender-akademik.view',
             'lms.materi.view',
@@ -75,14 +77,22 @@ class RoleSeeder extends Seeder
             'jadwal-semua-kelas.view',
 
             'master-data.guru.view',
+            'master-data.guru.manage',
             'master-data.siswa.view',
+            'master-data.siswa.manage',
             'master-data.jadwal-ajar.view',
+            'master-data.jadwal-ajar.manage',
             'master-data.rombel.view',
+            'master-data.rombel.manage',
 
             'konfigurasi.jadwal.view',
+            'konfigurasi.jadwal.manage',
             'konfigurasi.kalender-akademik.view',
+            'konfigurasi.kalender-akademik.manage',
             'konfigurasi.jurusan.view',
+            'konfigurasi.jurusan.manage',
             'konfigurasi.mapel.view',
+            'konfigurasi.mapel.manage',
         ]);
 
         // Kesiswaan: permission untuk kedisiplinan & PPDB
@@ -92,11 +102,19 @@ class RoleSeeder extends Seeder
             'pengumuman.manage',
 
             'master-data.siswa.view',
+            'master-data.siswa.manage',
             'kedisiplinan.view',
+            'kedisiplinan.manage',
             'ppdb.settings.view',
+            'ppdb.settings.manage',
             'ppdb.pendaftaran.view',
+            'ppdb.pendaftaran.manage',
             'ppdb.verifikasi.view',
+            'ppdb.verifikasi.manage',
             'ppdb.daftarulang.view',
+            'ppdb.daftarulang.manage',
+            'ppdb.siswabaru.view',
+            'ppdb.siswabaru.manage',
         ]);
 
         // Tata Usaha: permission untuk pengguna & payroll
@@ -106,9 +124,13 @@ class RoleSeeder extends Seeder
             'pengumuman.view',
 
             'guru-pegawai.view',
+            'guru-pegawai.manage',
             'siswa.view',
+            'siswa.manage',
             'rfid.register.view',
+            'rfid.register.manage',
 
+            'payroll.view',
             'payroll.run',
             'payroll.slip',
         ]);

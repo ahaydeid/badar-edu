@@ -166,14 +166,13 @@ Route::middleware(['auth'])->group(function () use ($ud) {
     Route::middleware(['permission:nilai.view'])->group(function () {
         Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
         
-        // POST routes need to be before wildcards if they conflict, but here structure is distinct
-        Route::post('/penilaian', [PenilaianController::class, 'storeJenis'])->name('penilaian.storeJenis');
-        Route::post('/penilaian/sub', [PenilaianController::class, 'storeSub'])->name('penilaian.storeSub');
-        Route::post('/penilaian/nilai', [PenilaianController::class, 'updateNilai'])->name('penilaian.updateNilai');
-        Route::post('/penilaian/finish', [PenilaianController::class, 'finishSub'])->name('penilaian.finishSub');
+        Route::post('/penilaian', [PenilaianController::class, 'storeJenis'])->middleware(['permission:nilai.manage'])->name('penilaian.storeJenis');
+        Route::post('/penilaian/sub', [PenilaianController::class, 'storeSub'])->middleware(['permission:nilai.manage'])->name('penilaian.storeSub');
+        Route::post('/penilaian/nilai', [PenilaianController::class, 'updateNilai'])->middleware(['permission:nilai.manage'])->name('penilaian.updateNilai');
+        Route::post('/penilaian/finish', [PenilaianController::class, 'finishSub'])->middleware(['permission:nilai.manage'])->name('penilaian.finishSub');
         Route::get('/penilaian/{kelasId}/hitung', [PenilaianController::class, 'hitungAkhir'])->name('penilaian.hitung');
-        Route::post('/penilaian/bobot', [PenilaianController::class, 'simpanBobot'])->name('penilaian.simpanBobot');
-        Route::post('/penilaian/kirim-akhir', [PenilaianController::class, 'kirimNilaiAkhir'])->name('penilaian.kirimAkhir');
+        Route::post('/penilaian/bobot', [PenilaianController::class, 'simpanBobot'])->middleware(['permission:nilai.manage'])->name('penilaian.simpanBobot');
+        Route::post('/penilaian/kirim-akhir', [PenilaianController::class, 'kirimNilaiAkhir'])->middleware(['permission:nilai.manage'])->name('penilaian.kirimAkhir');
 
         Route::get('/penilaian/{kelas}', [PenilaianController::class, 'detail'])->name('penilaian.detail');
         Route::get('/penilaian/{kelas}/{penilaian}', [PenilaianController::class, 'subPenilaian'])->name('penilaian.sub');
@@ -218,27 +217,27 @@ Route::middleware(['auth'])->group(function () use ($ud) {
             Route::get('/guru/{guru}/edit', [GuruController::class, 'edit'])
                 ->middleware(['permission:master-data.guru.view']);
             Route::post('/guru', [GuruController::class, 'store'])
-                ->middleware(['permission:master-data.guru.view']);
+                ->middleware(['permission:master-data.guru.manage']);
             Route::put('/guru/{guru}', [GuruController::class, 'update'])
-                ->middleware(['permission:master-data.guru.view']);
+                ->middleware(['permission:master-data.guru.manage']);
             Route::delete('/guru/{guru}', [GuruController::class, 'destroy'])
-                ->middleware(['permission:master-data.guru.view']);
+                ->middleware(['permission:master-data.guru.manage']);
 
             Route::get('/siswa', [SiswaController::class, 'index'])
                 ->middleware(['permission:master-data.siswa.view']);
             Route::get('/siswa/{id}', [SiswaController::class, 'show'])
                 ->middleware(['permission:master-data.siswa.view']);
             Route::post('/siswa', [SiswaController::class, 'store'])
-                ->middleware(['permission:master-data.siswa.view']);
+                ->middleware(['permission:master-data.siswa.manage']);
             Route::get('/siswa/{id}/edit', [SiswaController::class, 'edit'])
                 ->middleware(['permission:master-data.siswa.view']);
             Route::put('/siswa/{id}', [SiswaController::class, 'update'])
-                ->middleware(['permission:master-data.siswa.view']);
+                ->middleware(['permission:master-data.siswa.manage']);
             Route::delete('/siswa/{id}', [SiswaController::class, 'destroy'])
-                ->middleware(['permission:master-data.siswa.view']);
+                ->middleware(['permission:master-data.siswa.manage']);
 
             Route::post('/siswa/import', [SiswaController::class, 'import'])
-                ->middleware(['permission:master-data.siswa.view']);
+                ->middleware(['permission:master-data.siswa.manage']);
 
             Route::get('/jadwal-ajar', [JadwalController::class, 'index'])
                 ->middleware(['permission:master-data.jadwal-ajar.view']);
@@ -256,10 +255,10 @@ Route::middleware(['auth'])->group(function () use ($ud) {
         Route::get('/pengaturan', [PengaturanController::class, 'index'])
             ->middleware(['permission:ppdb.settings.view']);
         Route::post('/pengaturan', [PengaturanController::class, 'store'])
-            ->middleware(['permission:ppdb.settings.view'])
+            ->middleware(['permission:ppdb.settings.manage'])
             ->name('ppdb.pengaturan.store');
         Route::put('/pengaturan/{id}', [PengaturanController::class, 'update'])
-            ->middleware(['permission:ppdb.settings.view'])
+            ->middleware(['permission:ppdb.settings.manage'])
             ->name('ppdb.pengaturan.update');
         Route::get('/pendaftaran', [PendaftaranController::class, 'index'])
             ->middleware(['permission:ppdb.pendaftaran.view']);
@@ -269,23 +268,23 @@ Route::middleware(['auth'])->group(function () use ($ud) {
         Route::get('/verifikasi', [VerifikasiController::class, 'index'])
             ->middleware(['permission:ppdb.verifikasi.view']);
         Route::put('/verifikasi/{id}/status', [VerifikasiController::class, 'update'])
-            ->middleware(['permission:ppdb.verifikasi.view'])
+            ->middleware(['permission:ppdb.verifikasi.manage'])
             ->name('ppdb.verifikasi.update');
         Route::get('/daftar-ulang', [DaftarUlangController::class, 'index'])
             ->middleware(['permission:ppdb.daftarulang.view'])
             ->name('ppdb.daftarulang');
         Route::put('/daftar-ulang/{id}/complete', [DaftarUlangController::class, 'complete'])
-            ->middleware(['permission:ppdb.daftarulang.view'])
+            ->middleware(['permission:ppdb.daftarulang.manage'])
             ->name('ppdb.daftarulang.complete');
         Route::get('/cetak/{id}', [DaftarUlangController::class, 'cetak'])
             ->middleware(['permission:ppdb.daftarulang.view'])
             ->name('ppdb.cetak');
             
         Route::get('/siswa-baru', [\App\Http\Controllers\PPDB\SiswaBaruController::class, 'index'])
-            ->middleware(['permission:ppdb.daftarulang.view']) // Using same permission for now
+            ->middleware(['permission:ppdb.siswabaru.view'])
             ->name('ppdb.siswabaru');
         Route::post('/siswa-baru/bulk-migrate', [\App\Http\Controllers\PPDB\SiswaBaruController::class, 'bulkMigrate'])
-            ->middleware(['permission:ppdb.daftarulang.view'])
+            ->middleware(['permission:ppdb.siswabaru.manage'])
             ->name('ppdb.siswabaru.bulk-migrate');
     });
 
@@ -347,7 +346,7 @@ Route::middleware(['auth'])->group(function () use ($ud) {
             ->middleware(['permission:konfigurasi.view'])
             ->name('konfigurasi.profile');
         Route::post('/profile-sekolah', [SchoolProfileController::class, 'update'])
-            ->middleware(['permission:konfigurasi.view'])
+            ->middleware(['permission:konfigurasi.manage'])
             ->name('konfigurasi.profile.update');
     });
 
