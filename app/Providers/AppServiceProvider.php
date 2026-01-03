@@ -28,17 +28,28 @@ class AppServiceProvider extends ServiceProvider
                 'menus' => fn () => \App\Support\MenuBuilder::build(),
             ],
 
-            'topAnnouncements' => fn () =>
-                Pengumuman::query()
+            'topAnnouncements' => function () {
+                $user = Auth::user();
+
+                $query = Pengumuman::query();
+
+                if ($user) {
+                    $userRoleIds = $user->roles()->pluck('id')->toArray();
+                    $query->where(function ($q) use ($userRoleIds) {
+                        $q->whereDoesntHave('roles')
+                          ->orWhereHas('roles', function ($rq) use ($userRoleIds) {
+                              $rq->whereIn('roles.id', $userRoleIds);
+                          });
+                    });
+                } else {
+                    $query->whereDoesntHave('roles');
+                }
+
+                return $query->orderByDesc('is_active')
                     ->orderByDesc('tanggal_mulai')
                     ->limit(10)
-                    ->get([
-                        'id',
-                        'judul',
-                        'isi',
-                        'tanggal_mulai',
-                        'is_active',
-                    ]),
+                    ->get(['id', 'judul', 'isi', 'tanggal_mulai', 'is_active', 'gambar']);
+            },
         ]);
     }
 

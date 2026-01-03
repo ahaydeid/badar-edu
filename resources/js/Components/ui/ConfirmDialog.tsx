@@ -29,21 +29,17 @@ export default function ConfirmDialog({
         <AnimatePresence>
             {open && (
                 <motion.div
-                    className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+                    className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                 >
                     <motion.div
-                        className="relative w-full max-w-md rounded-2xl bg-white px-6 pb-6 pt-14 shadow-xl"
-                        initial={{ scale: 0.9, y: 30, opacity: 0 }}
-                        animate={{ scale: 1, y: 0, opacity: 1 }}
-                        exit={{ scale: 0.95, y: 20, opacity: 0 }}
-                        transition={{
-                            type: "spring",
-                            stiffness: 260,
-                            damping: 22,
-                        }}
+                        className="relative w-full max-w-md rounded bg-white px-6 pb-6 pt-14 shadow-lg border border-gray-200"
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.95, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
                     >
                         {/* ICON FLOAT */}
                         <motion.div

@@ -22,10 +22,11 @@ type StudentRow = any;
 type PageProps = {
     students: StudentRow[];
     rombelList: { id: number; nama: string }[];
+    canEdit: boolean;
 };
 
 export default function Index() {
-    const { students, rombelList } = usePage<PageProps & InertiaPageProps>()
+    const { students, rombelList, canEdit } = usePage<PageProps & InertiaPageProps>()
         .props;
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -136,6 +137,7 @@ export default function Index() {
                     data={numbered}
                     loading={false}
                     onEdit={handleOpenEdit}
+                    canEdit={canEdit}
                 />
 
                 <div className="flex justify-end items-center gap-3">

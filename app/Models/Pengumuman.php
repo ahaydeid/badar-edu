@@ -14,7 +14,6 @@ class Pengumuman extends Model
         'gambar',
         'tanggal_mulai',
         'tanggal_selesai',
-        'target',
         'is_active',
     ];
 
@@ -23,4 +22,9 @@ class Pengumuman extends Model
         'tanggal_selesai' => 'date',
         'is_active' => 'boolean',
     ];
+
+    public function roles()
+    {
+        return $this->belongsToMany(\Spatie\Permission\Models\Role::class, 'pengumuman_role', 'pengumuman_id', 'role_id');
+    }
 }

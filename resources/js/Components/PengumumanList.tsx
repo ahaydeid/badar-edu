@@ -6,6 +6,7 @@ type Pengumuman = {
     isi: string;
     tanggal_mulai: string;
     is_active: boolean;
+    gambar?: string;
 };
 
 function truncateWords(text: string, limit = 12) {
@@ -67,14 +68,25 @@ export default function PengumumanList({ items, onSelect }: Props) {
                         title={p.is_active ? "Aktif" : "Tidak aktif"}
                     />
 
-                    <div className="font-medium text-gray-800 pr-4">
-                        {p.judul}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                        {truncateWords(p.isi)}
-                    </div>
-                    <div className="text-xs text-gray-700 italic mt-1">
-                        - {formatDateShort(p.tanggal_mulai)}
+                    <div className="flex gap-3">
+                        {p.gambar && (
+                            <img 
+                                src={`/storage/${p.gambar}`} 
+                                alt="" 
+                                className="w-12 h-12 object-cover rounded shrink-0 border border-gray-100"
+                            />
+                        )}
+                        <div className="flex-1">
+                            <div className="font-medium text-gray-800 pr-4">
+                                {p.judul}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                                {truncateWords(p.isi)}
+                            </div>
+                            <div className="text-xs text-gray-700 italic mt-1">
+                                - {formatDateShort(p.tanggal_mulai)}
+                            </div>
+                        </div>
                     </div>
                 </button>
             ))}

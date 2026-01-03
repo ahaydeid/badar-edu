@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
+use App\Models\MasterDataConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -14,6 +15,7 @@ class GuruController extends Controller
     {
         return inertia('Master-Data/Guru/Index', [
             'guru' => Guru::orderBy('nama')->get(),
+            'canEdit' => MasterDataConfig::canEdit('guru_pegawai'),
         ]);
     }
 
@@ -90,6 +92,11 @@ class GuruController extends Controller
 
     public function update(Request $request, Guru $guru)
     {
+        // Check if editing is allowed
+        if (!MasterDataConfig::canEdit('guru_pegawai')) {
+            return back()->withErrors(['message' => 'Pengeditan data guru & pegawai saat ini dikunci. Hubungi administrator untuk membuka akses.']);
+        }
+
         $data = $request->validate([
              // 'kode_guru' is immutable
             'nama' => 'required|string|max:255',

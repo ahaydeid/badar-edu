@@ -14,7 +14,7 @@ export default function Index() {
         return pengumuman.filter(
             (p: any) =>
                 p.judul.toLowerCase().includes(q) ||
-                p.target.toLowerCase().includes(q)
+                (p.roles && p.roles.some((r: any) => r.name.toLowerCase().includes(q)))
         );
     }, [pengumuman, searchTerm]);
 

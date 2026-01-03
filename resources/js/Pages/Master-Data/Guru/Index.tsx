@@ -20,6 +20,7 @@ type GuruRow = any;
 
 type PageProps = {
     guru: GuruRow[];
+    canEdit: boolean;
     flash?: {
         success?: string;
         error?: string;
@@ -28,7 +29,7 @@ type PageProps = {
 
 export default function Index() {
     const { props } = usePage<PageProps & InertiaPageProps>();
-    const { guru } = props;
+    const { guru, canEdit } = props;
 
     const [searchTerm, setSearchTerm] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -147,6 +148,7 @@ export default function Index() {
                     data={numbered}
                     loading={false}
                     onEdit={handleOpenEdit}
+                    canEdit={canEdit}
                 />
 
                 <div className="flex justify-end items-center gap-3">

@@ -5,6 +5,7 @@ type Pengumuman = {
     judul: string;
     isi: string;
     tanggal_mulai: string;
+    gambar?: string;
 };
 
 function formatDateShort(dateString: string) {
@@ -38,6 +39,13 @@ export default function PengumumanModal({ open, data, onClose }: Props) {
                         <div className="text-xs text-gray-400">
                             {formatDateShort(data.tanggal_mulai)}
                         </div>
+                        {data.gambar && (
+                            <img 
+                                src={`/storage/${data.gambar}`} 
+                                alt={data.judul}
+                                className="w-full h-auto max-h-[500px] object-contain rounded border border-gray-100 bg-gray-50"
+                            />
+                        )}
                         <p className="whitespace-pre-line">{data.isi}</p>
                     </div>
 

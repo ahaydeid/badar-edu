@@ -14,8 +14,9 @@ class RoleController extends Controller
 {
     public function index()
     {
+        $isDev = auth()->user()->hasRole('devhero');
         $roles = DB::table('roles')
-            ->where('name', '!=', 'devhero')
+            ->when(!$isDev, fn($q) => $q->where('name', '!=', 'devhero'))
             ->leftJoin(
                 'role_has_permissions',
                 'roles.id',

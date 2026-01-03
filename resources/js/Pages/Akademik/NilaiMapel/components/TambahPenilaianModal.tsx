@@ -25,6 +25,7 @@ export default function TambahPenilaianModal({
         mapel_id: mapelId || '',
         jenis_penilaian_id: penilaianId || '',
         nama: "",
+        has_sub: false, // Default non-aktif
     });
 
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -37,6 +38,7 @@ export default function TambahPenilaianModal({
                 mapel_id: mapelId || '',
                 jenis_penilaian_id: penilaianId || '',
                 nama: "",
+                has_sub: false,
             });
             setIsConfirmOpen(false);
         }
@@ -101,19 +103,41 @@ export default function TambahPenilaianModal({
                         )}
 
                         {mode === "baru" && (
-                            <div>
-                                <label className="text-xs text-gray-500">
-                                    Nama Penilaian
-                                </label>
-                                <input
-                                    autoFocus
-                                    value={data.nama}
-                                    onChange={e => setData('nama', e.target.value)}
-                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500"
-                                    placeholder="Contoh: Tugas Mandiri"
-                                />
-                                {errors.nama && <div className="text-red-500 text-xs mt-1">{errors.nama}</div>}
-                            </div>
+                            <>
+                                <div>
+                                    <label className="text-xs text-gray-500">
+                                        Nama Penilaian
+                                    </label>
+                                    <input
+                                        autoFocus
+                                        value={data.nama}
+                                        onChange={e => setData('nama', e.target.value)}
+                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500"
+                                        placeholder="Contoh: Tugas Mandiri"
+                                    />
+                                    {errors.nama && <div className="text-red-500 text-xs mt-1">{errors.nama}</div>}
+                                </div>
+
+                                <div className="flex items-center justify-between py-2">
+                                    <div className="space-y-0.5">
+                                        <label className="text-sm font-medium text-gray-700">Gunakan Sub Nilai</label>
+                                        <p className="text-xs text-gray-500">Aktifkan jika penilaian ini memiliki beberapa rincian nilai <br/> yang akan diambil rata-ratanya.</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setData('has_sub', !data.has_sub)}
+                                        className={`${
+                                            data.has_sub ? 'bg-blue-600' : 'bg-gray-200'
+                                        } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
+                                    >
+                                        <span
+                                            className={`${
+                                                data.has_sub ? 'translate-x-5' : 'translate-x-0'
+                                            } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                                        />
+                                    </button>
+                                </div>
+                            </>
                         )}
 
                         {mode === "sub" && (

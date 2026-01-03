@@ -3,6 +3,7 @@ import { X, ChevronRight } from "lucide-react";
 import { router } from "@inertiajs/react";
 import TambahSiswaTabHeader from "./TambahSiswaTabHeader";
 import TambahSiswaTabPanels from "./TambahSiswaTabPanels";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 
 type Props = {
     open: boolean;
@@ -12,6 +13,7 @@ type Props = {
     initialData?: any;
     onSuccess: (message: string) => void;
     onError: (message: string) => void;
+    baseUrl?: string; // default: '/master-data/siswa'
 };
 
 type WaliForm = {
@@ -184,10 +186,12 @@ export default function TambahSiswa({
     initialData,
     onSuccess,
     onError,
+    baseUrl = '/master-data/siswa',
 }: Props) {
     const [form, setForm] = useState<FormState>(emptyForm());
     const [preview, setPreview] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     // TAB state (tambahan saja)
     const [activeTab, setActiveTab] = useState(0);
@@ -289,7 +293,7 @@ export default function TambahSiswa({
 
         if (editId) {
             data.append("_method", "PUT");
-            router.post(`/master-data/siswa/${editId}`, data, {
+            router.post(`${baseUrl}/${editId}`, data, {
                 forceFormData: true,
                 onFinish: () => setSubmitting(false),
                 onSuccess: () => {
@@ -303,7 +307,7 @@ export default function TambahSiswa({
             return;
         }
 
-        router.post("/master-data/siswa", data, {
+        router.post(baseUrl, data, {
             forceFormData: true,
             onFinish: () => setSubmitting(false),
             onSuccess: () => {
@@ -314,6 +318,11 @@ export default function TambahSiswa({
                 onError("Gagal menambahkan data siswa");
             },
         });
+    }
+
+    function handleConfirmSubmit() {
+        setConfirmOpen(false);
+        handleSubmit();
     }
 
     if (!open) return null;
@@ -376,16 +385,29 @@ export default function TambahSiswa({
                         ) : (
                             <button
                                 type="button"
-                                onClick={handleSubmit}
+                                onClick={() => setConfirmOpen(true)}
                                 disabled={submitting}
                                 className="px-6 py-2 bg-sky-600 text-white rounded"
                             >
-                                {submitting ? "Menyimpan..." : "Simpan"}
+                                {submitting ? "Menyimpan..." : editId ? "Update" : "Simpan"}
                             </button>
                         )}
                     </div>
                 </div>
             </div>
+
+            <ConfirmDialog
+                open={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={handleConfirmSubmit}
+                title={editId ? "Update Data Siswa?" : "Tambah Data Siswa?"}
+                message={editId 
+                    ? "Apakah Anda yakin ingin menyimpan perubahan data siswa ini?" 
+                    : "Apakah Anda yakin ingin menambahkan data siswa baru ini?"
+                }
+                confirmText={editId ? "Ya, Update" : "Ya, Tambahkan"}
+                loading={submitting}
+            />
         </div>
     );
 }

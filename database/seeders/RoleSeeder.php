@@ -40,7 +40,6 @@ class RoleSeeder extends Seeder
             'absensi-siswa.manage',
             'nilai.view',
             'nilai.manage',
-            'pengumuman.view',
             'kalender-akademik.view',
             'lms.materi.view',
             'lms.tugas.view',

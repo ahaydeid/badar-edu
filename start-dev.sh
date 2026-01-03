@@ -1,15 +1,26 @@
 #!/bin/bash
 
+# Fungsi untuk membersihkan proses saat skrip dihentikan (Ctrl+C)
+cleanup() {
+    echo ""
+    echo "🛑 Menghentikan lingkungan pengembangan..."
+    pkill -P $$
+    exit
+}
+
+trap cleanup SIGINT SIGTERM
+
 echo "🚀 Memulai lingkungan pengembangan..."
 
-# 1. Menjalankan XAMPP (memerlukan password sudo)
+# 1. Pastikan proses lama sudah benar-benar mati
+pkill -f "php artisan serve" > /dev/null 2>&1
+pkill -f "vite" > /dev/null 2>&1
+
+# 2. Menjalankan XAMPP (memerlukan password sudo)
 sudo /opt/lampp/lampp start
 
-# 2. Menjalankan PHP Artisan Serve di background
+# 3. Menjalankan PHP Artisan Serve di background
 php artisan serve &
 
-# 3. Menjalankan NPM Run Dev
+# 4. Menjalankan NPM Run Dev
 npm run dev
-
-# Catatan: Perintah terakhir (npm run dev) dibiarkan di foreground 
-# agar Anda bisa melihat log-nya.

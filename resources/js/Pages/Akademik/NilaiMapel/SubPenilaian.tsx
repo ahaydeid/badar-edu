@@ -1,10 +1,11 @@
 import { Head, useForm, router, usePage } from "@inertiajs/react";
-import { ArrowLeft, Plus, X, Save, CheckCircle } from "lucide-react";
+import { ArrowLeft, Plus, X, Save, CheckCircle, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import TambahPenilaianModal from "./components/TambahPenilaianModal";
-import ConfirmDialog from "@/Components/ui/ConfirmDialog";
+import NilaiInputModal from "./components/NilaiInputModal";
 import Toast from "@/Components/ui/Toast";
 import { useUiFeedback } from "@/hooks/useUiFeedback";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 
 type Siswa = {
     id: number;
@@ -34,6 +35,10 @@ export default function SubPenilaian({ kelas, penilaian, penilaianId, subPenilai
     // State for "Input Nilai"
     const [activeSub, setActiveSub] = useState<SubPenilaian | null>(null);
     const [isInputModalOpen, setIsInputModalOpen] = useState(false);
+
+    // Deletion State
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<number | null>(null);
     
     // Toast Handling
     const { toast, showToast } = useUiFeedback();
@@ -48,96 +53,27 @@ export default function SubPenilaian({ kelas, penilaian, penilaianId, subPenilai
         }
     }, [props.flash]);
 
-    // Confirm Dialog State
-    const [confirmConfig, setConfirmConfig] = useState<{
-        open: boolean;
-        title: string;
-        message: string;
-        action: 'save' | 'finish' | null;
-        variant?: 'primary' | 'danger';
-        confirmText?: string;
-    }>({
-        open: false,
-        title: '',
-        message: '',
-        action: null,
-        variant: 'primary',
-        confirmText: 'Ya'
-    });
-
-    // Form for Grade Input
-    const { data, setData, post, processing, reset, clearErrors } = useForm({
-        sub_penilaian_id: 0,
-        siswa_data: [] as { siswa_id: number; nilai: number | string }[]
-    });
-
     const openInputModal = (sub: SubPenilaian) => {
         setActiveSub(sub);
-        // Prepare data for form
-        const mappedData = sub.siswa.map(s => ({
-            siswa_id: s.id,
-            nilai: s.nilai ?? ''
-        }));
-        
-        setData({
-            sub_penilaian_id: sub.id,
-            siswa_data: mappedData
-        });
-        clearErrors();
         setIsInputModalOpen(true);
     };
 
-    const handleNilaiChange = (index: number, val: string) => {
-        const newData = [...data.siswa_data];
-        newData[index].nilai = val;
-        setData('siswa_data', newData);
+    const confirmDelete = (e: React.MouseEvent, id: number) => {
+        e.stopPropagation();
+        setItemToDelete(id);
     };
 
-    const triggerSave = () => {
-        setConfirmConfig({
-            open: true,
-            title: 'Simpan Perubahan?',
-            message: 'Apakah anda yakin ingin menyimpan perubahan nilai ini?',
-            action: 'save',
-            variant: 'primary',
-            confirmText: 'Simpan'
+    const handleDelete = () => {
+        if (!itemToDelete) return;
+        setIsDeleting(true);
+        router.delete(`/penilaian/sub/${itemToDelete}`, {
+            onSuccess: () => {
+                setItemToDelete(null);
+                setIsDeleting(false);
+            },
+            onError: () => setIsDeleting(false),
+            preserveScroll: true
         });
-    };
-
-    const triggerFinish = () => {
-        setConfirmConfig({
-            open: true,
-            title: 'Selesaikan Penilaian?',
-            message: 'Apakah anda yakin ingin menyelesaikan penilaian ini? Data tidak bisa diubah lagi setelah selesai.',
-            action: 'finish',
-            variant: 'danger', // Use danger/red to emphasize irreversible
-            confirmText: 'Selesaikan'
-        });
-    };
-
-    const handleConfirm = () => {
-        if (confirmConfig.action === 'save') {
-             post('/penilaian/nilai', {
-                onSuccess: () => {
-                    setIsInputModalOpen(false);
-                    // reset(); // Don't reset immediately if we want to re-open? Actually closing modal implies reset is fine.
-                    reset();
-                    setConfirmConfig(prev => ({ ...prev, open: false }));
-                },
-                onError: () => setConfirmConfig(prev => ({ ...prev, open: false })),
-                preserveScroll: true
-            });
-        } else if (confirmConfig.action === 'finish') {
-             router.post('/penilaian/finish', {
-                sub_penilaian_id: activeSub?.id
-             }, {
-                onSuccess: () => {
-                     setIsInputModalOpen(false);
-                     setConfirmConfig(prev => ({ ...prev, open: false }));
-                },
-                onError: () => setConfirmConfig(prev => ({ ...prev, open: false }))
-             });
-        }
     };
 
     return (
@@ -184,11 +120,20 @@ export default function SubPenilaian({ kelas, penilaian, penilaianId, subPenilai
                             <button
                                 key={s.id}
                                 onClick={() => openInputModal(s)}
-                                className="text-left block w-full rounded-lg border border-gray-200 bg-white p-4 hover:border-gray-300 transition shadow-sm hover:shadow-md"
+                                className="group relative text-left block w-full rounded-lg border border-gray-200 bg-white p-4 hover:border-gray-300 transition shadow-sm hover:shadow-md"
                             >
-                                {/* JUDUL */}
-                                <div className="text-base font-semibold text-gray-800">
-                                    {s.nama}
+                                <div className="flex items-start justify-between">
+                                    {/* JUDUL */}
+                                    <div className="text-base font-semibold text-gray-800">
+                                        {s.nama}
+                                    </div>
+                                    <button
+                                        onClick={(e) => confirmDelete(e, s.id)}
+                                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                                        title="Hapus Sub Nilai"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
                                 </div>
 
                                 {/* META */}
@@ -229,104 +174,6 @@ export default function SubPenilaian({ kelas, penilaian, penilaianId, subPenilai
                 </div>
             </div>
 
-            {/* MODAL INPUT NILAI */}
-            {isInputModalOpen && activeSub && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4">
-                    <div className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-lg bg-white border border-gray-200 shadow-xl">
-                        {/* HEADER MODAL */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 shrink-0">
-                            <div>
-                                <div className="text-lg font-semibold text-gray-800">
-                                    {activeSub.nama}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    {kelas}
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setIsInputModalOpen(false)}
-                                className="rounded-full p-2 hover:bg-gray-100 transition"
-                            >
-                                <X className="h-5 w-5 text-gray-500" />
-                            </button>
-                        </div>
-
-                        {/* BODY - SCROLLABLE */}
-                        <div className="flex-1 overflow-y-auto p-6">
-                            <div className="border rounded-lg overflow-hidden">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-gray-50 text-gray-700 font-medium uppercase text-xs">
-                                        <tr>
-                                            <th className="px-4 py-3 w-16 text-center">No</th>
-                                            <th className="px-4 py-3">Nama Siswa</th>
-                                            <th className="px-4 py-3 w-32 text-center">Nilai (0-100)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200">
-                                        {data.siswa_data.map((item, i) => {
-                                            // Find name from activeSub to display since form data only has ID
-                                            const studentName = activeSub.siswa.find(s => s.id === item.siswa_id)?.nama || '-';
-                                            return (
-                                                <tr key={item.siswa_id} className="hover:bg-gray-50">
-                                                    <td className="px-4 py-2 text-center text-gray-500">
-                                                        {i + 1}
-                                                    </td>
-                                                    <td className="px-4 py-2 font-medium text-gray-900">
-                                                        {studentName}
-                                                    </td>
-                                                    <td className="px-4 py-2 text-center">
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            max="100"
-                                                            value={item.nilai}
-                                                            onChange={(e) => handleNilaiChange(i, e.target.value)}
-                                                            className="w-20 rounded-md border border-gray-300 px-2 py-1 text-center text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                                            placeholder="0"
-                                                            disabled={activeSub?.status === 'selesai'}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/* FOOTER */}
-                        <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 shrink-0">
-                            {!activeSub || activeSub.status !== 'selesai' ? (
-                                <>
-                                    <button
-                                        onClick={triggerSave}
-                                        disabled={processing}
-                                        className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 shadow-sm disabled:opacity-70 transition"
-                                    >
-                                        <Save className="w-4 h-4" />
-                                        {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
-                                    </button>
-                                    
-                                    <button
-                                        onClick={triggerFinish}
-                                        disabled={processing} 
-                                        className="inline-flex items-center gap-2 rounded-md bg-green-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-700 shadow-sm disabled:opacity-70 transition"
-                                    >
-                                        <CheckCircle className="w-4 h-4" />
-                                        Selesaikan
-                                    </button>
-                                </>
-                            ) : (
-                                <div className="text-sm text-green-600 font-medium flex items-center gap-2">
-                                    <CheckCircle className="w-5 h-5" />
-                                    Penilaian telah diselesaikan
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <TambahPenilaianModal
                 open={openTambahSub}
                 mode="sub"
@@ -334,16 +181,28 @@ export default function SubPenilaian({ kelas, penilaian, penilaianId, subPenilai
                 onClose={() => setOpenTambahSub(false)}
             />
 
+            {activeSub && (
+                <NilaiInputModal
+                    open={isInputModalOpen}
+                    onClose={() => {
+                        setIsInputModalOpen(false);
+                        setActiveSub(null);
+                    }}
+                    activeSub={activeSub}
+                    kelas={kelas}
+                />
+            )}
+
             <ConfirmDialog
-                 open={confirmConfig.open}
-                 title={confirmConfig.title}
-                 message={confirmConfig.message}
-                 confirmText={confirmConfig.confirmText}
-                 cancelText="Batal"
-                 loading={processing}
-                 variant={confirmConfig.variant}
-                 onConfirm={handleConfirm}
-                 onClose={() => setConfirmConfig(prev => ({ ...prev, open: false }))}
+                open={!!itemToDelete}
+                title="Hapus Sub Nilai"
+                message="Apakah Anda yakin ingin menghapus sub penilaian ini beserta semua data nilainya?"
+                confirmText="Ya, Hapus"
+                cancelText="Batal"
+                variant="danger"
+                loading={isDeleting}
+                onConfirm={handleDelete}
+                onClose={() => setItemToDelete(null)}
             />
         </>
     );

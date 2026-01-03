@@ -11,6 +11,10 @@ class JenisPenilaian extends Model
 
     protected $table = 'jenis_penilaian';
     protected $guarded = ['id'];
+    
+    protected $casts = [
+        'has_sub' => 'boolean',
+    ];
 
     public function guru()
     {

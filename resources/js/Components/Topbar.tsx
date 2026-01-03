@@ -38,7 +38,7 @@ export default function Topbar() {
                     >
                         <Bell className="w-6 h-6 text-gray-700" />
                         {activeCount > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-1 rounded-full">
+                            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
                                 {activeCount}
                             </span>
                         )}

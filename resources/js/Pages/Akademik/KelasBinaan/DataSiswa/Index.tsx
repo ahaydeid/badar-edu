@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
 import { usePage, Link } from "@inertiajs/react";
-import { ChevronLeft, ChevronRight, Eye, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, Pencil, User } from "lucide-react";
 import ModalFoto from "./components/ModalFoto";
+import TambahSiswaModal from "@/Pages/Master-Data/Siswa/components/TambahSiswa";
+import Toast from "@/Components/ui/Toast";
+import { useUiFeedback } from "@/hooks/useUiFeedback";
 
 export default function Index() {
-    const { siswa, kelas } = usePage<any>().props;
+    const { siswa, kelas, rombelList, canEdit } = usePage<any>().props;
 
     const [searchTerm, setSearchTerm] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -13,6 +16,12 @@ export default function Index() {
     const [openFoto, setOpenFoto] = useState(false);
     const [fotoAktif, setFotoAktif] = useState<string | null>(null);
     const [namaAktif, setNamaAktif] = useState<string | null>(null);
+
+    // Edit modal state
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editId, setEditId] = useState<number | null>(null);
+    const [editInitial, setEditInitial] = useState<any>(null);
+    const { toast, showToast } = useUiFeedback();
 
     const filtered = useMemo(() => {
         const q = searchTerm.toLowerCase();
@@ -26,6 +35,22 @@ export default function Index() {
         ...s,
         no: start + i + 1,
     }));
+
+    async function handleOpenEdit(id: number) {
+        const res = await fetch(`/kelas-binaan/siswa/${id}/edit`, {
+            headers: { Accept: "application/json" },
+        });
+
+        if (!res.ok) {
+            showToast("Gagal memuat data siswa", "error");
+            return;
+        }
+
+        const payload = await res.json();
+        setEditId(id);
+        setEditInitial(payload);
+        setIsEditModalOpen(true);
+    }
 
     return (
         <div className="w-full space-y-6">
@@ -73,6 +98,7 @@ export default function Index() {
                                 <th className="p-3">Nama</th>
                                 <th className="p-3 text-center">JK</th>
                                 <th className="p-3 text-center">NIPD</th>
+                                <th className="p-3 text-center">NIS</th>
                                 <th className="p-3 text-center">NISN</th>
                                 <th className="p-3 text-center">
                                     Status Kedisiplinan
@@ -84,7 +110,7 @@ export default function Index() {
                         <tbody>
                             {numbered.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="p-4 text-center">
+                                    <td colSpan={8} className="p-4 text-center">
                                         Tidak ada data siswa.
                                     </td>
                                 </tr>
@@ -137,20 +163,40 @@ export default function Index() {
                                             {s.nipd ?? "-"}
                                         </td>
                                         <td className="p-3 text-center">
+                                            {s.nis ?? "-"}
+                                        </td>
+                                        <td className="p-3 text-center">
                                             {s.nisn ?? "-"}
                                         </td>
                                         <td className="p-3 text-center italic text-gray-400">
                                             Tidak ada sanksi
                                         </td>
                                         <td className="p-3 text-center">
-                                            <div className="flex justify-center">
+                                            <div className="flex justify-center gap-2">
                                                 <Link
                                                     href={`/kelas-binaan/siswa/${s.id}`}
-                                                    className="px-3 py-2 bg-sky-500 text-white rounded-md text-xs flex items-center gap-1"
+                                                    className="px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md text-xs flex items-center gap-1"
                                                 >
                                                     <Eye className="w-4 h-4" />
                                                     Detail
                                                 </Link>
+
+                                                <button
+                                                    onClick={() => {
+                                                        if (!canEdit) return;
+                                                        handleOpenEdit(s.id);
+                                                    }}
+                                                    disabled={!canEdit}
+                                                    title={!canEdit ? "Pengeditan sedang dikunci" : "Perbarui data siswa"}
+                                                    className={`px-3 py-2 rounded-md text-xs flex items-center gap-1 ${
+                                                        canEdit 
+                                                            ? "bg-amber-500 hover:bg-amber-600 text-white cursor-pointer" 
+                                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                    }`}
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                    Perbarui
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -182,13 +228,30 @@ export default function Index() {
                     <ChevronRight className="h-4 w-4" />
                 </button>
             </div>
+
             <ModalFoto
                 open={openFoto}
                 foto={fotoAktif}
                 nama={namaAktif}
                 onClose={() => setOpenFoto(false)}
             />
-            ;
+
+            <TambahSiswaModal
+                open={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                rombelList={rombelList || []}
+                editId={editId}
+                initialData={editInitial}
+                onSuccess={(msg) => showToast(msg, "success")}
+                onError={(msg) => showToast(msg, "error")}
+                baseUrl="/kelas-binaan/siswa"
+            />
+
+            <Toast
+                open={toast.open}
+                message={toast.message}
+                type={toast.type}
+            />
         </div>
     );
 }

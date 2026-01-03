@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\HariIni;
 
 use App\Http\Controllers\Controller;
+use App\Models\AbsenGuru;
 use App\Models\Jadwal;
 use App\Models\Semester;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -39,6 +41,9 @@ class AbsensiGuruController extends Controller
                 'absen_guru.metode_absen',
                 'absen_guru.latitude',
                 'absen_guru.longitude',
+                'absen_guru.foto_selfie',
+                'absen_guru.status_verifikasi',
+                'absen_guru.is_in_range',
                 'jenis_absen.nama as status_absen',
             ])
             ->join('guru', 'guru.id', '=', 'jadwal.guru_id')
@@ -60,6 +65,9 @@ class AbsensiGuruController extends Controller
                 'absen_guru.metode_absen',
                 'absen_guru.latitude',
                 'absen_guru.longitude',
+                'absen_guru.foto_selfie',
+                'absen_guru.status_verifikasi',
+                'absen_guru.is_in_range',
                 'jenis_absen.nama'
             )
             ->orderBy('guru.nama')
@@ -78,11 +86,34 @@ class AbsensiGuruController extends Controller
                     'metodeAbsen' => $row->metode_absen,
                     'lat'         => $row->latitude,
                     'lng'         => $row->longitude,
+                    'foto'        => $row->foto_selfie ? asset('storage/' . $row->foto_selfie) : null,
+                    'verifikasi'  => $row->status_verifikasi,
+                    'isInRange'   => (bool)$row->is_in_range,
                 ];
             });
 
         return Inertia::render('Hari-Ini/Absensi-Guru/Index', [
             'items' => $items,
         ]);
+    }
+
+    public function verify(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:APPROVED,REJECTED',
+        ]);
+
+        $absen = AbsenGuru::where('guru_id', $id)
+            ->whereDate('tanggal', Carbon::today())
+            ->firstOrFail();
+
+        $absen->update([
+            'status_verifikasi' => $request->status,
+            'verified_by' => auth()->id(),
+            'verified_at' => Carbon::now(),
+            'status_id' => $request->status === 'APPROVED' ? 1 : 4, // 1=HADIR, 4=ALFA/DITOLAK (cek jenis_absen)
+        ]);
+
+        return back()->with('success', 'Status absensi berhasil diperbarui.');
     }
 }

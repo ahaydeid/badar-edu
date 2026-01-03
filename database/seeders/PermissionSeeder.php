@@ -110,6 +110,8 @@ class PermissionSeeder extends Seeder
             'konfigurasi.role.view',
             'konfigurasi.role.edit',
             'konfigurasi.role.manage',
+            'konfigurasi.master-data-config.view',
+            'konfigurasi.master-data-config.manage',
 
             // Kedisiplinan
             'kedisiplinan.view',

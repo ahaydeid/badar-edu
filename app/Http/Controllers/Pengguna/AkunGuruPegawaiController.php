@@ -9,12 +9,15 @@ class AkunGuruPegawaiController extends Controller
 {
     public function index()
     {
-        $allRoles = \App\Models\Role::where('name', '!=', 'devhero')->get();
+        $isDev = auth()->user()->hasRole('devhero');
+        $allRoles = \App\Models\Role::query()
+            ->when(!$isDev, fn($q) => $q->where('name', '!=', 'devhero'))
+            ->get();
 
         return inertia('Pengguna/Akun/GuruPegawai/Index', [
             'users' => \App\Models\User::with('profile')
                 ->with('roles')
-                ->whereDoesntHave('roles', fn($q) => $q->where('name', 'devhero'))
+                ->when(!$isDev, fn($q) => $q->whereDoesntHave('roles', fn($rq) => $rq->where('name', 'devhero')))
                 ->where('profile_type', '!=', 'App\Models\Siswa')
                 ->orderBy('username')
                 ->get(),
@@ -69,9 +72,7 @@ class AkunGuruPegawaiController extends Controller
         ]);
 
         if ($request->has('roles')) {
-            // Security check against devhero
-             if (in_array('devhero', $request->roles)) {
-                 // skip devhero but sync others
+             if (in_array('devhero', $request->roles) && !auth()->user()->hasRole('devhero')) {
                  $roles = array_diff($request->roles, ['devhero']);
                  $user->syncRoles($roles);
              } else {
@@ -90,8 +91,8 @@ class AkunGuruPegawaiController extends Controller
             'status' => ['required', 'in:aktif,nonaktif,ACTIVE,INACTIVE'],
         ]);
 
-        // Prevent assigning devhero via this endpoint for security
-        if (in_array('devhero', $request->roles ?? [])) {
+        // Prevent assigning devhero via this endpoint for non-dev users
+        if (in_array('devhero', $request->roles ?? []) && !auth()->user()->hasRole('devhero')) {
              return back()->withErrors(['roles' => 'Cannot assign restricted role.']);
         }
 
@@ -107,8 +108,8 @@ class AkunGuruPegawaiController extends Controller
 
     public function destroy(\Illuminate\Http\Request $request, \App\Models\User $user)
     {
-        // Optional: Prevent deleting self or specific roles if needed
-        if ($user->hasRole('devhero')) {
+        // Prevent deleting restricted accounts for non-dev users
+        if ($user->hasRole('devhero') && !auth()->user()->hasRole('devhero')) {
              return back()->withErrors(['message' => 'Cannot delete restricted account.']);
         }
 

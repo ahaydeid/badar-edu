@@ -74,11 +74,10 @@ export default function Sidebar({ isOpen, onToggle }) {
                 return prev.filter((x) => x !== key);
             }
             
-            // Jika menu baru dibuka, tutup semua menu level 1 lainnya
-            // Hanya simpan submenu yang masih dalam parent yang sama
+            // Tetap buka jika x adalah parent dari key (ancestor)
+            // Atau jika x adalah anak dari key (descendant)
             const newOpen = prev.filter((x) => {
-                // Jika x adalah child dari key yang baru dibuka, pertahankan
-                return x.startsWith(key + '/');
+                return key.startsWith(x + "/") || x.startsWith(key + "/");
             });
             
             // Tambahkan menu baru
@@ -88,8 +87,26 @@ export default function Sidebar({ isOpen, onToggle }) {
 
     const isDropdownOpen = (key: string) => openDropdowns.includes(key);
 
-    const isActive = (path: string) =>
-        url === path || url.startsWith(path + "/") || url.startsWith(path + "?");
+    // Ambil semua path yang tersedia di menu yang sudah di-filter
+    const getAllPaths = (items: MenuItem[]): string[] => {
+        let paths: string[] = [];
+        items.forEach((item) => {
+            if (item.path) paths.push(item.path);
+            if (item.children) {
+                paths = [...paths, ...getAllPaths(item.children)];
+            }
+        });
+        return paths;
+    };
+
+    const allPaths = getAllPaths(filteredMenu);
+    
+    // Cari path terpanjang yang cocok dengan URL saat ini (Deepest Match)
+    const activePath = allPaths
+        .filter((path) => url === path || url.startsWith(path + "/") || url.startsWith(path + "?"))
+        .sort((a, b) => b.length - a.length)[0];
+
+    const isActive = (path: string) => path === activePath;
 
     const renderMenu = (items: MenuItem[], level = 1) =>
         items.map((item) => {

@@ -7,9 +7,10 @@ type ToastProps = {
     open: boolean;
     message: string;
     type?: ToastType;
+    onClose?: () => void;
 };
 
-export default function Toast({ open, message, type = "success" }: ToastProps) {
+export default function Toast({ open, message, type = "success", onClose }: ToastProps) {
     const isSuccess = type === "success";
 
     return (
@@ -22,34 +23,22 @@ export default function Toast({ open, message, type = "success" }: ToastProps) {
                     exit={{ opacity: 0 }}
                 >
                     <motion.div
-                        className="relative w-full max-w-md rounded-2xl bg-white px-6 pb-6 pt-14 shadow-xl"
-                        initial={{ scale: 0.9, y: 30, opacity: 0 }}
-                        animate={{ scale: 1, y: 0, opacity: 1 }}
-                        exit={{ scale: 0.95, y: 20, opacity: 0 }}
-                        transition={{
-                            type: "spring",
-                            stiffness: 260,
-                            damping: 22,
-                        }}
+                        className="relative w-full max-w-md rounded bg-white px-6 pb-6 pt-14 shadow-lg border border-gray-200"
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.95, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
                     >
                         {/* ICON FLOAT */}
                         <motion.div
-                            className={`absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full text-white shadow-lg
+                            className={`absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full text-white shadow-md
                 ${isSuccess ? "bg-emerald-500" : "bg-rose-500"}`}
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{
                                 scale: 1,
                                 opacity: 1,
-                                y: [0, -6, 0],
                             }}
-                            transition={{
-                                y: {
-                                    repeat: Infinity,
-                                    duration: 2,
-                                    ease: "easeInOut",
-                                },
-                                scale: { duration: 0.3 },
-                            }}
+                            transition={{ duration: 0.2 }}
                         >
                             {isSuccess ? (
                                 <CheckCircle className="h-7 w-7" />

@@ -22,7 +22,7 @@ function Login() {
                 onError: () => setIsLoading(false),
                 onFinish: () => setIsLoading(false),
             });
-        }, 3000);
+        }, 1000);
     }
 
     return (
@@ -35,7 +35,7 @@ function Login() {
                     </p>
                 </div>
             )}
-            <div className="min-h-screen flex flex-col items-center justify-between px-4 py-8">
+            <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative">
                 <div
                     className="
                     w-full
@@ -48,6 +48,7 @@ function Login() {
                     grid-cols-1
                     md:grid-cols-2
                     md:h-[520px]
+                    z-10
                 "
                 >
                     <div
@@ -154,7 +155,7 @@ function Login() {
                     </div>
                 </div>
 
-                <footer className="text-center text-xs text-gray-400 mt-6">
+                <footer className="absolute bottom-10 text-center text-xs text-gray-400">
                     Created By{" "}
                     <a
                         href="https://ahadi.my.id"

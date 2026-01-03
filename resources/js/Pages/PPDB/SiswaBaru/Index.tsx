@@ -154,9 +154,9 @@ export default function Index({ siswaBaru = [] }: Props) {
                 </div>
 
                 {/* TABLE */}
-                <div className="rounded-md border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div className="rounded border border-gray-200 bg-white overflow-hidden">
                     <table className="w-full text-sm whitespace-nowrap">
-                        <thead className="bg-gray-50 text-xs uppercase text-gray-600 font-bold tracking-wider">
+                        <thead className="bg-sky-50 text-xs uppercase text-gray-600 font-bold tracking-wider">
                             <tr>
                                 <th className="px-4 py-4 text-center w-12 border-b border-gray-100">No</th>
                                 <th className="px-4 py-4 text-left border-b border-gray-100">Siswa</th>

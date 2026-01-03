@@ -110,27 +110,52 @@ class PenilaianController extends Controller
 
         $kelas = Kelas::findOrFail($kelasId);
         
+        $siswaList = \App\Models\Siswa::where('rombel_saat_ini', $kelasId)
+            ->orderBy('nama')
+            ->get(['id', 'nama']);
+
         $penilaians = JenisPenilaian::with(['subPenilaian.nilaiSiswa'])
             ->where('guru_id', $guru->id)
             ->where('kelas_id', $kelasId)
             ->where('mapel_id', $mapelId)
             ->where('semester_id', $semester->id)
             ->get()
-            ->map(function ($p) {
+            ->map(function ($p) use ($siswaList) {
+                // Robustness: if no sub-valuation exists for a direct-input type, create one now.
+                if (!$p->has_sub && $p->subPenilaian->isEmpty()) {
+                    SubPenilaian::create([
+                        'jenis_penilaian_id' => $p->id,
+                        'nama' => $p->nama,
+                        'status' => 'proses'
+                    ]);
+                    $p->load('subPenilaian.nilaiSiswa');
+                }
+
                 return [
                     'id' => $p->id,
                     'nama' => $p->nama,
+                    'has_sub' => $p->has_sub,
                     'deskripsi' => $p->deskripsi ?? '', 
-                    'sub' => $p->subPenilaian->map(function ($s) {
+                    'sub' => $p->subPenilaian->map(function ($s) use ($siswaList) {
+                        $siswaMapped = $siswaList->map(function ($siswa) use ($s) {
+                            $nilaiRecord = $s->nilaiSiswa->firstWhere('siswa_id', $siswa->id);
+                            return [
+                                'id' => $siswa->id,
+                                'nama' => $siswa->nama,
+                                'nilai' => $nilaiRecord ? (float) $nilaiRecord->nilai : null
+                            ];
+                        });
                         return [
                             'id' => $s->id,
                             'nama' => $s->nama,
+                            'status' => $s->status,
                             'dinilai' => $s->nilaiSiswa->count(), 
                             // Note: This count is total grades. 
                             // To be accurate "Students Graded", we should count distinct student_id? 
                             // Usually 1 grade per student. So count is fine.
                             // We need Total Students to calc "Belum". 
                             // We will pass total students count to frontend.
+                            'siswa' => $siswaMapped
                         ];
                     })
                 ];
@@ -154,18 +179,28 @@ class PenilaianController extends Controller
             'kelas_id' => 'required',
             'mapel_id' => 'required',
             'nama' => 'required|string|max:255',
+            'has_sub' => 'required|boolean',
         ]);
 
         $guru = $this->getGuru();
         $semester = $this->getActiveSemester();
 
-        JenisPenilaian::create([
+        $jenis = JenisPenilaian::create([
             'guru_id' => $guru->id,
             'kelas_id' => $request->kelas_id,
             'mapel_id' => $request->mapel_id,
             'semester_id' => $semester->id,
             'nama' => $request->nama,
+            'has_sub' => $request->has_sub,
         ]);
+
+        if (!$request->has_sub) {
+            SubPenilaian::create([
+                'jenis_penilaian_id' => $jenis->id,
+                'nama' => $request->nama,
+                'status' => 'proses'
+            ]);
+        }
 
         return back()->with('success', 'Berhasil menambahkan penilaian baru');
     }
@@ -227,6 +262,30 @@ class PenilaianController extends Controller
         ]);
 
         return back()->with('success', 'Sub penilaian berhasil ditambahkan.');
+    }
+
+    public function destroyJenis($id)
+    {
+        $guru = $this->getGuru();
+        $jenis = JenisPenilaian::where('guru_id', $guru->id)->findOrFail($id);
+        $jenis->delete();
+
+        return back()->with('success', 'Berhasil menghapus penilaian');
+    }
+
+    public function destroySub($id)
+    {
+        $sub = SubPenilaian::findOrFail($id);
+        
+        // Safety: check if the parent JenisPenilaian belongs to the logged in guru
+        $guru = $this->getGuru();
+        if ($sub->jenisPenilaian->guru_id !== $guru->id) {
+            return back()->with('error', 'Anda tidak memiliki akses untuk menghapus data ini');
+        }
+
+        $sub->delete();
+
+        return back()->with('success', 'Berhasil menghapus sub penilaian');
     }
 
     public function updateNilai(Request $request)

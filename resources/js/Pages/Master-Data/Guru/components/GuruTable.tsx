@@ -5,7 +5,7 @@ import ModalFoto from "./ModalFoto";
 import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 import Toast from "@/Components/ui/Toast";
 
-export default function GuruTable({ data, loading, onEdit }) {
+export default function GuruTable({ data, loading, onEdit, canEdit }) {
     const [openFoto, setOpenFoto] = useState(false);
     const [fotoAktif, setFotoAktif] = useState<string | null>(null);
     const [namaAktif, setNamaAktif] = useState<string | null>(null);
@@ -181,17 +181,24 @@ export default function GuruTable({ data, loading, onEdit }) {
                                                     Detail
                                                 </Link>
 
-                                                <Link
-                                                    href={`/master-data/guru/${g.id}/edit`}
+
+                                                <button
                                                     onClick={(e) => {
+                                                        if (!canEdit) return;
                                                         e.preventDefault();
                                                         onEdit(g.id);
                                                     }}
-                                                    className="px-3 py-2 bg-amber-500 text-white rounded-md text-xs flex items-center gap-1"
+                                                    disabled={!canEdit}
+                                                    title={!canEdit ? "Pengeditan sedang dikunci" : "Edit data guru"}
+                                                    className={`px-3 py-2 rounded-md text-xs flex items-center gap-1 ${
+                                                        canEdit 
+                                                            ? "bg-amber-500 hover:bg-amber-600 text-white cursor-pointer" 
+                                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                    }`}
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                     Edit
-                                                </Link>
+                                                </button>
 
                                                 <button
                                                     onClick={() => handleDeleteClick(g.id)}

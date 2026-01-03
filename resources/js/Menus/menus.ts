@@ -405,6 +405,11 @@ export const panelMenu: MenuItem[] = [
                 // permission: "konfigurasi.view", // Removed per request
                 children: [
                     {
+                        name: "Master Data",
+                        path: "/konfigurasi/master-data",
+                        permission: "konfigurasi.master-data-config.view",
+                    },
+                    {
                         name: "Profil Sekolah",
                         path: "/konfigurasi/profile-sekolah",
                         permission: "konfigurasi.view",

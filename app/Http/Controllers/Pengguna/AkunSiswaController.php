@@ -9,12 +9,15 @@ class AkunSiswaController extends Controller
 {
     public function index()
     {
-        $allRoles = \App\Models\Role::where('name', '!=', 'devhero')->get();
+        $isDev = auth()->user()->hasRole('devhero');
+        $allRoles = \App\Models\Role::query()
+            ->when(!$isDev, fn($q) => $q->where('name', '!=', 'devhero'))
+            ->get();
 
         return inertia('Pengguna/Akun/Siswa/Index', [
             'users' => \App\Models\User::with('profile')
                 ->with('roles')
-                ->whereDoesntHave('roles', fn($q) => $q->where('name', 'devhero'))
+                ->when(!$isDev, fn($q) => $q->whereDoesntHave('roles', fn($rq) => $rq->where('name', 'devhero')))
                 ->where('profile_type', 'App\Models\Siswa')
                 ->orderBy('username')
                 ->get(),

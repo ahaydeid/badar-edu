@@ -7,6 +7,9 @@ interface LokasiAbsenModalProps {
     lng: number | null;
     nama: string | null;
     jamMasuk: string | null;
+    foto: string | null;
+    verifikasi: "AUTO" | "PENDING" | "APPROVED" | "REJECTED" | null;
+    isInRange: boolean;
 }
 
 export default function LokasiAbsenModal({
@@ -16,6 +19,9 @@ export default function LokasiAbsenModal({
     lng,
     nama,
     jamMasuk,
+    foto,
+    verifikasi,
+    isInRange,
 }: LokasiAbsenModalProps) {
     if (!open) return null;
 
@@ -40,8 +46,19 @@ export default function LokasiAbsenModal({
                 {/* Maps */}
                 {hasLocation ? (
                     <div className="space-y-4">
+                        {/* Photo Selfie */}
+                        {foto && (
+                            <div className="w-full flex justify-center mb-4">
+                                <img
+                                    src={`/storage/${foto}`}
+                                    alt="Selfie Absen"
+                                    className="h-64 rounded-lg object-cover shadow-md border-4 border-white"
+                                />
+                            </div>
+                        )}
+
                         {/* MAPS */}
-                        <div className="w-full h-[450px] overflow-hidden border border-gray-200">
+                        <div className="w-full h-[400px] overflow-hidden border border-gray-200 rounded-lg">
                             <iframe
                                 width="100%"
                                 height="100%"
@@ -52,34 +69,47 @@ export default function LokasiAbsenModal({
                         </div>
 
                         {/* Info */}
-                        <div className="pt-4 border-t border-gray-300 space-y-2 text-sm text-gray-800">
-                            <p>
-                                <span className="font-semibold">
-                                    Jam Masuk:
-                                </span>{" "}
-                                {jamMasuk ?? "-"}
-                            </p>
+                        <div className="pt-4 border-t border-gray-300 grid grid-cols-2 gap-4 text-sm text-gray-800">
+                            <div className="space-y-2">
+                                <p>
+                                    <span className="font-semibold">
+                                        Jam Masuk:
+                                    </span>{" "}
+                                    {jamMasuk ?? "-"}
+                                </p>
+                                <p>
+                                    <span className="font-semibold">
+                                        Koordinat:
+                                    </span>{" "}
+                                    {lat}, {lng}
+                                </p>
+                            </div>
 
-                            <p>
-                                <span className="font-semibold">
-                                    Koordinat:
-                                </span>{" "}
-                                {lat}, {lng}
-                            </p>
-
-                            {/* Status Lokasi */}
-                            <div className="mt-6">
-                                <span
-                                    className={`px-4 py-2 text-sm font-semibold ${
-                                        hasLocation
-                                            ? "bg-green-100 text-green-700"
-                                            : "bg-red-100 text-red-700"
-                                    }`}
-                                >
-                                    {hasLocation
-                                        ? "Absen diterima"
-                                        : "Absen ditolak"}
-                                </span>
+                            <div className="space-y-2 text-right">
+                                <p>
+                                    <span className="font-semibold">
+                                        Jarak Lokasi:
+                                    </span>{" "}
+                                    {isInRange ? (
+                                        <span className="text-green-600 font-bold">DALAM JANGKAUAN</span>
+                                    ) : (
+                                        <span className="text-red-500 font-bold">DI LUAR JANGKAUAN</span>
+                                    )}
+                                </p>
+                                <p>
+                                    <span className="font-semibold">
+                                        Status Verifikasi:
+                                    </span>{" "}
+                                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                                        verifikasi === 'APPROVED' || verifikasi === 'AUTO' 
+                                            ? 'bg-green-100 text-green-700' 
+                                            : verifikasi === 'REJECTED' 
+                                            ? 'bg-red-100 text-red-700' 
+                                            : 'bg-yellow-100 text-yellow-700'
+                                    }`}>
+                                        {verifikasi}
+                                    </span>
+                                </p>
                             </div>
                         </div>
                     </div>

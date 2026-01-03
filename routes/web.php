@@ -53,6 +53,8 @@ use App\Http\Controllers\Konfigurasi\MapelController;
 use App\Http\Controllers\Konfigurasi\JurusanController;
 use App\Http\Controllers\Konfigurasi\RoleController;
 use App\Http\Controllers\Konfigurasi\SchoolProfileController;
+use App\Http\Controllers\Konfigurasi\MasterDataConfigController;
+use App\Http\Controllers\Konfigurasi\TitikAbsenController;
 
 use App\Http\Controllers\Kedisiplinan\KedisiplinanController;
 use App\Http\Controllers\JadwalSemuaKelasController;
@@ -62,7 +64,7 @@ Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/', fn () => Inertia::render('Home'));
+Route::get('/', fn () => redirect('/dashboard'));
 $ud = fn () => Inertia::render('UnderDevelopment');
 
 /*
@@ -84,6 +86,7 @@ Route::middleware(['auth'])->group(function () use ($ud) {
     // HARI INI (payung absensi_guru.view)
     Route::middleware(['permission:absensi_guru.view'])->group(function () {
         Route::get('/absensi-guru', [AbsensiGuruController::class, 'index']);
+        Route::post('/absensi-guru/verify/{id}', [AbsensiGuruController::class, 'verify'])->name('absensi-guru.verify');
         });
 
         Route::get('/kelas-berlangsung', [KelasBerlangsungController::class, 'index'])
@@ -138,6 +141,10 @@ Route::middleware(['auth'])->group(function () use ($ud) {
             ->middleware('permission:kelas-binaan.siswa.view');
         Route::get('/siswa/{id}', [SiswaController::class, 'show'])
             ->middleware('permission:kelas-binaan.siswa.detail');
+        Route::get('/siswa/{id}/edit', [DataSiswaController::class, 'edit'])
+            ->middleware('permission:kelas-binaan.siswa.view');
+        Route::put('/siswa/{id}', [DataSiswaController::class, 'update'])
+            ->middleware('permission:kelas-binaan.siswa.view');
         Route::get('/rapor-siswa', $ud)
             ->middleware('permission:kelas-binaan.rapor.view');
     });
@@ -162,7 +169,6 @@ Route::middleware(['auth'])->group(function () use ($ud) {
 
 
     // NILAI (pakai nilai.view)
-    // NILAI (pakai nilai.view)
     Route::middleware(['permission:nilai.view'])->group(function () {
         Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
         
@@ -176,6 +182,9 @@ Route::middleware(['auth'])->group(function () use ($ud) {
 
         Route::get('/penilaian/{kelas}', [PenilaianController::class, 'detail'])->name('penilaian.detail');
         Route::get('/penilaian/{kelas}/{penilaian}', [PenilaianController::class, 'subPenilaian'])->name('penilaian.sub');
+
+        Route::delete('/penilaian/{jenis}', [PenilaianController::class, 'destroyJenis'])->middleware(['permission:nilai.manage'])->name('penilaian.destroyJenis');
+        Route::delete('/penilaian/sub/{sub}', [PenilaianController::class, 'destroySub'])->middleware(['permission:nilai.manage'])->name('penilaian.destroySub');
     });
 
     // PENGGUNA
@@ -330,8 +339,14 @@ Route::middleware(['auth'])->group(function () use ($ud) {
         Route::get('/mapel', [MapelController::class, 'index'])
             ->middleware(['permission:konfigurasi.mapel.view']);
 
-        Route::get('/titik-absen', $ud)
-            ->middleware(['permission:konfigurasi.view']);
+        Route::get('/titik-absen', [TitikAbsenController::class, 'index'])
+            ->middleware(['permission:konfigurasi.view'])->name('titik-absen.index');
+        Route::post('/titik-absen', [TitikAbsenController::class, 'store'])
+            ->middleware(['permission:konfigurasi.manage'])->name('titik-absen.store');
+        Route::patch('/titik-absen/{id}', [TitikAbsenController::class, 'update'])
+            ->middleware(['permission:konfigurasi.manage'])->name('titik-absen.update');
+        Route::delete('/titik-absen/{id}', [TitikAbsenController::class, 'destroy'])
+            ->middleware(['permission:konfigurasi.manage'])->name('titik-absen.destroy');
 
         // Konfigurasi Role
         Route::get('/role', [RoleController::class, 'index'])
@@ -340,6 +355,14 @@ Route::middleware(['auth'])->group(function () use ($ud) {
             ->middleware(['permission:konfigurasi.role.edit']);
         Route::post('/role/{role}/permissions', [RoleController::class, 'updatePermissions'])
             ->middleware(['permission:konfigurasi.role.edit']);
+
+        // Master Data Config
+        Route::get('/master-data', [MasterDataConfigController::class, 'index'])
+            ->middleware(['permission:konfigurasi.master-data-config.view'])
+            ->name('konfigurasi.master-data.index');
+        Route::post('/master-data/{key}', [MasterDataConfigController::class, 'update'])
+            ->middleware(['permission:konfigurasi.master-data-config.manage'])
+            ->name('konfigurasi.master-data.update');
 
         // Profil Sekolah
         Route::get('/profile-sekolah', [SchoolProfileController::class, 'index'])

@@ -8,6 +8,7 @@ use App\Helpers\ImportHelper;
 use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\WaliSiswa;
+use App\Models\MasterDataConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -71,6 +72,7 @@ class SiswaController extends Controller
         return Inertia::render("Master-Data/Siswa/Index", [
             "students" => $students,
             "rombelList" => $rombelList,
+            "canEdit" => MasterDataConfig::canEdit('siswa'),
         ]);
     }
 
@@ -425,6 +427,11 @@ class SiswaController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Check if editing is allowed
+        if (!MasterDataConfig::canEdit('siswa')) {
+            return back()->withErrors(['message' => 'Pengeditan data siswa saat ini dikunci. Hubungi administrator untuk membuka akses.']);
+        }
+
         DB::transaction(function () use ($request, $id) {
             $siswa = Siswa::findOrFail($id);
             $validated = $this->validateSiswa($request);

@@ -13,6 +13,7 @@ class Siswa extends Model
         'foto',
 
         'nipd',
+        'nis',
         'nisn',
         'jenis_kelamin',
         'tempat_lahir',
