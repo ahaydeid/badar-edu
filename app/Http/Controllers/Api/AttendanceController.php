@@ -41,6 +41,7 @@ class AttendanceController extends Controller
         $jadwal = Jadwal::where('guru_id', $guruId)
             ->where('hari_id', $hariId)
             ->where('semester_id', $semesterId)
+            ->where('is_active', true)
             ->first();
 
         if (!$jadwal) {

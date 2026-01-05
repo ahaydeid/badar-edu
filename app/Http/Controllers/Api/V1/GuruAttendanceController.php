@@ -63,12 +63,13 @@ class GuruAttendanceController extends Controller
         }
 
         // Get jadwal mengajar hari ini
-        $hariIni = Carbon::now()->dayOfWeek; // 0 = Sunday, 1 = Monday, ...
+        $hariIni = Carbon::now()->dayOfWeek;
         $hariId = $hariIni == 0 ? 7 : $hariIni; // Convert to 1-7 (Monday-Sunday)
 
         $jadwalHariIni = Jadwal::with(['jam', 'kelas', 'mapel'])
             ->where('guru_id', $guru->id)
             ->where('hari_id', $hariId)
+            ->where('is_active', true)
             ->orderBy('jam_id')
             ->get();
 
@@ -186,6 +187,7 @@ class GuruAttendanceController extends Controller
         $jadwalTerakhir = Jadwal::with('jam')
             ->where('guru_id', $guru->id)
             ->where('hari_id', $hariId)
+            ->where('is_active', true)
             ->orderBy('jam_id', 'desc')
             ->first();
 
@@ -247,6 +249,7 @@ class GuruAttendanceController extends Controller
         $jadwalHariIni = Jadwal::with(['jam', 'kelas', 'mapel'])
             ->where('guru_id', $guru->id)
             ->where('hari_id', $hariId)
+            ->where('is_active', true)
             ->orderBy('jam_id')
             ->get();
 

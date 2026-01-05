@@ -4,6 +4,7 @@ import ClassCard from "./components/ClassCard";
 import SubjectSidebar from "./components/SubjectSidebar";
 import { Filter, Info, Pencil, Save, X } from "lucide-react";
 import Toast from "@/Components/ui/Toast";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 
 export default function Index() {
     const { kelas, jadwal, mapel, hari, jam, activeSemester, flash } = usePage<any>().props;
@@ -14,6 +15,7 @@ export default function Index() {
     const [isEditMode, setIsEditMode] = useState(false);
     const [pendingChanges, setPendingChanges] = useState<any[]>([]);
     const [toast, setToast] = useState({ open: false, message: "", type: "success" as any });
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
     useEffect(() => {
         if (flash?.success) {
@@ -36,6 +38,11 @@ export default function Index() {
             return;
         }
 
+        // Show confirmation dialog
+        setIsConfirmOpen(true);
+    };
+
+    const confirmSave = () => {
         console.log('Saving changes:', pendingChanges);
 
         router.post('/master-data/jadwal-ajar/bulk-sync', {
@@ -45,10 +52,12 @@ export default function Index() {
                 console.log('Save successful!');
                 setIsEditMode(false);
                 setPendingChanges([]);
+                setIsConfirmOpen(false);
             },
             onError: (errors) => {
                 console.error('Save failed:', errors);
                 alert('Gagal menyimpan jadwal: ' + JSON.stringify(errors));
+                setIsConfirmOpen(false);
             }
         });
     };
@@ -151,7 +160,7 @@ export default function Index() {
                                     </button>
                                     <button 
                                         onClick={handleSave}
-                                        className="flex items-center gap-2 bg-sky-600 px-6 py-2.5 rounded-xl text-sm font-bold text-white hover:bg-sky-700 transition-all"
+                                        className="flex items-center gap-2 bg-sky-600 px-6 py-2.5 rounded text-sm font-bold text-white hover:bg-sky-700 transition-all"
                                     >
                                         <Save className="w-4 h-4" />
                                         Simpan {pendingChanges.length > 0 && `(${pendingChanges.length})`}
@@ -205,6 +214,18 @@ export default function Index() {
                 mapel={mapel}
                 activeTingkat={activeTingkat}
                 isEditMode={isEditMode}
+            />
+
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+                open={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={confirmSave}
+                title="Simpan Perubahan Jadwal"
+                message={`Anda akan menyimpan ${pendingChanges.length} perubahan jadwal. Pastikan semua perubahan sudah benar sebelum melanjutkan.`}
+                confirmText="Ya, Simpan"
+                cancelText="Batal"
+                variant="primary"
             />
         </div>
     );

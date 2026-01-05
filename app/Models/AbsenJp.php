@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AbsenJp extends Model
 {
     protected $table = 'absen_jp';
+    protected $guarded = ['id'];
 
     protected $fillable = [
         'jadwal_id',

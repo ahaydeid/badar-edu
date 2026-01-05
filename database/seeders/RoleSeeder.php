@@ -16,15 +16,15 @@ class RoleSeeder extends Seeder
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create roles
-        $superadmin = Role::firstOrCreate(['name' => 'devhero', 'guard_name' => 'web']);
-        $admin = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
-        $guru = Role::firstOrCreate(['name' => 'Guru', 'guard_name' => 'web']);
-        $waliKelas = Role::firstOrCreate(['name' => 'Wali Kelas', 'guard_name' => 'web']);
-        $siswa = Role::firstOrCreate(['name' => 'Siswa', 'guard_name' => 'web']);
-        $kurikulum = Role::firstOrCreate(['name' => 'Kurikulum', 'guard_name' => 'web']);
-        $kesiswaan = Role::firstOrCreate(['name' => 'Kesiswaan', 'guard_name' => 'web']);
-        $tataUsaha = Role::firstOrCreate(['name' => 'Tata Usaha', 'guard_name' => 'web']);
+        // Create roles with dashboard_type
+        $superadmin = Role::updateOrCreate(['name' => 'devhero', 'guard_name' => 'web'], ['dashboard_type' => 'admin']);
+        $admin      = Role::updateOrCreate(['name' => 'Admin', 'guard_name' => 'web'], ['dashboard_type' => 'admin']);
+        $guru       = Role::updateOrCreate(['name' => 'Guru', 'guard_name' => 'web'], ['dashboard_type' => 'guru_mapel']);
+        $waliKelas  = Role::updateOrCreate(['name' => 'Wali Kelas', 'guard_name' => 'web'], ['dashboard_type' => 'wali_kelas']);
+        $siswa      = Role::updateOrCreate(['name' => 'Siswa', 'guard_name' => 'web'], ['dashboard_type' => 'admin']); // Not used in web
+        $kurikulum  = Role::updateOrCreate(['name' => 'Kurikulum', 'guard_name' => 'web'], ['dashboard_type' => 'admin']);
+        $kesiswaan  = Role::updateOrCreate(['name' => 'Kesiswaan', 'guard_name' => 'web'], ['dashboard_type' => 'staff']);
+        $tataUsaha  = Role::updateOrCreate(['name' => 'Tata Usaha', 'guard_name' => 'web'], ['dashboard_type' => 'staff']);
 
         // Super Admin: semua permission (untuk developer/IT)
         // $superadmin->givePermissionTo(Permission::all()); // BYPASS via AuthServiceProvider

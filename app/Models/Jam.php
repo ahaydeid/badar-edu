@@ -9,6 +9,6 @@ class Jam extends Model
     protected $table = 'jam';
 
     protected $fillable = [
-        'nama','jam_mulai','jam_selesai','jumlah_jp'
+        'nama','jam_mulai','jam_selesai','jumlah_jp','status'
     ];
 }

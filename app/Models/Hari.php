@@ -8,5 +8,5 @@ class Hari extends Model
 {
     protected $table = 'hari';
 
-    protected $fillable = ['nama','hari_ke'];
+    protected $fillable = ['nama','hari_ke','status'];
 }

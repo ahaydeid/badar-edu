@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: laravel_app
+    container_name: badu_app
     restart: unless-stopped
     working_dir: /var/www
     volumes:
@@ -14,14 +14,13 @@ services:
       - db
     networks:
       - appnet
+      - proxy_network
 
   web:
     image: nginx:alpine
-    container_name: laravel_web
+    container_name: badu_web
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
+    # Ports removed as they will be handled by Reverse Proxy
     volumes:
       - .:/var/www
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -30,10 +29,11 @@ services:
       - app
     networks:
       - appnet
+      - proxy_network
 
   db:
     image: mysql:8.0
-    container_name: laravel_db
+    container_name: badu_db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -42,13 +42,14 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
       - dbdata:/var/lib/mysql
-    ports:
-      - "3306:3306"
+    # Database port remains internal to the network
     networks:
       - appnet
 
 networks:
   appnet:
+  proxy_network:
+    external: true
 
 volumes:
   dbdata:

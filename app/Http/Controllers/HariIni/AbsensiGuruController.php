@@ -57,6 +57,7 @@ class AbsensiGuruController extends Controller
             ->leftJoin('jenis_absen', 'jenis_absen.id', '=', 'absen_guru.status_id')
             ->where('jadwal.hari_id', $hariId)
             ->where('jadwal.semester_id', $semesterId)
+            ->where('jadwal.is_active', true)
             ->groupBy(
                 'guru.id',
                 'guru.nama',

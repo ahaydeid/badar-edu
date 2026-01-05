@@ -32,6 +32,15 @@ Route::prefix('v1')->group(function () {
         
         // Guru Schedule
         Route::get('guru-schedule', [\App\Http\Controllers\Api\V1\GuruScheduleController::class, 'index']);
+        Route::get('guru-schedule/{id}', [\App\Http\Controllers\Api\V1\GuruScheduleController::class, 'show']);
+        Route::post('guru-schedule/{id}/finish', [\App\Http\Controllers\Api\V1\GuruScheduleController::class, 'finish']);
+
+        // Kalender Akademik
+        Route::get('kaldik', [\App\Http\Controllers\Api\V1\KaldikController::class, 'index']);
+
+        // Student Attendance
+        Route::get('student-attendance/{jadwal_id}', [\App\Http\Controllers\Api\V1\StudentAttendanceController::class, 'getStudents']);
+        Route::post('student-attendance/{jadwal_id}', [\App\Http\Controllers\Api\V1\StudentAttendanceController::class, 'saveAttendance']);
 
         // Future API endpoints will be added here
         // Example: Jadwal, Absensi, Penilaian, etc.
