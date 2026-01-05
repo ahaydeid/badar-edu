@@ -12,6 +12,7 @@ class AbsenGuru extends Model
         "jadwal_id",
         "guru_id",
         "tanggal",
+        "metode_absen",
         "jam_masuk",
         "latitude",
         "longitude",

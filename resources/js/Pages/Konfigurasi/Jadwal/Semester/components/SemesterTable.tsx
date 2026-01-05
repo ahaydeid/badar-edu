@@ -11,6 +11,8 @@ type Props = {
     onRowsChange: (v: number) => void;
     onPrev: () => void;
     onNext: () => void;
+    onAdd: () => void;
+    onEdit: (semester: any) => void;
 };
 
 function formatDate(d: string) {
@@ -33,19 +35,21 @@ export default function SemesterTable({
     onRowsChange,
     onPrev,
     onNext,
+    onAdd,
+    onEdit,
 }: Props) {
     return (
         <div className="w-full space-y-6">
             {/* ACTION BAR */}
             <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm flex-wrap">
-                    <Link
-                        href="/semester/create"
+                    <button
+                        onClick={onAdd}
                         className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded"
                     >
                         <Plus className="w-4 h-4" />
                         Tambah Semester
-                    </Link>
+                    </button>
                 </div>
 
                 <div className="flex items-center justify-between gap-4">
@@ -133,21 +137,13 @@ export default function SemesterTable({
                                         </td>
                                         <td className="p-3 text-center">
                                             <div className="flex justify-center gap-2">
-                                                <Link
-                                                    href={`/semester/${s.id}`}
-                                                    className="px-3 py-2 bg-sky-500 text-white rounded-md text-xs flex items-center gap-1"
-                                                >
-                                                    <Eye className="w-4 h-4" />
-                                                    Detail
-                                                </Link>
-
-                                                <Link
-                                                    href={`/semester/${s.id}/edit`}
-                                                    className="px-3 py-2 bg-amber-500 text-white rounded-md text-xs flex items-center gap-1"
+                                                <button
+                                                    onClick={() => onEdit(s)}
+                                                    className="px-3 py-2 bg-amber-500 text-white rounded-md text-xs flex items-center gap-1 hover:bg-amber-600 transition-colors"
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                     Edit
-                                                </Link>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

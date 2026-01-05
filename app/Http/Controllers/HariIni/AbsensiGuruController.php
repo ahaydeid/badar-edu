@@ -44,6 +44,7 @@ class AbsensiGuruController extends Controller
                 'absen_guru.foto_selfie',
                 'absen_guru.status_verifikasi',
                 'absen_guru.is_in_range',
+                'absen_guru.status_id',
                 'jenis_absen.nama as status_absen',
             ])
             ->join('guru', 'guru.id', '=', 'jadwal.guru_id')
@@ -68,6 +69,7 @@ class AbsensiGuruController extends Controller
                 'absen_guru.foto_selfie',
                 'absen_guru.status_verifikasi',
                 'absen_guru.is_in_range',
+                'absen_guru.status_id',
                 'jenis_absen.nama'
             )
             ->orderBy('guru.nama')
@@ -83,6 +85,7 @@ class AbsensiGuruController extends Controller
                     'jamMasuk'    => $row->jam_masuk,
                     'jamPulang'   => $row->jam_pulang,
                     'status'      => $row->status_absen ?? 'BELUM ABSEN',
+                    'statusId'    => $row->status_id,
                     'metodeAbsen' => $row->metode_absen,
                     'lat'         => $row->latitude,
                     'lng'         => $row->longitude,
@@ -92,7 +95,7 @@ class AbsensiGuruController extends Controller
                 ];
             });
 
-        return Inertia::render('Hari-Ini/Absensi-Guru/Index', [
+        return Inertia::render('HariIni/AbsensiGuru/Index', [
             'items' => $items,
         ]);
     }
@@ -100,7 +103,7 @@ class AbsensiGuruController extends Controller
     public function verify(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:APPROVED,REJECTED',
+            'status' => 'required|in:DISETUJUI,DITOLAK',
         ]);
 
         $absen = AbsenGuru::where('guru_id', $id)
@@ -111,7 +114,7 @@ class AbsensiGuruController extends Controller
             'status_verifikasi' => $request->status,
             'verified_by' => auth()->id(),
             'verified_at' => Carbon::now(),
-            'status_id' => $request->status === 'APPROVED' ? 1 : 4, // 1=HADIR, 4=ALFA/DITOLAK (cek jenis_absen)
+            'status_id' => $request->status === 'DISETUJUI' ? 1 : 4, // 1=HADIR, 4=ALFA/DITOLAK
         ]);
 
         return back()->with('success', 'Status absensi berhasil diperbarui.');

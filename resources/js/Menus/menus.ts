@@ -412,7 +412,7 @@ export const panelMenu: MenuItem[] = [
                     {
                         name: "Profil Sekolah",
                         path: "/konfigurasi/profile-sekolah",
-                        permission: "konfigurasi.view",
+                        permission: "konfigurasi.profil-sekolah.view",
                     },
                     {
                         name: "Jurusan",
@@ -468,7 +468,7 @@ export const panelMenu: MenuItem[] = [
                     {
                         name: "Titik Absensi",
                         path: "/konfigurasi/titik-absen",
-                        permission: "konfigurasi.view",
+                        permission: "konfigurasi.titik-absen.view",
                     },
                     {
                         name: "Role",

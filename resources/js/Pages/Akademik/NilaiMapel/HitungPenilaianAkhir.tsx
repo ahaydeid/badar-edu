@@ -4,7 +4,6 @@ import { Calculator, Save, ArrowLeft, User, FileSpreadsheet, AlertCircle, CheckC
 import { useUiFeedback } from '@/hooks/useUiFeedback';
 import Toast from '@/Components/ui/Toast';
 import ConfirmDialog from '@/Components/ui/ConfirmDialog';
-import * as XLSX from 'xlsx-js-style';
 
 // Interfaces matching backend data
 interface JenisPenilaian {
@@ -217,180 +216,180 @@ export default function HitungPenilaianAkhir({ kelas, mapel, jenisPenilaians, si
     };
 
     // Execute Export
-    const executeExport = () => {
+    const executeExport = async () => {
         setConfirmState({ type: null, isOpen: false });
         setProcessState({ isProcessing: true, message: 'Membuat file Excel...' });
 
-        // Simulate short delay for visual feedback
-        setTimeout(() => {
-            try {
-                // 1. Prepare Data
-                const rows: any[][] = [];
-                
-                // HEADER INFO (Rows 1-5)
-                rows.push(["DAFTAR NILAI AKHIR SISWA"]);
-                rows.push([]);
-                rows.push(["Mata Pelajaran", ": " + mapel.nama]);
-                rows.push(["Kelas", ": " + kelas.nama]);
-                rows.push(["Wali Kelas", ": " + waliKelas]);
-                rows.push(["Semester", ": " + semester]);
-                rows.push([]);
+        try {
+            // Lazy load XLSX
+            const XLSX = await import('xlsx-js-style');
+            
+            // 1. Prepare Data
+            const rows: any[][] = [];
+            
+            // HEADER INFO (Rows 1-5)
+            rows.push(["DAFTAR NILAI AKHIR SISWA"]);
+            rows.push([]);
+            rows.push(["Mata Pelajaran", ": " + mapel.nama]);
+            rows.push(["Kelas", ": " + kelas.nama]);
+            rows.push(["Wali Kelas", ": " + waliKelas]);
+            rows.push(["Semester", ": " + semester]);
+            rows.push([]);
 
-                // TABLE HEADER (Row 8)
-                const headerRow = ["No", "Nama Siswa"];
-                jenisPenilaians.forEach(j => headerRow.push(`${j.nama} (${j.bobot}%)`));
-                headerRow.push("Nilai Akhir");
-                rows.push(headerRow);
+            // TABLE HEADER (Row 8)
+            const headerRow = ["No", "Nama Siswa"];
+            jenisPenilaians.forEach(j => headerRow.push(`${j.nama} (${j.bobot}%)`));
+            headerRow.push("Nilai Akhir");
+            rows.push(headerRow);
 
-                // DATA ROWS
-                siswaList.forEach((siswa, i) => {
-                    const rowData: any[] = [
-                        i + 1,
-                        siswa.nama
-                    ];
+            // DATA ROWS
+            siswaList.forEach((siswa, i) => {
+                const rowData: any[] = [
+                    i + 1,
+                    siswa.nama
+                ];
 
-                    // Assessment Columns
-                    jenisPenilaians.forEach(j => {
-                        const val = siswa.nilai_per_jenis[j.id];
-                        rowData.push(val !== null ? val : 0); 
-                    });
-
-                    // Dummy logic for final grade just to fill the cell before formula
-                    rowData.push(0); 
-
-                    rows.push(rowData);
+                // Assessment Columns
+                jenisPenilaians.forEach(j => {
+                    const val = siswa.nilai_per_jenis[j.id];
+                    rowData.push(val !== null ? val : 0); 
                 });
 
-                // Create Worksheet
-                const ws = XLSX.utils.aoa_to_sheet(rows);
+                // Dummy logic for final grade just to fill the cell before formula
+                rowData.push(0); 
 
-                // --- STYLING START ---
-                
-                // Define Style
-                const headerStyle = {
-                    font: { name: "Calibri", sz: 11, bold: true, color: { rgb: "000000" } },
-                    fill: { fgColor: { rgb: "BDD7EE" } }, // Light Blue
-                    alignment: { horizontal: "center", vertical: "center" },
-                    border: {
-                        top: { style: "thin", color: { auto: 1 } },
-                        bottom: { style: "thin", color: { auto: 1 } },
-                        left: { style: "thin", color: { auto: 1 } },
-                        right: { style: "thin", color: { auto: 1 } }
-                    }
-                };
+                rows.push(rowData);
+            });
 
-                const dataBorder = {
+            // Create Worksheet
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+
+            // --- STYLING START ---
+            
+            // Define Style
+            const headerStyle = {
+                font: { name: "Calibri", sz: 11, bold: true, color: { rgb: "000000" } },
+                fill: { fgColor: { rgb: "BDD7EE" } }, // Light Blue
+                alignment: { horizontal: "center", vertical: "center" },
+                border: {
                     top: { style: "thin", color: { auto: 1 } },
                     bottom: { style: "thin", color: { auto: 1 } },
                     left: { style: "thin", color: { auto: 1 } },
                     right: { style: "thin", color: { auto: 1 } }
-                };
+                }
+            };
 
-                const dataStyle = {
-                    font: { name: "Calibri", sz: 11 },
-                    border: dataBorder
-                };
+            const dataBorder = {
+                top: { style: "thin", color: { auto: 1 } },
+                bottom: { style: "thin", color: { auto: 1 } },
+                left: { style: "thin", color: { auto: 1 } },
+                right: { style: "thin", color: { auto: 1 } }
+            };
 
-                const dataStyleCenter = {
-                    font: { name: "Calibri", sz: 11 },
-                    alignment: { horizontal: "center" },
-                    border: dataBorder
-                };
+            const dataStyle = {
+                font: { name: "Calibri", sz: 11 },
+                border: dataBorder
+            };
 
-                // Apply Styles
-                // @ts-ignore
-                const range = XLSX.utils.decode_range(ws['!ref'] || "A1:A1");
-                const headerRowLabel = 7; // 0-indexed (Row 8)
-                
-                for (let R = range.s.r; R <= range.e.r; ++R) {
-                    for (let C = range.s.c; C <= range.e.c; ++C) {
-                        const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+            const dataStyleCenter = {
+                font: { name: "Calibri", sz: 11 },
+                alignment: { horizontal: "center" },
+                border: dataBorder
+            };
+
+            // Apply Styles
+            // @ts-ignore
+            const range = XLSX.utils.decode_range(ws['!ref'] || "A1:A1");
+            const headerRowLabel = 7; // 0-indexed (Row 8)
+            
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+                    // @ts-ignore
+                    if (!ws[cellRef]) continue;
+
+                    // Apply Header Style
+                    if (R === headerRowLabel) {
                         // @ts-ignore
-                        if (!ws[cellRef]) continue;
-
-                        // Apply Header Style
-                        if (R === headerRowLabel) {
+                        ws[cellRef].s = headerStyle;
+                    }
+                    // Apply Data Style for table (rows > header)
+                    else if (R > headerRowLabel) {
+                        // Column 0 (No) and Columns > 1 (Values) -> Center
+                        // Column 1 (Nama) -> Left
+                        if (C === 0 || C >= 2) {
                             // @ts-ignore
-                            ws[cellRef].s = headerStyle;
-                        }
-                        // Apply Data Style for table (rows > header)
-                        else if (R > headerRowLabel) {
-                            // Column 0 (No) and Columns > 1 (Values) -> Center
-                            // Column 1 (Nama) -> Left
-                            if (C === 0 || C >= 2) {
-                                // @ts-ignore
-                                ws[cellRef].s = dataStyleCenter;
-                            } else {
-                                // @ts-ignore
-                                ws[cellRef].s = dataStyle;
-                            }
+                            ws[cellRef].s = dataStyleCenter;
+                        } else {
+                            // @ts-ignore
+                            ws[cellRef].s = dataStyle;
                         }
                     }
                 }
+            }
 
-                // --- COLUMN WIDTHS ---
-                // Calculate max width for each column based on HEADER CONTENT
-                const colWidths = rows[headerRowLabel].map((header: any) => {
-                    let maxLen = header ? header.toString().length : 10;
-                    return { wch: maxLen + 2 };
+            // --- COLUMN WIDTHS ---
+            // Calculate max width for each column based on HEADER CONTENT
+            const colWidths = rows[headerRowLabel].map((header: any) => {
+                let maxLen = header ? header.toString().length : 10;
+                return { wch: maxLen + 2 };
+            });
+            
+            // @ts-ignore
+            ws['!cols'] = colWidths;
+
+            // --- FORMULA RE-APPLICATION ---
+            const dataStartRow = 8; 
+            const totalRows = siswaList.length;
+            const lastColIndex = 2 + jenisPenilaians.length; 
+            
+            for (let r = 0; r < totalRows; r++) {
+                const currentRow = dataStartRow + r; 
+                const excelRow = currentRow + 1; 
+                
+                let weightedSumParts: string[] = [];
+                
+                jenisPenilaians.forEach((j, idx) => {
+                    const colIndex = 2 + idx; 
+                    const colLetter = XLSX.utils.encode_col(colIndex);
+                    const weightDecimal = j.bobot / 100;
+                    weightedSumParts.push(`(${colLetter}${excelRow}*${weightDecimal})`); 
                 });
                 
+                const formula = `CEILING(${weightedSumParts.join("+")}, 1)`;
+                
+                const cellRef = XLSX.utils.encode_cell({ r: currentRow, c: lastColIndex });
                 // @ts-ignore
-                ws['!cols'] = colWidths;
-
-                // --- FORMULA RE-APPLICATION ---
-                const dataStartRow = 8; 
-                const totalRows = siswaList.length;
-                const lastColIndex = 2 + jenisPenilaians.length; 
+                if (!ws[cellRef]) ws[cellRef] = { t: 'n', v: 0 }; 
+                // @ts-ignore
+                ws[cellRef].f = formula;
+                // @ts-ignore
+                ws[cellRef].v = undefined; 
                 
-                for (let r = 0; r < totalRows; r++) {
-                    const currentRow = dataStartRow + r; 
-                    const excelRow = currentRow + 1; 
-                    
-                    let weightedSumParts: string[] = [];
-                    
-                    jenisPenilaians.forEach((j, idx) => {
-                        const colIndex = 2 + idx; 
-                        const colLetter = XLSX.utils.encode_col(colIndex);
-                        const weightDecimal = j.bobot / 100;
-                        weightedSumParts.push(`(${colLetter}${excelRow}*${weightDecimal})`); 
-                    });
-                    
-                    const formula = `CEILING(${weightedSumParts.join("+")}, 1)`;
-                    
-                    const cellRef = XLSX.utils.encode_cell({ r: currentRow, c: lastColIndex });
-                    // @ts-ignore
-                    if (!ws[cellRef]) ws[cellRef] = { t: 'n', v: 0 }; 
-                    // @ts-ignore
-                    ws[cellRef].f = formula;
-                    // @ts-ignore
-                    ws[cellRef].v = undefined; 
-                    
-                    // Re-apply style to formula cell
-                    // @ts-ignore
-                    ws[cellRef].s = dataStyleCenter; 
-                }
-
-                // Create Workbook
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Nilai Akhir");
-
-                // Download
-                const safeKelas = kelas.nama.replace(/[^a-z0-9]/gi, '_');
-                const safeMapel = mapel.nama.replace(/[^a-z0-9]/gi, '_');
-                const fileName = `NilaiAkhir_${safeKelas}_${safeMapel}.xlsx`;
-                
-                XLSX.writeFile(wb, fileName);
-
-                setProcessState({ isProcessing: false, message: '' });
-                showToast("File Excel berhasil diunduh!", "success");
-
-            } catch (error) {
-                console.error(error);
-                setProcessState({ isProcessing: false, message: '' });
-                showToast("Gagal membuat file excel.", "error");
+                // Re-apply style to formula cell
+                // @ts-ignore
+                ws[cellRef].s = dataStyleCenter; 
             }
-        }, 2000); 
+
+            // Create Workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Nilai Akhir");
+
+            // Download
+            const safeKelas = kelas.nama.replace(/[^a-z0-9]/gi, '_');
+            const safeMapel = mapel.nama.replace(/[^a-z0-9]/gi, '_');
+            const fileName = `NilaiAkhir_${safeKelas}_${safeMapel}.xlsx`;
+            
+            XLSX.writeFile(wb, fileName);
+
+            setProcessState({ isProcessing: false, message: '' });
+            showToast("File Excel berhasil diunduh!", "success");
+
+        } catch (error) {
+            console.error("Failed to export excel", error);
+            setProcessState({ isProcessing: false, message: '' });
+            showToast("Gagal membuat file excel.", "error");
+        }
     };
 
     // Update ConfirmDialog usages
@@ -477,14 +476,14 @@ export default function HitungPenilaianAkhir({ kelas, mapel, jenisPenilaians, si
                     <button 
                         onClick={triggerExport}
                         disabled={processState.isProcessing}
-                        className="flex items-center rounded-sm border border-slate-300 bg-white px-5 py-2.5 text-xs font-bold tracking-widest text-slate-600 uppercase transition-all hover:bg-slate-50 hover:shadow-sm active:bg-slate-100"
+                        className="flex items-center rounded-sm border border-slate-300 bg-white px-5 py-2.5 text-xs font-bold tracking-widest text-slate-600 uppercase transition-all hover:bg-slate-50 hover:shadow-sm active:bg-slate-100 cursor-pointer"
                     >
                         <FileSpreadsheet className="mr-2 h-4 w-4" /> Export (.XLSX)
                     </button>
                     <button 
                         onClick={triggerHitungNilai}
                         disabled={totalBobot !== 100 || isBobotDirty || processState.isProcessing}
-                        className={`flex items-center rounded-sm px-5 py-2.5 text-xs font-bold tracking-widest text-white uppercase transition-all shadow-sm ${
+                        className={`flex items-center rounded-sm px-5 py-2.5 text-xs font-bold tracking-widest text-white uppercase transition-all shadow-sm cursor-pointer ${
                             totalBobot === 100 && !isBobotDirty && !processState.isProcessing
                             ? 'bg-blue-600 hover:bg-blue-700 active:scale-[0.98]' 
                             : 'bg-slate-300 cursor-not-allowed opacity-70'
@@ -539,7 +538,7 @@ export default function HitungPenilaianAkhir({ kelas, mapel, jenisPenilaians, si
                                 <button 
                                     onClick={handleSimpanBobot}
                                     disabled={totalBobot !== 100 || !isBobotDirty || processState.isProcessing}
-                                    className={`w-full flex items-center justify-center rounded-sm py-2.5 text-[10px] font-black tracking-[0.15em] text-white uppercase transition-colors ${
+                                    className={`w-full flex items-center justify-center rounded-sm py-2.5 text-[10px] font-black tracking-[0.15em] text-white uppercase transition-colors cursor-pointer ${
                                         (totalBobot === 100 && isBobotDirty)
                                         ? 'bg-slate-800 hover:bg-slate-900' 
                                         : 'bg-slate-300 cursor-not-allowed text-slate-500'
@@ -650,7 +649,7 @@ export default function HitungPenilaianAkhir({ kelas, mapel, jenisPenilaians, si
                             <button 
                                 onClick={triggerKirimNilai}
                                 disabled={processState.isProcessing || (isGradesSent && !isGradesChanged)}
-                                className={`flex items-center rounded-sm px-8 py-3 text-xs font-black tracking-[0.2em] text-white uppercase transition-all hover:shadow-md active:scale-[0.99] active:transform ${
+                                className={`flex items-center rounded-sm px-8 py-3 text-xs font-black tracking-[0.2em] text-white uppercase transition-all hover:shadow-md active:scale-[0.99] active:transform cursor-pointer ${
                                     processState.isProcessing 
                                     ? 'bg-green-400 cursor-wait' 
                                     : isGradesSent && !isGradesChanged

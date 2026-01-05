@@ -1,6 +1,20 @@
 {
+  "_xlsx.min-Bs9B7btE.js": {
+    "file": "assets/xlsx.min-Bs9B7btE.js",
+    "name": "xlsx.min",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx"
+    ]
+  },
+  "node_modules/xlsx/xlsx.mjs": {
+    "file": "assets/xlsx-BvJTHLik.js",
+    "name": "xlsx",
+    "src": "node_modules/xlsx/xlsx.mjs",
+    "isDynamicEntry": true
+  },
   "resources/css/app.css": {
-    "file": "assets/app-CYsrV3hs.css",
+    "file": "assets/app-_vLvblGN.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,12 +23,16 @@
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-DuUlHJy5.js",
+    "file": "assets/app-CPRatGLW.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
+    "dynamicImports": [
+      "_xlsx.min-Bs9B7btE.js",
+      "node_modules/xlsx/xlsx.mjs"
+    ],
     "css": [
-      "assets/app-CYsrV3hs.css"
+      "assets/app-_vLvblGN.css"
     ]
   }
 }

@@ -186,7 +186,7 @@ class KelasBerlangsungController extends Controller
         ->toArray();
 
 
-       return Inertia::render('Hari-Ini/Kelas-Berlangsung/Index', [
+       return Inertia::render('HariIni/KelasBerlangsung/Index', [
             'items' => $result,
             'detailAbsen' => $detailAbsenPerKelas,
         ]);

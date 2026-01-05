@@ -14,6 +14,7 @@ class Mapel extends Model
         'kategori',
         'tingkat',
         'jurusan_id',
+        'guru_id',
         'warna_hex_mapel',
     ];
 
@@ -22,8 +23,18 @@ class Mapel extends Model
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }
 
+    public function guru()
+    {
+        return $this->belongsTo(Guru::class, 'guru_id');
+    }
+
     public function jadwal()
     {
         return $this->hasMany(Jadwal::class, 'mapel_id');
+    }
+
+    public function gurus()
+    {
+        return $this->belongsToMany(Guru::class, 'guru_mapel', 'mapel_id', 'guru_id');
     }
 }

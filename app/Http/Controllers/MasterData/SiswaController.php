@@ -69,7 +69,7 @@ class SiswaController extends Controller
 
         $rombelList = Kelas::select('id', 'nama')->orderBy('nama')->get();
 
-        return Inertia::render("Master-Data/Siswa/Index", [
+        return Inertia::render("MasterData/Siswa/Index", [
             "students" => $students,
             "rombelList" => $rombelList,
             "canEdit" => MasterDataConfig::canEdit('siswa'),
@@ -84,7 +84,7 @@ class SiswaController extends Controller
         $ibu  = $s->wali->firstWhere('jenis_wali', 'IBU');
         $wali = $s->wali->firstWhere('jenis_wali', 'WALI');
 
-        return Inertia::render('Master-Data/Siswa/Show', [
+        return Inertia::render('MasterData/Siswa/Show', [
             'student' => [
                 'id' => $s->id,
                 'nama' => $s->nama,
@@ -290,6 +290,33 @@ class SiswaController extends Controller
         }
     }
 
+    /**
+     * Generate NIS dengan format 10 digit: YYYYSSNNNN
+     * - YYYY: Tahun masuk (4 digit)
+     * - SS: Kode sekolah (2 digit, default 01)
+     * - NNNN: Nomor urut siswa per tahun (4 digit)
+     */
+    private function generateNis(): string
+    {
+        $tahun = date('Y'); // Current year
+        $kodeSekolah = '01'; // Default school code
+        
+        // Get last sequence number for this year
+        $lastStudent = Siswa::where('nis', 'like', $tahun . $kodeSekolah . '%')
+            ->orderByDesc('nis')
+            ->first();
+        
+        if ($lastStudent && $lastStudent->nis) {
+            $lastSequence = (int) substr($lastStudent->nis, 6, 4);
+            $nextSequence = $lastSequence + 1;
+        } else {
+            $nextSequence = 1;
+        }
+        
+        // Format: YYYYSSNNNN (10 digits total)
+        return $tahun . $kodeSekolah . str_pad($nextSequence, 4, '0', STR_PAD_LEFT);
+    }
+
     public function store(Request $request)
     {
         DB::transaction(function () use ($request) {
@@ -300,6 +327,11 @@ class SiswaController extends Controller
             }
 
             $this->normalize($validated);
+
+            // Auto-generate NIS if not provided
+            if (empty($validated['nis'])) {
+                $validated['nis'] = $this->generateNis();
+            }
 
             $waliJson = $validated['wali'] ?? null;
             unset($validated['wali']);
@@ -419,7 +451,7 @@ class SiswaController extends Controller
 
         $rombelList = Kelas::select('id', 'nama')->orderBy('nama')->get();
 
-        return Inertia::render('Master-Data/Siswa/Edit', [
+        return Inertia::render('MasterData/Siswa/Edit', [
             'student' => $payload,
             'rombelList' => $rombelList,
         ]);

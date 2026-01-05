@@ -99,6 +99,10 @@ class PermissionSeeder extends Seeder
             // Konfigurasi
             'konfigurasi.view',
             'konfigurasi.manage',
+            'konfigurasi.profil-sekolah.view',
+            'konfigurasi.profil-sekolah.manage',
+            'konfigurasi.titik-absen.view',
+            'konfigurasi.titik-absen.manage',
             'konfigurasi.jadwal.view',
             'konfigurasi.jadwal.manage',
             'konfigurasi.kalender-akademik.view',

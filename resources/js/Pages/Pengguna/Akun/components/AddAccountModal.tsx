@@ -1,7 +1,6 @@
 import { useForm } from "@inertiajs/react";
-import { motion, AnimatePresence } from "framer-motion";
 import { X, Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AddAccountModal({ open, allRoles, candidatesGuru, candidatesSiswa, onClose, specificUserType }) {
     const { data, setData, post, processing, reset, errors } = useForm<{
@@ -17,6 +16,16 @@ export default function AddAccountModal({ open, allRoles, candidatesGuru, candid
         status: "aktif",
         roles: [],
     });
+
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        if (open) {
+            requestAnimationFrame(() => setVisible(true));
+        } else {
+            setVisible(false);
+        }
+    }, [open]);
 
     const candidates = data.user_type === "guru_pegawai" ? candidatesGuru : candidatesSiswa;
 
@@ -39,20 +48,18 @@ export default function AddAccountModal({ open, allRoles, candidatesGuru, candid
     };
 
     return (
-        <AnimatePresence>
-            {open && (
-                <motion.div
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+        <>
+            {(open || visible) && (
+                <div
+                    className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 transition-opacity duration-200 ${
+                        visible ? "opacity-100" : "opacity-0"
+                    }`}
                     onClick={onClose}
                 >
-                    <motion.div
-                        className="w-full max-w-lg bg-white rounded-xl shadow-xl overflow-hidden"
-                        initial={{ scale: 0.9, y: 20, opacity: 0 }}
-                        animate={{ scale: 1, y: 0, opacity: 1 }}
-                        exit={{ scale: 0.95, y: 20, opacity: 0 }}
+                    <div
+                        className={`w-full max-w-lg bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-200 ${
+                            visible ? "scale-100 opacity-100 translate-y-0" : "scale-90 opacity-0 translate-y-5"
+                        }`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
@@ -71,7 +78,7 @@ export default function AddAccountModal({ open, allRoles, candidatesGuru, candid
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-200/50 transition-colors"
+                                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-200/50 transition-colors cursor-pointer"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -92,7 +99,7 @@ export default function AddAccountModal({ open, allRoles, candidatesGuru, candid
                                                     setData("user_type", "guru_pegawai");
                                                     setData("user_id", ""); 
                                                 }}
-                                                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all cursor-pointer ${
                                                     data.user_type === "guru_pegawai"
                                                         ? "bg-white text-sky-600 shadow-sm"
                                                         : "text-gray-500 hover:text-gray-700"
@@ -106,7 +113,7 @@ export default function AddAccountModal({ open, allRoles, candidatesGuru, candid
                                                     setData("user_type", "siswa");
                                                     setData("user_id", "");
                                                 }}
-                                                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all cursor-pointer ${
                                                     data.user_type === "siswa"
                                                         ? "bg-white text-sky-600 shadow-sm"
                                                         : "text-gray-500 hover:text-gray-700"
@@ -142,7 +149,9 @@ export default function AddAccountModal({ open, allRoles, candidatesGuru, candid
                                     </select>
                                     {data.user_id && (
                                          <p className="mt-1 text-xs text-sky-600">
-                                            Username default akan digenerate dari nama yang dipilih.
+                                            {data.user_type === "guru_pegawai" 
+                                                ? "Username: Kode Guru, Password: NIK" 
+                                                : "Username: NISN, Password: password (default)"}
                                          </p>
                                     )}
                                 </div>
@@ -182,7 +191,7 @@ export default function AddAccountModal({ open, allRoles, candidatesGuru, candid
                                     </label>
                                     <div className="border border-gray-300 rounded-lg overflow-hidden">
                                         <div className="max-h-40 overflow-y-auto p-2 space-y-1">
-                                            {allRoles.map((role) => {
+                                            {allRoles.filter(r => r.name !== 'devhero').map((role) => {
                                                 const isSelected = data.roles.includes(role.name);
                                                 return (
                                                     <div
@@ -222,22 +231,22 @@ export default function AddAccountModal({ open, allRoles, candidatesGuru, candid
                                     type="button"
                                     onClick={onClose}
                                     disabled={processing}
-                                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
+                                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
                                 >
                                     Batal
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="px-6 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                                    className="px-6 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                                 >
                                     {processing ? "Simpan..." : "Tambah Akun"}
                                 </button>
                             </div>
                         </form>
-                    </motion.div>
-                </motion.div>
+                    </div>
+                </div>
             )}
-        </AnimatePresence>
+        </>
     );
 }

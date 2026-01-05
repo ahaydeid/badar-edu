@@ -1,5 +1,7 @@
-import { Link } from "@inertiajs/react";
-import { Plus, ChevronLeft, ChevronRight, Eye, Pencil } from "lucide-react";
+import React, { useState } from "react";
+import { Plus, ChevronLeft, ChevronRight, Eye, Pencil, Trash2, User, AlertCircle as AlertIcon } from "lucide-react";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
+import { router } from "@inertiajs/react";
 
 type Props = {
     data: any[];
@@ -11,6 +13,8 @@ type Props = {
     onRowsChange: (v: number) => void;
     onPrev: () => void;
     onNext: () => void;
+    onAdd: () => void;
+    onEdit: (m: any) => void;
 };
 
 export default function MapelTable({
@@ -23,19 +27,37 @@ export default function MapelTable({
     onRowsChange,
     onPrev,
     onNext,
+    onAdd,
+    onEdit,
 }: Props) {
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
+
+    const handleDelete = (id: number) => {
+        setSelectedId(id);
+        setIsConfirmOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (selectedId) {
+            router.delete(route("konfigurasi.mapel.destroy", selectedId), {
+                onSuccess: () => setIsConfirmOpen(false),
+            });
+        }
+    };
+
     return (
         <div className="w-full space-y-6">
             {/* ACTION BAR */}
             <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm flex-wrap">
-                    <Link
-                        href="/mapel/create"
+                    <button
+                        onClick={onAdd}
                         className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded"
                     >
                         <Plus className="w-4 h-4" />
                         Tambah Mata Pelajaran
-                    </Link>
+                    </button>
                 </div>
 
                 <div className="flex items-center justify-between gap-4">
@@ -75,11 +97,12 @@ export default function MapelTable({
                             <tr className="bg-sky-100 text-gray-700 h-12">
                                 <th className="p-3 text-center">No</th>
                                 <th className="p-3">Nama Mapel</th>
+                                <th className="p-3">Guru Pengampu</th>
                                 <th className="p-3 text-center">Kode</th>
                                 <th className="p-3 text-center">Kategori</th>
                                 <th className="p-3 text-center">Tingkat</th>
                                 <th className="p-3">Jurusan</th>
-                                <th className="p-3 text-center">Kode Warna</th>
+                                <th className="p-3 text-center">Warna</th>
                                 <th className="p-3 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -87,7 +110,7 @@ export default function MapelTable({
                         <tbody>
                             {data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} className="p-4 text-center">
+                                    <td colSpan={9} className="p-4 text-center">
                                         Tidak ada data mata pelajaran.
                                     </td>
                                 </tr>
@@ -102,6 +125,9 @@ export default function MapelTable({
                                         </td>
                                         <td className="p-3 font-medium">
                                             {m.nama}
+                                        </td>
+                                        <td className="p-3">
+                                            {m.guru ? m.guru.nama : <span className="text-red-500 italic text-xs">Belum ada guru</span>}
                                         </td>
                                         <td className="p-3 text-center">
                                             {m.kode_mapel}
@@ -133,21 +159,20 @@ export default function MapelTable({
                                         </td>
                                         <td className="p-3 text-center">
                                             <div className="flex justify-center gap-2">
-                                                <Link
-                                                    href={`/mapel/${m.id}`}
-                                                    className="px-3 py-2 bg-sky-500 text-white rounded-md text-xs flex items-center gap-1"
-                                                >
-                                                    <Eye className="w-4 h-4" />
-                                                    Detail
-                                                </Link>
-
-                                                <Link
-                                                    href={`/mapel/${m.id}/edit`}
-                                                    className="px-3 py-2 bg-amber-500 text-white rounded-md text-xs flex items-center gap-1"
+                                                <button
+                                                    onClick={() => onEdit(m)}
+                                                    className="px-3 py-2 bg-amber-500 text-white cursor-pointer rounded-md text-xs flex items-center gap-1"
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                     Edit
-                                                </Link>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(m.id)}
+                                                    className="px-3 py-2 bg-red-500 cursor-pointer text-white rounded-md text-xs flex items-center gap-1"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    Hapus
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -180,6 +205,17 @@ export default function MapelTable({
                     <ChevronRight className="h-4 w-4" />
                 </button>
             </div>
+
+            <ConfirmDialog
+                open={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={confirmDelete}
+                title="Hapus Mata Pelajaran"
+                message="Apakah Anda yakin ingin menghapus mata pelajaran ini? Data yang sudah dihapus tidak dapat dikembalikan."
+                confirmText="Ya, Hapus"
+                cancelText="Batal"
+                variant="danger"
+            />
         </div>
     );
 }

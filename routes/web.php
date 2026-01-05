@@ -204,6 +204,10 @@ Route::middleware(['auth'])->group(function () use ($ud) {
              ->middleware(['permission:guru-pegawai.manage'])
              ->name('akun.destroy');
 
+         Route::post('/akun/{user}/reset-password', [AkunGuruPegawaiController::class, 'resetPassword'])
+             ->middleware(['permission:guru-pegawai.manage'])
+             ->name('akun.reset-password');
+
          Route::get('/akun/siswa', [AkunSiswaController::class, 'index'])
              ->middleware(['permission:siswa.view'])
              ->name('siswa.index');
@@ -249,10 +253,29 @@ Route::middleware(['auth'])->group(function () use ($ud) {
                 ->middleware(['permission:master-data.siswa.manage']);
 
             Route::get('/jadwal-ajar', [JadwalController::class, 'index'])
-                ->middleware(['permission:master-data.jadwal-ajar.view']);
+                ->middleware(['permission:master-data.jadwal-ajar.view'])
+                ->name('master-data.jadwal.index');
+
+            Route::post('/jadwal-ajar/bulk-sync', [JadwalController::class, 'bulkSync'])
+                ->middleware(['permission:master-data.jadwal-ajar.manage'])
+                ->name('master-data.jadwal.bulk-sync');
+
+            Route::delete('/jadwal-ajar/{jadwal}', [JadwalController::class, 'destroy'])
+                ->middleware(['permission:master-data.jadwal-ajar.manage'])
+                ->name('master-data.jadwal.destroy');
 
             Route::get('/rombel', [KelasController::class, 'index'])
                 ->middleware(['permission:master-data.rombel.view']);
+
+            Route::post('/rombel', [KelasController::class, 'store'])
+                ->middleware(['permission:master-data.rombel.manage']);
+
+            Route::put('/rombel/{id}', [KelasController::class, 'update'])
+                ->middleware(['permission:master-data.rombel.manage']);
+
+            Route::delete('/rombel/{id}', [KelasController::class, 'destroy'])
+                ->middleware(['permission:master-data.rombel.manage']);
+
 
             Route::get('/alumni', $ud)
                 ->middleware(['permission:master-data.alumni.view']);
@@ -322,6 +345,12 @@ Route::middleware(['auth'])->group(function () use ($ud) {
                 ->middleware(['permission:konfigurasi.jadwal.view']);
             Route::get('/semester', [SemesterController::class, 'index'])
                 ->middleware(['permission:konfigurasi.jadwal.view']);
+            
+            Route::post('/semester', [SemesterController::class, 'store'])
+                ->middleware(['permission:konfigurasi.jadwal.manage']);
+            
+            Route::put('/semester/{semester}', [SemesterController::class, 'update'])
+                ->middleware(['permission:konfigurasi.jadwal.manage']);
         });
 
         Route::prefix('kalender-akademik')->group(function () use ($ud) {
@@ -337,7 +366,17 @@ Route::middleware(['auth'])->group(function () use ($ud) {
             ->middleware(['permission:konfigurasi.jurusan.view']);
 
         Route::get('/mapel', [MapelController::class, 'index'])
-            ->middleware(['permission:konfigurasi.mapel.view']);
+            ->middleware(['permission:konfigurasi.mapel.view'])
+            ->name('konfigurasi.mapel.index');
+        Route::post('/mapel', [MapelController::class, 'store'])
+            ->middleware(['permission:konfigurasi.mapel.manage'])
+            ->name('konfigurasi.mapel.store');
+        Route::put('/mapel/{mapel}', [MapelController::class, 'update'])
+            ->middleware(['permission:konfigurasi.mapel.manage'])
+            ->name('konfigurasi.mapel.update');
+        Route::delete('/mapel/{mapel}', [MapelController::class, 'destroy'])
+            ->middleware(['permission:konfigurasi.mapel.manage'])
+            ->name('konfigurasi.mapel.destroy');
 
         Route::get('/titik-absen', [TitikAbsenController::class, 'index'])
             ->middleware(['permission:konfigurasi.view'])->name('titik-absen.index');
@@ -351,6 +390,8 @@ Route::middleware(['auth'])->group(function () use ($ud) {
         // Konfigurasi Role
         Route::get('/role', [RoleController::class, 'index'])
             ->middleware(['permission:konfigurasi.role.view']);
+        Route::post('/role', [RoleController::class, 'store'])
+            ->middleware(['permission:konfigurasi.role.edit']);
         Route::get('/role/{role}/permissions', [RoleController::class, 'editPermissions'])
             ->middleware(['permission:konfigurasi.role.edit']);
         Route::post('/role/{role}/permissions', [RoleController::class, 'updatePermissions'])

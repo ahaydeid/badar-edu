@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { usePage, Link } from "@inertiajs/react";
 import { ChevronLeft, ChevronRight, Eye, Pencil, User } from "lucide-react";
 import ModalFoto from "./components/ModalFoto";
-import TambahSiswaModal from "@/Pages/Master-Data/Siswa/components/TambahSiswa";
+import TambahSiswaModal from "@/Pages/MasterData/Siswa/components/TambahSiswa";
 import Toast from "@/Components/ui/Toast";
 import { useUiFeedback } from "@/hooks/useUiFeedback";
 

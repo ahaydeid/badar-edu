@@ -56,6 +56,11 @@ class Guru extends Model
         return $this->hasMany(JenisPenilaian::class, 'guru_id');
     }
 
+    public function mapels()
+    {
+        return $this->hasMany(Mapel::class, 'guru_id');
+    }
+
     public function user()
     {
         return $this->morphOne(User::class, 'profile');

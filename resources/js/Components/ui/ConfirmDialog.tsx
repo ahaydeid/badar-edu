@@ -1,5 +1,4 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from "react";
 import { HelpCircle } from "lucide-react";
 
 type Props = {
@@ -21,84 +20,78 @@ export default function ConfirmDialog({
     confirmText = "Ya, Lanjutkan",
     cancelText = "Batal",
     loading = false,
-    variant = "primary", // Default to Primary (Blue/Sky)
+    variant = "primary",
     onConfirm,
     onClose,
 }: Props) {
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        if (open) {
+            requestAnimationFrame(() => setVisible(true));
+        } else {
+            setVisible(false);
+        }
+    }, [open]);
+
+    if (!open && !visible) return null;
+
     return (
-        <AnimatePresence>
-            {open && (
-                <motion.div
-                    className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+        <div
+            className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 transition-opacity duration-200 ${
+                visible ? "opacity-100" : "opacity-0"
+            }`}
+            onClick={onClose}
+        >
+            <div
+                className={`relative w-full max-w-md rounded bg-white px-6 pb-6 pt-14 shadow-lg border border-gray-200 transition-all duration-200 ${
+                    visible ? "scale-100 opacity-100" : "scale-95 opacity-0"
+                }`}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* ICON FLOAT */}
+                <div
+                    className={`absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full text-white shadow-lg transition-all duration-200 animate-bounce ${
+                        variant === "danger" ? "bg-red-500" : 
+                        variant === "warning" ? "bg-amber-500" : "bg-sky-500"
+                    } ${visible ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}
+                    style={{ animationDuration: "2s" }}
                 >
-                    <motion.div
-                        className="relative w-full max-w-md rounded bg-white px-6 pb-6 pt-14 shadow-lg border border-gray-200"
-                        initial={{ scale: 0.95, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.95, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
+                    <HelpCircle className="h-7 w-7" />
+                </div>
+
+                <h2 className="text-center text-lg font-semibold text-gray-800">
+                    {title}
+                </h2>
+
+                <p className="mt-2 text-center text-sm text-gray-600">
+                    {message}
+                </p>
+
+                <div className="mt-6 flex justify-center gap-3">
+                    <button
+                        onClick={onClose}
+                        disabled={loading}
+                        className="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 cursor-pointer"
                     >
-                        {/* ICON FLOAT */}
-                        <motion.div
-                            className={`absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full text-white shadow-lg ${
-                                variant === "danger" ? "bg-red-500" : 
-                                variant === "warning" ? "bg-amber-500" : "bg-sky-500"
-                            }`}
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{
-                                scale: 1,
-                                opacity: 1,
-                                y: [0, -6, 0],
-                            }}
-                            transition={{
-                                y: {
-                                    repeat: Infinity,
-                                    duration: 2,
-                                    ease: "easeInOut",
-                                },
-                                scale: { duration: 0.3 },
-                            }}
-                        >
-                            <HelpCircle className="h-7 w-7" />
-                        </motion.div>
+                        {cancelText}
+                    </button>
 
-                        <h2 className="text-center text-lg font-semibold text-gray-800">
-                            {title}
-                        </h2>
-
-                        <p className="mt-2 text-center text-sm text-gray-600">
-                            {message}
-                        </p>
-
-                        <div className="mt-6 flex justify-center gap-3">
-                            <button
-                                onClick={onClose}
-                                disabled={loading}
-                                className="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
-                            >
-                                {cancelText}
-                            </button>
-
-                            <button
-                                onClick={onConfirm}
-                                disabled={loading}
-                                className={`rounded-lg cursor-pointer px-4 py-2 text-sm text-white disabled:opacity-60 transition-colors ${
-                                    variant === "danger"
-                                        ? "bg-rose-600 hover:bg-rose-700"
-                                        : variant === "warning"
-                                        ? "bg-amber-600 hover:bg-amber-700"
-                                        : "bg-sky-600 hover:bg-sky-700"
-                                }`}
-                            >
-                                {loading ? "Memproses..." : confirmText}
-                            </button>
-                        </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+                    <button
+                        onClick={onConfirm}
+                        disabled={loading}
+                        className={`rounded-lg cursor-pointer px-4 py-2 text-sm text-white disabled:opacity-60 transition-colors ${
+                            variant === "danger"
+                                ? "bg-rose-600 hover:bg-rose-700"
+                                : variant === "warning"
+                                ? "bg-amber-600 hover:bg-amber-700"
+                                : "bg-sky-600 hover:bg-sky-700"
+                        }`}
+                    >
+                        {loading ? "Memproses..." : confirmText}
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 }

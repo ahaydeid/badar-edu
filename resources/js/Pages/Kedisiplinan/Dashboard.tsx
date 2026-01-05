@@ -1,5 +1,4 @@
 import { Head, usePage } from "@inertiajs/react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Users, AlertTriangle } from "lucide-react";
 
 type DashboardProps = {
@@ -19,6 +18,46 @@ const COLORS = [
     "#8b5cf6",
     "#14b8a6",
 ];
+
+// Lightweight SVG Donut Chart
+function DonutChart({ data, totalSiswa, sanksiAktif, size = 220, innerRadius = 70, outerRadius = 100 }) {
+    const total = data.reduce((sum, item) => sum + item.total, 0);
+    const radius = (innerRadius + outerRadius) / 2;
+    const circumference = 2 * Math.PI * radius;
+    let accumulatedAngle = 0;
+
+    return (
+        <div className="relative flex items-center justify-center">
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="transform -rotate-90">
+                {data.map((item, i) => {
+                    const percentage = (item.total / total) * 100;
+                    const dashArray = (percentage / 100) * circumference;
+                    const offset = (accumulatedAngle / 100) * circumference;
+                    accumulatedAngle += percentage;
+
+                    return (
+                        <circle
+                            key={i}
+                            cx={size / 2}
+                            cy={size / 2}
+                            r={radius}
+                            fill="transparent"
+                            stroke={COLORS[i % COLORS.length]}
+                            strokeWidth={outerRadius - innerRadius}
+                            strokeDasharray={`${dashArray} ${circumference}`}
+                            strokeDashoffset={-offset}
+                            className="transition-all duration-500 ease-out"
+                        />
+                    );
+                })}
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="text-xs text-slate-500 uppercase tracking-wider">Total</span>
+                <span className="text-3xl font-bold text-slate-800">{sanksiAktif}</span>
+            </div>
+        </div>
+    );
+}
 
 export default function Dashboard() {
     const { totalSiswa, sanksiAktif, rekapSanksi } = usePage()
@@ -91,56 +130,8 @@ export default function Dashboard() {
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* DONUT */}
-                            <div className="h-72">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={rekapSanksi}
-                                            dataKey="total"
-                                            nameKey="nama"
-                                            innerRadius={70}
-                                            outerRadius={100}
-                                            paddingAngle={4}
-                                        >
-                                            {rekapSanksi.map((_, i) => (
-                                                <Cell
-                                                    key={i}
-                                                    fill={
-                                                        COLORS[
-                                                            i % COLORS.length
-                                                        ]
-                                                    }
-                                                />
-                                            ))}
-                                        </Pie>
-
-                                        {/* CENTER TOTAL */}
-                                        <text
-                                            x="50%"
-                                            y="50%"
-                                            textAnchor="middle"
-                                            dominantBaseline="middle"
-                                            className="fill-slate-800"
-                                        >
-                                            <tspan
-                                                x="50%"
-                                                dy="-2"
-                                                className="text-sm fill-slate-500"
-                                            >
-                                                Total
-                                            </tspan>
-                                            <tspan
-                                                x="50%"
-                                                dy="22"
-                                                className="text-2xl font-semibold"
-                                            >
-                                                {sanksiAktif}
-                                            </tspan>
-                                        </text>
-
-                                        <Tooltip />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                            <div className="h-72 flex items-center justify-center">
+                                <DonutChart data={rekapSanksi} sanksiAktif={sanksiAktif} totalSiswa={totalSiswa} />
                             </div>
 
                             {/* LEGEND */}

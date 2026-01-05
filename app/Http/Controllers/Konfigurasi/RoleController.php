@@ -25,18 +25,49 @@ class RoleController extends Controller
             )
             ->select(
                 'roles.id',
-                DB::raw('roles.name as name'),
-                DB::raw('roles.name as display_name'),
-                DB::raw('NULL as description'),
+                'roles.name',
+                'roles.display_name',
+                'roles.description',
                 DB::raw('COUNT(role_has_permissions.permission_id) as permissions_count')
             )
-            ->groupBy('roles.id', 'roles.name')
+            ->groupBy('roles.id', 'roles.name', 'roles.display_name', 'roles.description')
             ->orderByDesc('permissions_count')
+            ->get();
+
+        $allPermissions = DB::table('permissions')
+            ->select('id', 'name')
+            ->orderBy('name')
             ->get();
 
         return Inertia::render('Konfigurasi/Role/Index', [
             'roles' => $roles,
+            'allPermissions' => $allPermissions,
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
+            'permissions' => ['array'],
+            'permissions.*' => ['integer'],
+        ]);
+
+        $role = Role::create([
+            'name' => strtolower($request->name),
+            'display_name' => ucfirst($request->name),
+            'description' => null,
+            'guard_name' => 'web',
+        ]);
+
+        if (!empty($request->permissions)) {
+            $permissions = \Spatie\Permission\Models\Permission::whereIn('id', $request->permissions)->get();
+            $role->syncPermissions($permissions);
+        }
+
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        return back()->with('success', 'Role baru berhasil ditambahkan.');
     }
 
     public function editPermissions($roleId)

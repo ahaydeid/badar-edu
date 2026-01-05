@@ -155,7 +155,7 @@ export default function Index({ users, allRoles, candidatesSiswa }) {
                                         ) && (
                                             <button
                                                 onClick={() => handleManageRole(u)}
-                                                className="inline-flex items-center gap-1 px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md text-xs transition-colors"
+                                                className="inline-flex items-center cursor-pointer gap-1 px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md text-xs transition-colors"
                                             >
                                                 <Settings2 className="w-4 h-4" />
                                                 Kelola

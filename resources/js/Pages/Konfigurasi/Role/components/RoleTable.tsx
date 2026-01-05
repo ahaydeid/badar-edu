@@ -11,6 +11,7 @@ type Props = {
     onRowsChange: (v: number) => void;
     onPrev: () => void;
     onNext: () => void;
+    onAdd: () => void;
 };
 
 export default function RoleTable({
@@ -23,19 +24,20 @@ export default function RoleTable({
     onRowsChange,
     onPrev,
     onNext,
+    onAdd,
 }: Props) {
     return (
         <div className="w-full space-y-6">
             {/* ACTION BAR */}
             <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm flex-wrap">
-                    <Link
-                        href="/role/create"
-                        className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded"
+                    <button
+                        onClick={onAdd}
+                        className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded shadow active:scale-95 transition-all"
                     >
                         <Plus className="w-4 h-4" />
                         Tambah Role
-                    </Link>
+                    </button>
                 </div>
 
                 <div className="flex items-center justify-between gap-4">

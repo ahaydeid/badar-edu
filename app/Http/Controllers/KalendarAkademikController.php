@@ -65,7 +65,7 @@ class KalendarAkademikController extends Controller
             }
         }
 
-        return Inertia::render('Kalendar-Akademik/Index', [
+        return Inertia::render('KalendarAkademik/Index', [
             'events' => $events,
         ]);
     }

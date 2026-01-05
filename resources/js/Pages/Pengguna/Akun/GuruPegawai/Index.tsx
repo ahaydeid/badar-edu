@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { Settings2, X, Check, Search, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Link, useForm } from "@inertiajs/react";
-import { motion, AnimatePresence } from "framer-motion";
 import EditAccountModal from "../components/EditAccountModal";
 import AddAccountModal from "../components/AddAccountModal";
 
@@ -157,7 +156,7 @@ export default function Index({ users, allRoles, candidatesGuru, candidatesSiswa
                                         ) && (
                                             <button
                                                 onClick={() => handleManageRole(u)}
-                                                className="inline-flex items-center gap-1 px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md text-xs transition-colors"
+                                                className="inline-flex cursor-pointer items-center gap-1 px-3 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md text-xs transition-colors"
                                             >
                                                 <Settings2 className="w-4 h-4" />
                                                 Kelola

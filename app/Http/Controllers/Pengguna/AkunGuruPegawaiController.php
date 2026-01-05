@@ -50,22 +50,29 @@ class AkunGuruPegawaiController extends Controller
                  return back()->withErrors(['user_id' => "Username/NISN ($username) sudah digunakan oleh akun lain."]);
             }
         } else {
-             // Generate Username for Guru/Pegawai (simple logic: first name lowercased + random number)
-            $baseUsername = strtolower(str_replace(' ', '.', $profile->nama));
-            $username = $baseUsername;
-            $counter = 1;
-            while (\App\Models\User::where('username', $username)->exists()) {
-                $username = $baseUsername . $counter;
-                $counter++;
+            // Use Kode Guru as Username for Guru/Pegawai
+            $username = $profile->kode_guru;
+            
+            if (empty($username)) {
+                return back()->withErrors(['user_id' => 'Data guru ini tidak memiliki Kode Guru. Silakan lengkapi master data dahulu.']);
+            }
+
+            if (\App\Models\User::where('username', $username)->exists()) {
+                return back()->withErrors(['user_id' => "Username/Kode Guru ($username) sudah memiliki akun."]);
             }
         }
 
         // Map status to DB ENUM
         $dbStatus = in_array(strtoupper($request->status), ['AKTIF', 'ACTIVE']) ? 'ACTIVE' : 'INACTIVE';
 
+        // Use NIK as password for Guru, or default for Siswa
+        $password = ($request->user_type === 'guru_pegawai') 
+            ? ($profile->nik ? $profile->nik : 'password123') 
+            : 'password';
+
         $user = \App\Models\User::create([
             'username'     => $username,
-            'password'     => bcrypt('password'), // Global default password
+            'password'     => \Illuminate\Support\Facades\Hash::make($password),
             'profile_type' => $modelClass,
             'profile_id'   => $profile->id,
             'status'       => $dbStatus,
@@ -116,5 +123,40 @@ class AkunGuruPegawaiController extends Controller
         $user->delete();
 
         return back()->with('success', 'Akun berhasil dihapus.');
+    }
+
+    public function resetPassword(\App\Models\User $user)
+    {
+        // Prevent resetting restricted accounts for non-dev users
+        if ($user->hasRole('devhero') && !auth()->user()->hasRole('devhero')) {
+            return back()->withErrors(['message' => 'Cannot reset restricted account.']);
+        }
+
+        $profile = $user->profile;
+        if (!$profile) {
+            return back()->withErrors(['message' => 'Akun tidak memiliki profil yang terhubung.']);
+        }
+
+        // Get default password based on profile type
+        $defaultPassword = null;
+        if ($user->profile_type === 'App\Models\Guru') {
+            $defaultPassword = $profile->nik;
+            if (empty($defaultPassword)) {
+                return back()->withErrors(['message' => 'NIK guru tidak tersedia. Tidak dapat reset password.']);
+            }
+        } elseif ($user->profile_type === 'App\Models\Siswa') {
+            $defaultPassword = $profile->nis;
+            if (empty($defaultPassword)) {
+                return back()->withErrors(['message' => 'NIS siswa tidak tersedia. Tidak dapat reset password.']);
+            }
+        } else {
+            return back()->withErrors(['message' => 'Tipe profil tidak dikenali.']);
+        }
+
+        $user->update([
+            'password' => bcrypt($defaultPassword),
+        ]);
+
+        return back()->with('success', "Password berhasil direset ke default ({$defaultPassword}).");
     }
 }

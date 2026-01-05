@@ -25,11 +25,9 @@
         "@inertiajs/react": "^2.2.19",
         "@vitejs/plugin-react": "^5.1.1",
         "dayjs": "^1.11.19",
-        "framer-motion": "^12.23.26",
         "lucide-react": "^0.555.0",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
-        "recharts": "^3.6.0",
         "xlsx": "^0.18.5",
         "xlsx-js-style": "^1.2.0"
     }

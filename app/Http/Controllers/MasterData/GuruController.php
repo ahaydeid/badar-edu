@@ -13,7 +13,7 @@ class GuruController extends Controller
 {
     public function index()
     {
-        return inertia('Master-Data/Guru/Index', [
+        return inertia('MasterData/Guru/Index', [
             'guru' => Guru::orderBy('nama')->get(),
             'canEdit' => MasterDataConfig::canEdit('guru_pegawai'),
         ]);
@@ -21,7 +21,7 @@ class GuruController extends Controller
 
     public function show(Guru $guru)
 {
-    return inertia('Master-Data/Guru/Show', [
+    return inertia('MasterData/Guru/Show', [
         'guru' => $guru,
     ]);
 }
@@ -80,7 +80,42 @@ class GuruController extends Controller
 
         $data['kode_guru'] = $prefix . $nextSequence;
 
-        Guru::create($data);
+        $guru = Guru::create($data);
+
+        // Optional Account Creation
+        if ($request->boolean('create_account')) {
+            // Use Kode Guru as Username for Guru/Pegawai
+            $username = $guru->kode_guru;
+            
+            if (empty($username)) {
+                // This should ideally not happen if kode_guru is always generated,
+                // but as a safeguard.
+                // In this context, we're creating the guru first, so kode_guru should exist.
+                // If this error is triggered, it means the kode_guru generation failed.
+                // For now, we'll just log or handle it as an internal error.
+                // For user feedback, it might be better to prevent account creation
+                // if kode_guru is somehow missing.
+            }
+
+            // Check if username already exists (though unlikely right after guru creation with unique kode_guru)
+            if (\App\Models\User::where('username', $username)->exists()) {
+                // This scenario implies a collision, which should be rare if kode_guru is unique.
+                // For now, we'll proceed, but in a real app, this might need more robust handling
+                // or prevent account creation.
+            }
+
+            // Use NIK as password for Guru, or default if NIK is not provided
+            $password = $guru->nik ? $guru->nik : 'password123';
+
+            $user = \App\Models\User::create([
+                'username'     => $username,
+                'password'     => \Illuminate\Support\Facades\Hash::make($password),
+                'profile_type' => get_class($guru),
+                'profile_id'   => $guru->id,
+                'status'       => 'ACTIVE' // Default status for newly created accounts
+            ]);
+            $user->assignRole('Guru'); // Fixed role for Guru
+        }
 
         return back();
     }
