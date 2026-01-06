@@ -35,12 +35,36 @@ class ProfileController extends Controller
         $guru = $user->profile;
 
         $request->validate([
+             // Identitas
              'nama' => 'required|string|max:255',
-             'nip' => 'nullable|string|max:20', 
-             'nik' => 'required|string|size:16', 
+             'nip' => 'nullable|string|max:20',
+             'nik' => 'required|string|size:16',
+             // Ignore unique constraint for current user
              'nip' => 'nullable|unique:guru,nip,'.$guru->id,
              'nik' => 'required|unique:guru,nik,'.$guru->id,
              'nuptk' => 'nullable|unique:guru,nuptk,'.$guru->id,
+             'jk' => 'nullable|in:L,P',
+             'tempat_lahir' => 'nullable|string|max:255',
+             'tanggal_lahir' => 'nullable|date',
+             
+             // Kepegawaian & Akademik
+             'status_kepegawaian' => 'nullable|string|max:100',
+             'jenis_ptk' => 'nullable|string|max:100',
+             'gelar_depan' => 'nullable|string|max:50',
+             'gelar_belakang' => 'nullable|string|max:50',
+             'jenjang' => 'nullable|string|max:20',
+             'prodi' => 'nullable|string|max:100',
+             'sertifikasi' => 'nullable|string|max:100',
+             
+             // Tugas & Jam
+             'tmt_kerja' => 'nullable|date',
+             'tugas_tambahan' => 'nullable|string|max:255',
+             'mengajar' => 'nullable|string|max:255',
+             'jam_tugas_tambahan' => 'nullable|numeric',
+             'jjm' => 'nullable|numeric',
+             'total_jjm' => 'nullable|numeric',
+             'kompetensi' => 'nullable|string',
+
              'foto' => 'nullable|image|max:2048',
         ]);
 
