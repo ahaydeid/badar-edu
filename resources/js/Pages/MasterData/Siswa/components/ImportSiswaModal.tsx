@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { router, usePage } from "@inertiajs/react";
-import { X, FileSpreadsheet, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { X, FileSpreadsheet, Loader2, CheckCircle, AlertCircle, Download, Upload } from "lucide-react";
 import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 
 type Props = {
@@ -127,7 +127,10 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
                 <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all">
                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
                     
-                    <h3 className="font-semibold text-lg text-gray-800">Import Data Siswa</h3>
+                   <h3 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
+                        <Upload className="w-5 h-5" />
+                        Import Data Siswa
+                    </h3>
                     {!loading && (
                         <button onClick={onClose} className="cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
                             <X className="w-5 h-5" />

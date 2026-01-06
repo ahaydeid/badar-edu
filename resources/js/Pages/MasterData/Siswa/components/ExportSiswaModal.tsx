@@ -62,18 +62,18 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
             // Gunakan fetch POST
             const res = await fetch("/master-data/siswa/export", {
                 method: "POST",
+                credentials: "include", // PENTING: kirim cookie auth
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
-                    // CSRF Token biasanya otomatis diurus Laravel Sanctum/Inertia jika pakai axios, 
-                    // tapi fetch butuh X-CSRF-TOKEN dari meta tag
                     "X-CSRF-TOKEN": (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || ""
                 },
                 body: JSON.stringify(payload)
             });
 
             if(!res.ok) {
-                throw new Error("Gagal mengambil data export");
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.message || "Gagal mengambil data export");
             }
 
             const data = await res.json();
@@ -98,6 +98,7 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
         setSearching(true);
         try {
             const res = await fetch(`/master-data/siswa/search?q=${encodeURIComponent(searchQuery)}`, {
+                credentials: "include", // PENTING: kirim cookie auth
                 headers: { 
                     "Accept": "application/json" 
                 }
