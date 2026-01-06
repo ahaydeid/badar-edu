@@ -58,7 +58,17 @@ Route::get('/user', function (Request $request) {
 
 // PPDB Public API
 Route::prefix('ppdb')->group(function () {
-    Route::post('/register', [\App\Http\Controllers\Api\PpdbController::class, 'store']);
+    // Informasi PPDB Aktif (Public)
+    Route::get('/active-period', [\App\Http\Controllers\Api\V1\PpdbInfoController::class, 'getActivePeriod']);
+    
+    // Autentikasi & Verifikasi
+    Route::post('/register', [\App\Http\Controllers\Api\V1\PpdbAuthController::class, 'register']);
+    Route::post('/verify-otp', [\App\Http\Controllers\Api\V1\PpdbAuthController::class, 'verifyOtp']);
+    Route::post('/resend-otp', [\App\Http\Controllers\Api\V1\PpdbAuthController::class, 'resendOtp']);
+    Route::post('/login', [\App\Http\Controllers\Api\V1\PpdbAuthController::class, 'login']);
+    
+    // Legacy/Old Registration (might be replaced by the one above)
+    // Route::post('/submit-old', [\App\Http\Controllers\Api\PpdbController::class, 'store']);
     Route::get('/check-status/{no_pendaftaran}', [\App\Http\Controllers\Api\PpdbController::class, 'checkStatus']);
 });
 

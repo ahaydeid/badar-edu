@@ -19,6 +19,11 @@ class PpdbUser extends Authenticatable
         'email_verified_at',
     ];
 
+    public function verifications()
+    {
+        return $this->hasMany(PpdbVerification::class);
+    }
+
     protected $hidden = [
         'password',
         'remember_token',
