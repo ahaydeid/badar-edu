@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { router, usePage } from "@inertiajs/react";
 import { X, FileSpreadsheet, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 
 type Props = {
     open: boolean;
@@ -16,6 +17,7 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0); // 0-100
     const [processingStage, setProcessingStage] = useState<"idle" | "reading" | "uploading" | "processing">("idle");
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     const page = usePage<any>();
     const import_failed: boolean = page.props?.import_failed ?? false;
@@ -64,8 +66,13 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
         }
     }
 
+    function onConfirmImport() {
+        setConfirmOpen(true);
+    }
+
     function handleImport() {
         if (!rows.length) return;
+        setConfirmOpen(false); // Close dialog
 
         setLoading(true);
         setProcessingStage("uploading");
@@ -105,6 +112,17 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
 
     return (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+            {/* KONFIRMASI */}
+            <ConfirmDialog
+                open={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={handleImport}
+                title="Konfirmasi Import"
+                message={`Anda akan mengimport data siswa sebanyak ${rows.length} baris. Pastikan format Excel sudah sesuai template. Lanjutkan?`}
+                confirmText="Ya, Import Sekarang"
+                loading={loading}
+            />
+
             <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all">
                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
                     <h3 className="font-semibold text-lg text-gray-800">Import Data Siswa</h3>
@@ -214,7 +232,7 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
                     </button>
                     <button
                         disabled={!rows.length || loading}
-                        onClick={handleImport}
+                        onClick={onConfirmImport}
                         className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-2"
                     >
                         {loading ? (
