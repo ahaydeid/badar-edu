@@ -55,7 +55,7 @@ export default function Settings({ user, guru, canEdit }: { user: any, guru: any
                         {/* Card 2: Ubah Kata Sandi */}
                         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                         <div className="p-6">
-                            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4 text-amber-600">
+                            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4 text-gray-600">
                                 <Key className="w-6 h-6" />
                             </div>
                             <h3 className="text-lg font-semibold text-gray-800 mb-2">Ubah Kata Sandi</h3>

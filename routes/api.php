@@ -42,6 +42,10 @@ Route::prefix('v1')->group(function () {
         Route::get('student-attendance/{jadwal_id}', [\App\Http\Controllers\Api\V1\StudentAttendanceController::class, 'getStudents']);
         Route::post('student-attendance/{jadwal_id}', [\App\Http\Controllers\Api\V1\StudentAttendanceController::class, 'saveAttendance']);
 
+        // Profile & Account Settings
+        Route::post('profile/update', [\App\Http\Controllers\Api\V1\ProfileController::class, 'updateProfile']);
+        Route::post('profile/change-password', [\App\Http\Controllers\Api\V1\ProfileController::class, 'updatePassword']);
+
         // Future API endpoints will be added here
         // Example: Jadwal, Absensi, Penilaian, etc.
     });
