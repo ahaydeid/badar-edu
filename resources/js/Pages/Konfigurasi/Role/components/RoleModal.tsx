@@ -99,7 +99,7 @@ export default function RoleModal({ isOpen, onClose }: Props) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-2 bg-sky-600 text-white text-sm font-bold rounded-xl hover:bg-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-95 disabled:opacity-50"
+                            className="px-6 py-2 bg-sky-600 text-white text-sm font-bold rounded-lg hover:bg-sky-700 transition-all shadow active:scale-95 disabled:opacity-50"
                         >
                             {processing ? "Menyimpan..." : "Simpan Role"}
                         </button>

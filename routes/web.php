@@ -82,6 +82,11 @@ Route::middleware(['auth'])->group(function () use ($ud) {
     // PROFILE (sebelumnya cuma auth, sekarang pakai permission)
     Route::get('/profile', [ProfileController::class, 'index'])
         ->name('profile');
+        
+    Route::get('/profile/settings', [ProfileController::class, 'settings'])
+        ->name('profile.settings');
+    Route::post('/profile/update-data', [ProfileController::class, 'updateData'])
+        ->name('profile.update-data');
 
     // HARI INI (payung absensi_guru.view)
     Route::middleware(['permission:absensi_guru.view'])->group(function () {
