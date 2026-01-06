@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Download, FileSpreadsheet, CheckCircle, Loader2 } from "lucide-react";
-import axios from "axios";
+// import axios from "axios"; // Gunakan fetch bawaan agar konsisten
 
 type Props = {
     open: boolean;
@@ -14,7 +14,7 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
     const [mode, setMode] = useState<ExportMode>("all");
     const [selectedRombel, setSelectedRombel] = useState<number | "">("");
     
-    // Untuk pencarian siswa (sederhana)
+    // Untuk pencarian siswa
     const [searchQuery, setSearchQuery] = useState("");
     const [foundStudents, setFoundStudents] = useState<{id: number, nama: string, rombel_nama: string}[]>([]);
     const [selectedSiswa, setSelectedSiswa] = useState<{id: number, nama: string} | null>(null);
@@ -24,47 +24,6 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
 
     if (!open) return null;
 
-    async function handleSearch(q: string) {
-        setSearchQuery(q);
-        if (q.length < 3) return;
-
-        setSearching(true);
-        try {
-            // Gunakan endpoint index biasa dengan param search & json response hint jika perlu
-            // Atau asumsi kita buat helper search nanti.
-            // Untuk sekarang, kita coba fetch ke index dengan expectsJson
-            /* 
-               NOTE: Idealnya ada endpoint khusus search. 
-               Di sini kita akan gunakan fetch Client-side filtering dari 'all' kalau record sedikit,
-               tapi requestnya max 1000. 
-               
-               Alternatif: Kita gunakan endpoint export itu sendiri tapi limit 5 buat search? 
-               Ah tidak, itu return format flat.
-            */ 
-            // Workaround: Karena belum ada endpoint search JSON, kita skip fitur "Cari" real-time 
-            // dan minta user input ID? Tidak user friendly.
-            // Kita akan implementasi simple search via client fetch ke endpoint 'exportData' mode 'siswa' 
-            // tapi itu butuh ID.
-            
-            // Temporary: Dummy search logik atau kita bisa fetch dari props `students` parents? 
-            // Tapi itu cuma current page.
-
-            // Solusi: Kita tambah endpoint search nanti. 
-            // Untuk langkah ini, saya akan disable fitur search real dan minta user pilih dari list rombel saja dulu,
-            // atau implementasi nanti. 
-            // TAPI User Request "pilihan export 1 siswa".
-            // OK, saya akan buat input manual "Masukkan Nama" -> Lalu klik "Cari" -> Backend exportData dimodifikasi
-            // untuk support search by name? Tidak, itu single responsibility.
-            
-            // Let's assume user wants to export a specific student ID.
-            // Better: Add `search` method in SiswaController later.
-            // For now, I will leave the search logic blank or mock it.
-        } catch (e) {
-            console.error(e); 
-        } finally {
-            setSearching(false);
-        }
-    }
     
     // Helper untuk download file
     function saveExcel(data: any[], filename: string) {
@@ -93,7 +52,6 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
             } 
             else if (mode === "siswa") {
                 if (!selectedSiswa) {
-                    // Fallback sementara: kalau belum pilih siswa valid, error
                     alert("Cari dan pilih siswa terlebih dahulu");
                     setLoading(false); return;
                 }
@@ -101,8 +59,24 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
                 filename = `Data_Siswa_${selectedSiswa.nama}.xlsx`;
             }
 
-            const res = await axios.post("/master-data/siswa/export", payload);
-            const data = res.data;
+            // Gunakan fetch POST
+            const res = await fetch("/master-data/siswa/export", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    // CSRF Token biasanya otomatis diurus Laravel Sanctum/Inertia jika pakai axios, 
+                    // tapi fetch butuh X-CSRF-TOKEN dari meta tag
+                    "X-CSRF-TOKEN": (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || ""
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if(!res.ok) {
+                throw new Error("Gagal mengambil data export");
+            }
+
+            const data = await res.json();
 
             if (Array.isArray(data) && data.length > 0) {
                  saveExcel(data, filename);
@@ -113,22 +87,25 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
 
         } catch (e: any) {
             console.error(e);
-            alert("Gagal export: " + (e.response?.data?.message || e.message));
+            alert("Gagal export: " + (e.message));
         } finally {
             setLoading(false);
         }
     }
 
-    // Temporary stub for searching student:
-    // Kita akan gunakan axios ke endpoint baru '/master-data/siswa/search' nanti.
-    // Sekarang saya tulis UI-nya dulu.
     const runSearch = async () => {
         if(searchQuery.length < 3) return;
         setSearching(true);
         try {
-            // TODO: Create this endpoint or method
-            const { data } = await axios.get("/master-data/siswa/search", { params: { q: searchQuery }});
-            setFoundStudents(data);
+            const res = await fetch(`/master-data/siswa/search?q=${encodeURIComponent(searchQuery)}`, {
+                headers: { 
+                    "Accept": "application/json" 
+                }
+            });
+            if(res.ok) {
+                const data = await res.json();
+                setFoundStudents(data);
+            }
         } catch(e) {
             console.error(e);
         } finally {
@@ -142,7 +119,7 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
             <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
-                        <Download className="w-5 h-5 text-amber-500" />
+                        <Download className="w-5 h-5" />
                         Export Data Siswa
                     </h3>
                     <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded-full text-gray-400">
@@ -153,7 +130,7 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
                 <div className="p-6 space-y-6">
                     {/* MODE SELECTION */}
                     <div className="space-y-3">
-                        <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-sky-50 transition-colors has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50">
+                        <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-sky-50 transition-colors has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50">
                             <input 
                                 type="radio" 
                                 name="exportMode" 
@@ -168,7 +145,7 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
                             </div>
                         </label>
 
-                        <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-sky-50 transition-colors has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50">
+                        <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-sky-50 transition-colors has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50">
                             <input 
                                 type="radio" 
                                 name="exportMode" 
@@ -198,7 +175,7 @@ export default function ExportSiswaModal({ open, onClose, rombelList }: Props) {
                             </div>
                         )}
 
-                        <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-sky-50 transition-colors has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50">
+                        <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-sky-50 transition-colors has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50">
                             <input 
                                 type="radio" 
                                 name="exportMode" 

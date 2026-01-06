@@ -126,6 +126,7 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
             <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
                 <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all">
                 <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
+                    
                     <h3 className="font-semibold text-lg text-gray-800">Import Data Siswa</h3>
                     {!loading && (
                         <button onClick={onClose} className="cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">

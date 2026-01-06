@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import SiswaTable from "./components/SiswaTable";
 import TambahSiswaModal from "./components/TambahSiswa";
-import TambahSiswaModal from "./components/TambahSiswa";
 import ImportSiswaModal from "./components/ImportSiswaModal";
 import ExportSiswaModal from "./components/ExportSiswaModal";
 import Toast from "@/Components/ui/Toast";
