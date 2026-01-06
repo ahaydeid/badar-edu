@@ -9,7 +9,7 @@ fi
 
 # Build and restart the containers
 echo "🏗️ Building and restarting containers..."
-docker-compose up -d --build
+docker compose up -d --build
 
 # Install PHP dependencies
 echo "📦 Installing PHP dependencies..."
