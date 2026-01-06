@@ -240,12 +240,14 @@ class GuruScheduleController extends Controller
         }
 
         // 2. Previous Note
-        // Get last record before today for same mapel & kelas
-        $prevNoteRecord = AbsenKelas::where('catatan', '!=', null)
-             ->where('tanggal', '<', $today)
+        // Logic: Get last AbsenKelas record before today for same mapel & kelas
+        $prevNoteRecord = AbsenKelas::whereDate('tanggal', '<', $today)
+             ->whereNotNull('catatan')
+             ->where('catatan', '!=', '')
              ->whereHas('jadwal', function($q) use ($jadwal) {
                  $q->where('kelas_id', $jadwal->kelas_id)
-                   ->where('mapel_id', $jadwal->mapel_id);
+                   ->where('mapel_id', $jadwal->mapel_id)
+                   ->where('guru_id', $jadwal->guru_id); // Ensure same teacher
              })
              ->orderBy('tanggal', 'desc')
              ->first();
