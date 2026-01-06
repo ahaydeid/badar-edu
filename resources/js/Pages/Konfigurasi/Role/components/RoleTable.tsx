@@ -100,7 +100,7 @@ export default function RoleTable({
                                             {r.no}
                                         </td>
                                         <td className="p-3 font-medium">
-                                            {r.display_name}
+                                            {r.display_name && r.display_name !== "" ? r.display_name : r.name}
                                         </td>
                                         <td className="p-3">
                                             {r.description ?? "-"}

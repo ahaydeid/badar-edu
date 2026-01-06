@@ -31,6 +31,7 @@ export default function Index() {
         return roles.filter(
             (r: any) =>
                 (r.display_name ?? "").toLowerCase().includes(q) ||
+                (r.name ?? "").toLowerCase().includes(q) ||
                 (r.description ?? "").toLowerCase().includes(q)
         );
     }, [roles, searchTerm]);

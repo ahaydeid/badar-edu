@@ -14,9 +14,8 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $isDev = auth()->user()->hasRole('devhero');
         $roles = DB::table('roles')
-            ->when(!$isDev, fn($q) => $q->where('name', '!=', 'devhero'))
+            ->where('name', '!=', 'devhero') // Always hide devhero from general management
             ->leftJoin(
                 'role_has_permissions',
                 'roles.id',
@@ -74,8 +73,13 @@ class RoleController extends Controller
     {
         $role = DB::table('roles')
             ->where('id', $roleId)
+            ->where('name', '!=', 'devhero') // Prevent editing devhero permissions
             ->select('id', 'name')
             ->first();
+
+        if (!$role) {
+            return redirect()->route('konfigurasi.role.index')->with('error', 'Role tidak ditemukan atau tidak diperbolehkan untuk diubah.');
+        }
 
         $allPermissions = DB::table('permissions')
             ->select('id', 'name')
@@ -110,6 +114,11 @@ class RoleController extends Controller
         ]);
 
         $role = Role::findOrFail($roleId);
+
+        if ($role->name === 'devhero') {
+            return back()->with('error', 'Role Developer Hero tidak diperbolehkan untuk diubah.');
+        }
+
         \Illuminate\Support\Facades\Log::info("Updating Role: {$role->name} (Guard: {$role->guard_name})");
 
         $permissions = \Spatie\Permission\Models\Permission::whereIn(
