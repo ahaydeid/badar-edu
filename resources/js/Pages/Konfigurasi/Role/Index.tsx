@@ -30,7 +30,7 @@ export default function Index() {
         const q = searchTerm.toLowerCase();
         return roles.filter(
             (r: any) =>
-                r.display_name.toLowerCase().includes(q) ||
+                (r.display_name ?? "").toLowerCase().includes(q) ||
                 (r.description ?? "").toLowerCase().includes(q)
         );
     }, [roles, searchTerm]);
