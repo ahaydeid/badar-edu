@@ -149,7 +149,7 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
                         <a
                             href="/templates/template_import_siswa.xlsx"
                             download
-                            className="text-sm font-medium text-sky-600 hover:text-sky-700 bg-white px-3 py-1.5 rounded-md shadow-sm border border-sky-200 hover:border-sky-300 transition-all cursor-pointer"
+                            className="text-sm font-medium text-white px-3 py-1.5 rounded-md hover:shadow-sm border bg-sky-500 hover:bg-sky-600 transition-all cursor-pointer"
                         >
                             Unduh
                         </a>
@@ -234,7 +234,7 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
                     <button
                         disabled={!rows.length || loading}
                         onClick={onConfirmImport}
-                        className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-2"
+                        className="bg-sky-600 cursor-pointer hover:bg-sky-700 text-white px-6 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-2"
                     >
                         {loading ? (
                             <>

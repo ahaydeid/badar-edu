@@ -788,7 +788,7 @@ class SiswaController extends Controller
     }
 
     if (str_contains($msg, 'rombel')) {
-        return 'Rombel tidak ditemukan';
+        return 'Rombel/Kelas yang dimasukkan tidak valid atau tidak ditemukan';
     }
 
     if (str_contains($msg, 'date') || str_contains($msg, 'tanggal')) {
@@ -802,5 +802,80 @@ class SiswaController extends Controller
     return 'Data tidak valid';
 }
 
+    public function exportData(Request $request)
+    {
+        $mode = $request->mode; // 'all', 'rombel', 'siswa'
+        $id = $request->id;
 
+        $query = Siswa::query()
+            ->with(['rombel', 'wali']);
+
+        if ($mode === 'rombel' && $id) {
+            $query->where('rombel_saat_ini', $id);
+        } elseif ($mode === 'siswa' && $id) {
+            $query->where('id', $id);
+        } else {
+            // Mode ALL, limit 1000
+            $query->limit(1000);
+        }
+
+        $students = $query->get();
+
+        // Mapping ke format Flat JSON agar mudah di-parse xlsx di frontend
+        // Format Header sesuaikan dengan Template Import agar konsisten
+        $data = $students->map(function ($s) {
+            $ayah = $s->wali->where('hubungan', 'AYAH')->first();
+            $ibu = $s->wali->where('hubungan', 'IBU')->first();
+            $wali = $s->wali->where('hubungan', 'WALI')->first();
+
+            return [
+                'Nama' => $s->nama,
+                'NIPD' => $s->nipd,
+                'NISN' => $s->nisn,
+                'JK' => $s->jenis_kelamin,
+                'Tempat Lahir' => $s->tempat_lahir,
+                'Tanggal Lahir' => $s->tanggal_lahir,
+                'Rombel Saat Ini' => $s->rombel ? $s->rombel->nama : '',
+                
+                // Alamat
+                'Alamat' => $s->alamat,
+                'RT' => $s->rt,
+                'RW' => $s->rw,
+                'Dusun' => $s->dusun,
+                'Kelurahan' => $s->kelurahan,
+                'Kecamatan' => $s->kecamatan,
+                'Kode Pos' => $s->kode_pos,
+
+                // Data Wali
+                'Nama Ayah' => $ayah ? $ayah->nama : '',
+                'Nama Ibu' => $ibu ? $ibu->nama : '',
+                'Nama Wali' => $wali ? $wali->nama : '',
+                'Pekerjaan Ayah' => $ayah ? $ayah->pekerjaan : '',
+                'Pekerjaan Ibu' => $ibu ? $ibu->pekerjaan : '',
+                'Pekerjaan Wali' => $wali ? $wali->pekerjaan : '',
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+    public function search(Request $request)
+    {
+        $q = $request->q;
+        if (!$q || strlen($q) < 3) return response()->json([]);
+
+        $data = Siswa::query()
+            ->where('nama', 'like', "%{$q}%")
+            ->orWhere('nisn', 'like', "%{$q}%")
+            ->with(['rombel'])
+            ->limit(10)
+            ->get()
+            ->map(fn($s) => [
+                'id' => $s->id,
+                'nama' => $s->nama,
+                'rombel_nama' => $s->rombel ? $s->rombel->nama : '-'
+            ]);
+            
+        return response()->json($data);
+    }
 }

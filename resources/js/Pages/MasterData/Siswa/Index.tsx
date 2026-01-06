@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import SiswaTable from "./components/SiswaTable";
 import TambahSiswaModal from "./components/TambahSiswa";
+import TambahSiswaModal from "./components/TambahSiswa";
 import ImportSiswaModal from "./components/ImportSiswaModal";
+import ExportSiswaModal from "./components/ExportSiswaModal";
 import Toast from "@/Components/ui/Toast";
 import { useUiFeedback } from "@/hooks/useUiFeedback";
 
@@ -35,6 +37,7 @@ export default function Index() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [importOpen, setImportOpen] = useState(false);
+    const [exportOpen, setExportOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
     const [editInitial, setEditInitial] = useState<any>(null);
     const { toast, showToast } = useUiFeedback();
@@ -94,7 +97,10 @@ export default function Index() {
                             Import
                         </button>
 
-                        <button className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded">
+                        <button 
+                            onClick={() => setExportOpen(true)}
+                            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 cursor-pointer text-white px-4 py-2 rounded"
+                        >
                             <Download className="w-4 h-4" />
                             Export
                         </button>
@@ -182,6 +188,12 @@ export default function Index() {
                     showToast("Import data siswa berhasil", "success");
                     router.reload({ only: ["students"] });
                 }}
+            />
+
+            <ExportSiswaModal
+                open={exportOpen}
+                onClose={() => setExportOpen(false)}
+                rombelList={rombelList}
             />
 
             <Toast

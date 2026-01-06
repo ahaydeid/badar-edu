@@ -252,6 +252,12 @@ Route::middleware(['auth'])->group(function () use ($ud) {
             Route::post('/siswa/import', [SiswaController::class, 'import'])
                 ->middleware(['permission:master-data.siswa.manage']);
 
+            Route::post('/siswa/export', [SiswaController::class, 'exportData'])
+                ->middleware(['permission:master-data.siswa.view']);
+
+            Route::get('/siswa/search', [SiswaController::class, 'search'])
+                ->middleware(['permission:master-data.siswa.view']);
+
             Route::get('/jadwal-ajar', [JadwalController::class, 'index'])
                 ->middleware(['permission:master-data.jadwal-ajar.view'])
                 ->name('master-data.jadwal.index');
