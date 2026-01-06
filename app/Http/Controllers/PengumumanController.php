@@ -18,9 +18,7 @@ class PengumumanController extends Controller
     public function create()
     {
         $roles = \Spatie\Permission\Models\Role::query()
-            ->when(!auth()->user()->hasRole('devhero'), function ($q) {
-                return $q->where('name', '!=', 'devhero');
-            })
+            ->where('name', '!=', 'devhero')
             ->get(['id', 'name']);
 
         return Inertia::render('Pengumuman/Create', [
@@ -59,9 +57,7 @@ class PengumumanController extends Controller
     public function edit(Pengumuman $pengumuman)
     {
         $roles = \Spatie\Permission\Models\Role::query()
-            ->when(!auth()->user()->hasRole('devhero'), function ($q) {
-                return $q->where('name', '!=', 'devhero');
-            })
+            ->where('name', '!=', 'devhero')
             ->get(['id', 'name']);
 
         return Inertia::render('Pengumuman/Edit', [

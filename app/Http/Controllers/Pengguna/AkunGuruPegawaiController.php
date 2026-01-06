@@ -9,15 +9,14 @@ class AkunGuruPegawaiController extends Controller
 {
     public function index()
     {
-        $isDev = auth()->user()->hasRole('devhero');
         $allRoles = \App\Models\Role::query()
-            ->when(!$isDev, fn($q) => $q->where('name', '!=', 'devhero'))
+            ->where('name', '!=', 'devhero')
             ->get();
 
         return inertia('Pengguna/Akun/GuruPegawai/Index', [
             'users' => \App\Models\User::with('profile')
                 ->with('roles')
-                ->when(!$isDev, fn($q) => $q->whereDoesntHave('roles', fn($rq) => $rq->where('name', 'devhero')))
+                ->whereDoesntHave('roles', fn($rq) => $rq->where('name', 'devhero'))
                 ->where('profile_type', '!=', 'App\Models\Siswa')
                 ->orderBy('username')
                 ->get(),
@@ -79,12 +78,9 @@ class AkunGuruPegawaiController extends Controller
         ]);
 
         if ($request->has('roles')) {
-             if (in_array('devhero', $request->roles) && !auth()->user()->hasRole('devhero')) {
-                 $roles = array_diff($request->roles, ['devhero']);
-                 $user->syncRoles($roles);
-             } else {
-                 $user->syncRoles($request->roles);
-             }
+             // Strictly filter out devhero if tried to be injected
+             $roles = array_diff($request->roles, ['devhero']);
+             $user->syncRoles($roles);
         }
 
         return back()->with('success', 'Akun berhasil dibuat. Password default: password');
@@ -99,7 +95,8 @@ class AkunGuruPegawaiController extends Controller
         ]);
 
         // Prevent assigning devhero via this endpoint for non-dev users
-        if (in_array('devhero', $request->roles ?? []) && !auth()->user()->hasRole('devhero')) {
+        // Prevent assigning devhero via this endpoint
+        if (in_array('devhero', $request->roles ?? [])) {
              return back()->withErrors(['roles' => 'Cannot assign restricted role.']);
         }
 
@@ -115,8 +112,8 @@ class AkunGuruPegawaiController extends Controller
 
     public function destroy(\Illuminate\Http\Request $request, \App\Models\User $user)
     {
-        // Prevent deleting restricted accounts for non-dev users
-        if ($user->hasRole('devhero') && !auth()->user()->hasRole('devhero')) {
+        // Prevent deleting restricted accounts
+        if ($user->hasRole('devhero')) {
              return back()->withErrors(['message' => 'Cannot delete restricted account.']);
         }
 
@@ -128,7 +125,8 @@ class AkunGuruPegawaiController extends Controller
     public function resetPassword(\App\Models\User $user)
     {
         // Prevent resetting restricted accounts for non-dev users
-        if ($user->hasRole('devhero') && !auth()->user()->hasRole('devhero')) {
+        // Prevent resetting restricted accounts
+        if ($user->hasRole('devhero')) {
             return back()->withErrors(['message' => 'Cannot reset restricted account.']);
         }
 
