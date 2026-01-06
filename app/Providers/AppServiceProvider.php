@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use App\Models\Pengumuman;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
      */
    public function boot(): void
     {
+        // Force HTTPS in production
+        if (config('app.env') === 'production' || config('app.env') === 'local') {
+            URL::forceScheme('https');
+        }
+
         Inertia::share([
             'auth' => [
                 'user' => fn () => Auth::user(),
