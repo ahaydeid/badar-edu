@@ -80,7 +80,10 @@ class AuthController extends Controller
     {
         $user = $request->user()->load('profile.mapels');
 
-        return ApiResponse::success(new UserResource($user));
+        return ApiResponse::success([
+            'user' => new UserResource($user),
+            'can_edit_profile' => \App\Models\MasterDataConfig::where('key', 'guru_pegawai')->value('can_edit') ?? 1,
+        ]);
     }
 
     /**
