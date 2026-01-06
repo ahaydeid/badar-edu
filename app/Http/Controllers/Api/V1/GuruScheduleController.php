@@ -330,7 +330,7 @@ class GuruScheduleController extends Controller
 
         $catatan = $request->catatan ?? $request->notes;
 
-        DB::beginTransaction();
+        \DB::beginTransaction();
         try {
             $today = Carbon::today()->toDateString();
             // Find/Create AbsenKelas
@@ -390,7 +390,7 @@ class GuruScheduleController extends Controller
                 $temp->update(['status_absen' => 'SELESAI']);
             }
 
-            DB::commit();
+            \DB::commit();
 
             return response()->json([
                 'success' => true, 
@@ -399,7 +399,7 @@ class GuruScheduleController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            DB::rollBack();
+            \DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyelesaikan kelas: ' . $e->getMessage()

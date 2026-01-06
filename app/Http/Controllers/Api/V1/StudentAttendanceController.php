@@ -39,13 +39,15 @@ class StudentAttendanceController extends Controller
 
         $today = Carbon::today()->toDateString();
         
+        $studentData = [];
+
         // Get all students in this class
         $students = Siswa::where('rombel_saat_ini', $jadwal->kelas_id)
             ->orderBy('nama')
             ->get(['id', 'nama']);
 
         // Check if temporary attendance records exist for today
-        $absenRecords = DB::table('absen_jp_temporary')
+        $absenRecords = \DB::table('absen_jp_temporary')
             ->where('jadwal_id', $jadwal_id)
             ->where('tanggal', $today)
             ->join('jenis_absen', 'absen_jp_temporary.status_id', '=', 'jenis_absen.id')
@@ -103,7 +105,7 @@ class StudentAttendanceController extends Controller
         $today = Carbon::today()->toDateString();
         $bulan = Carbon::today()->month;
 
-        DB::beginTransaction();
+        \DB::beginTransaction();
         try {
             // Get jenis_absen mapping (Case-insensitive)
             $jenisAbsenMap = JenisAbsen::all()->mapWithKeys(function ($item) {
@@ -151,7 +153,7 @@ class StudentAttendanceController extends Controller
                 ]
             );
 
-            DB::commit();
+            \DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -159,7 +161,7 @@ class StudentAttendanceController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            DB::rollBack();
+            \DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan absensi: ' . $e->getMessage()
