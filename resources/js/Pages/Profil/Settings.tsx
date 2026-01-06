@@ -28,11 +28,6 @@ export default function Settings({ user, guru, canEdit }: { user: any, guru: any
                     </div>
                 )}
                 
-                {/* DEBUG BANNER - TO BE REMOVED */}
-                <div className="text-xs text-gray-400 text-center">
-                    Debug Status: Izin Edit (Server) = {canEdit ? "AKTIF (TRUE)" : "NONAKTIF (FALSE)"}
-                </div>
-
                 <div className="grid md:grid-cols-2 gap-6">
                     
                     {/* Card 1: Perbarui Data */}
@@ -48,7 +43,7 @@ export default function Settings({ user, guru, canEdit }: { user: any, guru: any
                             <button 
                                 onClick={() => setUpdateModalOpen(true)}
                                 disabled={!canEdit}
-                                className="w-full py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                             >
                                 Edit Data Guru
                             </button>
