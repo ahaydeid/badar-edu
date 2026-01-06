@@ -14,7 +14,7 @@ import {
     Pencil,
 } from "lucide-react";
 
-export default function Profile() {
+export default function Profile({ canEdit }: { canEdit: boolean }) {
     const { auth } = usePage<any>().props;
     const u = auth?.user;
 
@@ -97,16 +97,18 @@ export default function Profile() {
 
                             {open && (
                                 <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-md shadow-md z-50">
-                                    <Link 
-                                        href="/profile/settings"
-                                        className="w-full flex items-center gap-2 text-left px-4 py-2 hover:bg-gray-50"
-                                    >
-                                        <Pencil
-                                            size={16}
-                                            className="text-gray-600"
-                                        />
-                                        Edit Data
-                                    </Link>
+                                    {canEdit && (
+                                        <Link 
+                                            href="/profile/settings"
+                                            className="w-full flex items-center gap-2 text-left px-4 py-2 hover:bg-gray-50"
+                                        >
+                                            <Pencil
+                                                size={16}
+                                                className="text-gray-600"
+                                            />
+                                            Edit Data
+                                        </Link>
+                                    )}
                                     <button
                                         onClick={() => setConfirmLogout(true)}
                                         className="w-full flex items-center gap-2 text-left px-4 py-2  text-red-600 hover:bg-gray-50"

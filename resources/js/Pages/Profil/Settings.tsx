@@ -3,7 +3,7 @@ import { Head, Link } from "@inertiajs/react";
 import { User, Key, ArrowLeft } from "lucide-react";
 import UpdateProfileGuru from "./components/UpdateProfileGuru";
 
-export default function Settings({ user, guru }: { user: any, guru: any }) {
+export default function Settings({ user, guru, canEdit }: { user: any, guru: any, canEdit: boolean }) {
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
 
     return (
@@ -22,6 +22,12 @@ export default function Settings({ user, guru }: { user: any, guru: any }) {
                     </div>
                 </div>
 
+                {!canEdit && (
+                    <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-sm">
+                        Pengeditan data profil saat ini sedang ditutup oleh administrator.
+                    </div>
+                )}
+
                 <div className="grid md:grid-cols-2 gap-6">
                     
                     {/* Card 1: Perbarui Data */}
@@ -36,7 +42,8 @@ export default function Settings({ user, guru }: { user: any, guru: any }) {
                             </p>
                             <button 
                                 onClick={() => setUpdateModalOpen(true)}
-                                className="w-full py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                                disabled={!canEdit}
+                                className="w-full py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Edit Data Guru
                             </button>

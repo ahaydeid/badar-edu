@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
+use App\Models\MasterDataConfig;
+
 class ProfileController extends Controller
 {
     public function index()
@@ -14,7 +16,8 @@ class ProfileController extends Controller
             // Eager load profile if needed
             'guru' => Auth::user()->profile_type === 'App\Models\Guru' 
                 ? Auth::user()->profile 
-                : null
+                : null,
+            'canEdit' => MasterDataConfig::canEdit('guru_pegawai'),
         ]);
     }
 
@@ -29,12 +32,17 @@ class ProfileController extends Controller
 
         return Inertia::render('Profil/Settings', [
             'user' => $user,
-            'guru' => $guru
+            'guru' => $guru,
+            'canEdit' => MasterDataConfig::canEdit('guru_pegawai'),
         ]);
     }
 
     public function updateData(\Illuminate\Http\Request $request)
     {
+        if (!MasterDataConfig::canEdit('guru_pegawai')) {
+            return back()->with('error', 'Pengeditan data profil sedang ditutup.');
+        }
+
         $user = Auth::user();
         
         if ($user->profile_type !== 'App\Models\Guru') {
