@@ -3,7 +3,7 @@ import { useState } from "react";
 import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 import {
     MoreVertical,
-    Settings,
+    Settings as SettingsIcon,
     LogOut,
     User,
     FileText,
@@ -85,30 +85,28 @@ export default function Profile({ canEdit }: { canEdit: boolean }) {
 
                         {/* SETTINGS */}
                         <div className="relative">
-                            <button
-                                onClick={() => setOpen(!open)}
-                                className="p-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                            >
-                                <Settings
-                                    size={18}
-                                    className="text-gray-600"
-                                />
-                            </button>
+                                <button
+                                    onClick={() => setOpen(!open)}
+                                    className="p-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                                >
+                                    <SettingsIcon
+                                        size={18}
+                                        className="text-gray-600"
+                                    />
+                                </button>
 
                             {open && (
                                 <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-md shadow-md z-50">
-                                    {canEdit && (
-                                        <Link 
-                                            href="/profile/settings"
-                                            className="w-full flex items-center gap-2 text-left px-4 py-2 hover:bg-gray-50"
-                                        >
-                                            <Pencil
-                                                size={16}
-                                                className="text-gray-600"
-                                            />
-                                            Edit Data
-                                        </Link>
-                                    )}
+                                    <Link 
+                                        href="/profile/settings"
+                                        className="w-full flex items-center gap-2 text-left px-4 py-2 hover:bg-gray-50"
+                                    >
+                                        <SettingsIcon
+                                            size={16}
+                                            className="text-gray-600"
+                                        />
+                                        Pengaturan
+                                    </Link>
                                     <button
                                         onClick={() => setConfirmLogout(true)}
                                         className="w-full flex items-center gap-2 text-left px-4 py-2  text-red-600 hover:bg-gray-50"
