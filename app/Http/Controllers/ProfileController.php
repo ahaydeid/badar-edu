@@ -84,4 +84,18 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
+    public function updatePassword(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'new_password' => 'required|string|min:8|confirmed|different:current_password',
+        ]);
+
+        $user = Auth::user();
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
+        ]);
+
+        return back()->with('success', 'Kata sandi berhasil diperbarui.');
+    }
 }

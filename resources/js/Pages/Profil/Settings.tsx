@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 import { User, Key, ArrowLeft } from "lucide-react";
 import UpdateProfileGuru from "./components/UpdateProfileGuru";
+import UpdatePasswordModal from "./components/UpdatePasswordModal";
 
 export default function Settings({ user, guru, canEdit }: { user: any, guru: any, canEdit: boolean }) {
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
+    const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
     return (
         <>
@@ -23,7 +25,7 @@ export default function Settings({ user, guru, canEdit }: { user: any, guru: any
                 </div>
 
                 {!canEdit && (
-                    <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-sm">
+                    <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 text-sm rounded-lg mb-6">
                         Pengeditan data profil saat ini sedang ditutup oleh administrator.
                     </div>
                 )}
@@ -61,7 +63,7 @@ export default function Settings({ user, guru, canEdit }: { user: any, guru: any
                                 Amankan akun anda dengan memperbarui kata sandi secara berkala.
                             </p>
                             <button 
-                                onClick={() => alert("Fitur ubah sandi segera hadir!")}
+                                onClick={() => setPasswordModalOpen(true)}
                                 className="w-full py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                             >
                                 Ubah Kata Sandi
@@ -77,6 +79,11 @@ export default function Settings({ user, guru, canEdit }: { user: any, guru: any
                 open={updateModalOpen} 
                 onClose={() => setUpdateModalOpen(false)}
                 initialData={guru}
+            />
+
+            <UpdatePasswordModal
+                open={passwordModalOpen}
+                onClose={() => setPasswordModalOpen(false)}
             />
         </>
     );
