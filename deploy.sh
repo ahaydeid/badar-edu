@@ -26,8 +26,9 @@ docker exec badu_app php artisan route:cache
 docker exec badu_app php artisan view:cache
 
 # Build frontend assets using a temporary node container
-echo "🎨 Building frontend assets..."
-docker run --rm -v $(pwd):/var/www -w /var/www node:20-alpine sh -c "npm install && npm run build"
+# DISABLED: Build locally instead! Run `npm run build` before pushing to Git
+# echo "🎨 Building frontend assets..."
+# docker run --rm -v $(pwd):/var/www -w /var/www node:20-alpine sh -c "npm install && npm run build"
 
 # Set permissions for storage & bootstrap/cache
 echo "🔐 Setting permissions..."
