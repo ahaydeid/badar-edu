@@ -628,7 +628,42 @@ class SiswaController extends Controller
                     if (!$penerimaKip) { $nomorKip = null; $namaDiKip = null; }
                     if (!$layakPip) $alasanPip = null;
 
-                    $siswa = Siswa::create([
+                    // CEK DUPLIKASI (Simple Check: NIK atau NIPD atau NISN)
+                    // Jika data sudah ada, kita SKIP atau UPDATE.
+                    // Di sini kita pakai pendekatan: JIKA ADA NIK/NISN YANG SAMA, UPDATE DATANYA.
+                    // JIKA TIDAK ADA, CREATE BARU.
+
+                    $nik = ImportHelper::text($this->pick($r, 'NIK', 'nik'));
+                    $nisn = ImportHelper::text($this->pick($r, 'NISN', 'nisn'));
+                    $nipd = ImportHelper::text($this->pick($r, 'NIPD', 'nipd'));
+
+                    $existingSiswa = null;
+
+                    if ($nik) {
+                        $existingSiswa = Siswa::where('nik', $nik)->first();
+                    }
+                    if (!$existingSiswa && $nisn) {
+                        $existingSiswa = Siswa::where('nisn', $nisn)->first();
+                    }
+                     if (!$existingSiswa && $nipd) {
+                        $existingSiswa = Siswa::where('nipd', $nipd)->first();
+                    }
+
+                    if ($existingSiswa) {
+                        // UPDATE DATA YANG ADA
+                         $existingSiswa->update([
+                            'nama' => ImportHelper::text($nama), // Tetap update nama
+                            'nipd' => $nipd ?: $existingSiswa->nipd,
+                            'nisn' => $nisn ?: $existingSiswa->nisn,
+                            'jenis_kelamin' =>
+                                strtoupper((string)($this->pick($r, 'JK', 'jenis_kelamin') ?? 'L')) === 'P' ? 'P' : 'L',
+                            'rombel_saat_ini' => $rombelId ?: $existingSiswa->rombel_saat_ini, // Update rombel jika ada
+                             // ... (field lain bisa diupdate sesuai kebutuhan, untuk sekarang yang krusial saja)
+                         ]);
+                         $siswa = $existingSiswa;
+                    } else {
+                        // CREATE BARU
+                        $siswa = Siswa::create([
                         'nama' => ImportHelper::text($nama),
                         'nipd' => ImportHelper::text($this->pick($r, 'NIPD', 'nipd')),
                         'nisn' => ImportHelper::text($this->pick($r, 'NISN', 'nisn')),
@@ -703,7 +738,7 @@ class SiswaController extends Controller
                     ]);
 
                     $this->saveWaliFromImportRow($siswa->id, $r);
-
+                    }
                 } catch (\Throwable $e) {
                     $errors[] = [
                         'nama'   => ImportHelper::text($nama) ?: '(Tanpa Nama)',

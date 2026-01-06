@@ -10,31 +10,36 @@ class DapodikNormalizer
 
         $raw = trim(strtoupper($raw));
 
-        // contoh: "12 TSM 1"
-        if (!preg_match('/^(10|11|12)\s+([A-Z]+)\s+(\d+)$/', $raw, $m)) {
-            return null; // format tidak dikenali
+        // Regex: 10/11/12 + SPASI + JURUSAN + (OPTIONAL SPASI + NOMOR)
+        // contoh: "10 MPLB 1" atau "10 TKR"
+        if (!preg_match('/^(10|11|12)\s+([A-Z]+)(?:\s+(\d+))?$/', $raw, $m)) {
+            // Fallback: kembalikan apa adanya jika tidak match pattern,
+            // barangkali user input "X TKR 1" manual dan di DB memang begitu.
+            // Tapi untuk kasus ini kita coba return $raw saja biar ResolveRombelId yg urus fuzzy match.
+            return $raw;  
         }
 
-        [$full, $kelas, $jurusan, $urut] = $m;
+        $kelas = $m[1];
+        $jurusan = $m[2];
+        $urut = $m[3] ?? '';
 
-        // angka ke romawi
-        $romanMap = [
-            '10' => 'X',
-            '11' => 'XI',
-            '12' => 'XII',
-        ];
-
-        // mapping jurusan RESMI SAJA
+        // mapping jurusan (Opsional, sesuaikan dengan DB)
+        // Jika di DB pakai "TSM", jangan ubah ke "TBSM" kalau tidak perlu.
+        // Tapi lihat data tadi "10 TBSM 1". 
+        // Jika input Excel "TSM", kita ubah ke "TBSM".
         $jurusanMap = [
             'TSM'  => 'TBSM',
-            'TKR'  => 'TKR',
-            'MPLB' => 'MPLB',
+            // Tambahkan mapping lain jika perlu
         ];
 
-        if (!isset($romanMap[$kelas])) return null;
-        if (!isset($jurusanMap[$jurusan])) return null;
+        $jurusan = $jurusanMap[$jurusan] ?? $jurusan;
 
-        return "{$romanMap[$kelas]} {$jurusanMap[$jurusan]} {$urut}";
+        // KEMBALIKAN FORMAT ANGKA (sesuai DB: 10 MPLB 1)
+        if ($urut !== '') {
+            return "{$kelas} {$jurusan} {$urut}";
+        } else {
+            return "{$kelas} {$jurusan}";
+        }
     }
 
     public static function normalizeYesNo($v): bool
