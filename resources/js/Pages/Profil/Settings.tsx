@@ -27,6 +27,11 @@ export default function Settings({ user, guru, canEdit }: { user: any, guru: any
                         Pengeditan data profil saat ini sedang ditutup oleh administrator.
                     </div>
                 )}
+                
+                {/* DEBUG BANNER - TO BE REMOVED */}
+                <div className="text-xs text-gray-400 text-center">
+                    Debug Status: Izin Edit (Server) = {canEdit ? "AKTIF (TRUE)" : "NONAKTIF (FALSE)"}
+                </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                     
