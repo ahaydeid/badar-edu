@@ -87,6 +87,8 @@ Route::middleware(['auth'])->group(function () use ($ud) {
         ->name('profile.settings');
     Route::post('/profile/update-data', [ProfileController::class, 'updateData'])
         ->name('profile.update-data');
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])
+        ->name('profile.update-password');
 
     // HARI INI (payung absensi_guru.view)
     Route::middleware(['permission:absensi_guru.view'])->group(function () {
