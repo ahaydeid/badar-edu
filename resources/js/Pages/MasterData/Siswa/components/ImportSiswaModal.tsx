@@ -76,35 +76,45 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
 
         setLoading(true);
         setProcessingStage("uploading");
-        setProgress(0);
+        setProgress(30); // Show some initial progress
+
+        // Simulate progress during upload (since Inertia doesn't support onProgress)
+        const progressInterval = setInterval(() => {
+            setProgress((prev) => {
+                if (prev >= 90) return prev; // Cap at 90% until server responds
+                return prev + 10;
+            });
+        }, 500);
 
         router.post(
             "/master-data/siswa/import",
             { rows },
             {
-                onProgress: (progressEvent) => {
-                    const percentage = progressEvent?.percentage || 0;
-                    setProgress(percentage);
-                    if (percentage >= 100) {
-                         setProcessingStage("processing");
-                    }
-                },
                 onSuccess: () => {
-                    setLoading(false);
-                    onImported(); // This triggers parent toast
-                    onClose();
-                    // Reset state
-                    setRows([]);
-                    setFileName("");
-                    setProcessingStage("idle");
+                    clearInterval(progressInterval);
+                    setProgress(100);
+                    setProcessingStage("processing");
+                    
+                    // Small delay to show 100% before closing
+                    setTimeout(() => {
+                        setLoading(false);
+                        onImported(); // This triggers parent toast
+                        onClose();
+                        // Reset state
+                        setRows([]);
+                        setFileName("");
+                        setProcessingStage("idle");
+                        setProgress(0);
+                    }, 500);
                 },
                 onError: () => {
+                   clearInterval(progressInterval);
                    setLoading(false);
                    setProcessingStage("idle");
+                   setProgress(0);
                 },
                 onFinish: () => {
-                    // Jaga-jaga jika bukan success/error standard
-                    // setLoading(false);
+                    clearInterval(progressInterval);
                 }
             }
         );
