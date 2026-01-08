@@ -280,7 +280,7 @@ class SiswaController extends Controller
             WaliSiswa::create([
                 'siswa_id' => $siswaId,
                 'jenis_wali' => $jenis,
-                'nama' => $nama,
+                'nama' => ImportHelper::titleCase($nama),
                 'tahun_lahir' => ($data['tahun_lahir'] ?? '') !== '' ? (int)$data['tahun_lahir'] : null,
                 'jenjang_pendidikan' => ($data['jenjang_pendidikan'] ?? '') ?: null,
                 'pekerjaan' => ($data['pekerjaan'] ?? '') ?: null,
@@ -581,7 +581,7 @@ class SiswaController extends Controller
             WaliSiswa::create([
                 'siswa_id' => $siswaId,
                 'jenis_wali' => $jenis,
-                'nama' => $nama,
+                'nama' => ImportHelper::titleCase($nama),
                 'tahun_lahir' => $tahunInt,
                 'jenjang_pendidikan' => ImportHelper::text($this->pick($r, $cols['pendidikan'])),
                 'pekerjaan' => ImportHelper::text($this->pick($r, $cols['pekerjaan'])),
@@ -652,7 +652,7 @@ class SiswaController extends Controller
                     if ($existingSiswa) {
                         // UPDATE DATA YANG ADA
                          $existingSiswa->update([
-                            'nama' => ImportHelper::text($nama), // Tetap update nama
+                            'nama' => ImportHelper::titleCase($nama), // Update nama dengan Title Case
                             'nipd' => $nipd ?: $existingSiswa->nipd,
                             'nisn' => $nisn ?: $existingSiswa->nisn,
                             'jenis_kelamin' =>
@@ -664,7 +664,7 @@ class SiswaController extends Controller
                     } else {
                         // CREATE BARU
                         $siswa = Siswa::create([
-                        'nama' => ImportHelper::text($nama),
+                        'nama' => ImportHelper::titleCase($nama),
                         'nipd' => ImportHelper::text($this->pick($r, 'NIPD', 'nipd')),
                         'nisn' => ImportHelper::text($this->pick($r, 'NISN', 'nisn')),
                         'jenis_kelamin' =>

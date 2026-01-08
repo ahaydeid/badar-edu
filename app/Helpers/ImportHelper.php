@@ -43,4 +43,16 @@ class ImportHelper
 
         return $v === '' || $v === '0' ? null : $v;
     }
+
+    public static function titleCase($value): ?string
+    {
+        if ($value === null) return null;
+
+        $v = trim((string) $value);
+
+        if ($v === '' || $v === '0') return null;
+
+        // Convert to Title Case using mb_convert_case for UTF-8 support
+        return mb_convert_case($v, MB_CASE_TITLE, 'UTF-8');
+    }
 }
