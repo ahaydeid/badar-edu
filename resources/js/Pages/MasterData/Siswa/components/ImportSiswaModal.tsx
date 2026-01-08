@@ -76,15 +76,28 @@ export default function ImportSiswaModal({ open, onClose, onImported }: Props) {
 
         setLoading(true);
         setProcessingStage("uploading");
-        setProgress(30); // Show some initial progress
+        setProgress(0);
 
-        // Simulate progress during upload (since Inertia doesn't support onProgress)
+        // Smooth progress animation with easing
+        const startTime = Date.now();
+        const duration = 10000; // 10 seconds to reach 90%
+        const targetProgress = 90;
+
         const progressInterval = setInterval(() => {
-            setProgress((prev) => {
-                if (prev >= 90) return prev; // Cap at 90% until server responds
-                return prev + 10;
-            });
-        }, 500);
+            const elapsed = Date.now() - startTime;
+            const timeProgress = Math.min(elapsed / duration, 1);
+            
+            // Ease out quad function for smooth deceleration
+            const easedProgress = 1 - Math.pow(1 - timeProgress, 2);
+            const currentProgress = Math.floor(easedProgress * targetProgress);
+            
+            setProgress(currentProgress);
+            
+            // Stop at 90%
+            if (currentProgress >= targetProgress) {
+                clearInterval(progressInterval);
+            }
+        }, 100); // Update every 100ms for smooth animation
 
         router.post(
             "/master-data/siswa/import",

@@ -1,6 +1,6 @@
 {
-  "_xlsx.min-BfQcoUPD.js": {
-    "file": "assets/xlsx.min-BfQcoUPD.js",
+  "_xlsx.min-lxTgrMnk.js": {
+    "file": "assets/xlsx.min-lxTgrMnk.js",
     "name": "xlsx.min",
     "isDynamicEntry": true,
     "imports": [
@@ -23,12 +23,12 @@
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-C_4l5Y6K.js",
+    "file": "assets/app-CIZCUaPd.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
     "dynamicImports": [
-      "_xlsx.min-BfQcoUPD.js",
+      "_xlsx.min-lxTgrMnk.js",
       "node_modules/xlsx/xlsx.mjs",
       "node_modules/xlsx/xlsx.mjs"
     ],
