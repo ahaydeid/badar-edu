@@ -5,7 +5,7 @@ import Toast from "@/Components/ui/Toast";
 import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 
 export default function AbsensiGuru() {
-    const { items } = usePage<any>().props;
+    const { items, lokasiKantor } = usePage<any>().props;
     const rows = items as any[];
 
     const [search, setSearch] = useState("");
@@ -43,6 +43,9 @@ export default function AbsensiGuru() {
         foto: string | null;
         verifikasi: "OTOMATIS" | "PENDING" | "DISETUJUI" | "DITOLAK" | null;
         isInRange: boolean;
+        schoolLat: number;
+        schoolLng: number;
+        radius: number;
     }>({
         nama: null,
         jamMasuk: null,
@@ -51,6 +54,9 @@ export default function AbsensiGuru() {
         foto: null,
         verifikasi: null,
         isInRange: true,
+        schoolLat: lokasiKantor?.latitude || -6.2060385,
+        schoolLng: lokasiKantor?.longitude || 106.4230608,
+        radius: lokasiKantor?.radius || 150,
     });
 
     const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +96,9 @@ export default function AbsensiGuru() {
             foto: item.foto,
             verifikasi: item.verifikasi,
             isInRange: item.isInRange,
+            schoolLat: lokasiKantor?.latitude || -6.2060385,
+            schoolLng: lokasiKantor?.longitude || 106.4230608,
+            radius: lokasiKantor?.radius || 150,
         });
         setOpen(true);
     };
@@ -136,7 +145,7 @@ export default function AbsensiGuru() {
                     onChange={handleSearch}
                 />
 
-                {/* Summary Section - Moved up */}
+                {/* Summary Section */}
                 {rows.filter(item => item.verifikasi === 'PENDING').length > 0 && (
                     <div className="p-4 bg-yellow-100 border border-yellow-100 rounded text-sm text-gray-800 animate-pulse">
                         <strong>Perhatian:</strong> Terdapat {rows.filter(item => item.verifikasi === 'PENDING').length} absensi yang memerlukan verifikasi manual.
@@ -239,7 +248,6 @@ export default function AbsensiGuru() {
                         </tbody>
                     </table>
                 </div>
-
             </div>
 
             <LokasiAbsenModal
@@ -252,9 +260,12 @@ export default function AbsensiGuru() {
                 foto={detail.foto}
                 verifikasi={detail.verifikasi}
                 isInRange={detail.isInRange}
+                schoolLat={detail.schoolLat}
+                schoolLng={detail.schoolLng}
+                radius={detail.radius}
             />
 
-            <Toast open={false} {...toast} />
+            <Toast open={toast.show} {...toast} />
             <ConfirmDialog
                 open={confirmAction.open}
                 variant={confirmAction.status === 'DITOLAK' ? 'danger' : 'primary'}

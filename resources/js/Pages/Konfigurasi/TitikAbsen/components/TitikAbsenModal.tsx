@@ -1,6 +1,22 @@
 import { useEffect, useState } from "react";
 import { useForm } from "@inertiajs/react";
+import { MapContainer, TileLayer, Marker, Circle } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import ConfirmDialog from "@/Components/ui/ConfirmDialog";
+
+// Fix Leaflet default marker icons
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 interface Location {
     id: number;
@@ -76,7 +92,7 @@ export default function TitikAbsenModal({ isOpen, onClose, editData, showToast }
 
     return (
         <>
-            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200">
                 <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                     <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h2 className="text-xl font-bold text-slate-800">
@@ -86,16 +102,6 @@ export default function TitikAbsenModal({ isOpen, onClose, editData, showToast }
                     </div>
 
                     <form onSubmit={handleConfirmSave} className="p-6 space-y-6">
-                        {/* Warning: Single Location Policy */}
-                        {data.is_active && (
-                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-                                <p className="text-sm text-yellow-800">
-                                    <strong>⚠️ Perhatian:</strong> Hanya 1 titik absen yang dapat aktif pada satu waktu.
-                                    Mengaktifkan titik ini akan menonaktifkan titik lain secara otomatis.
-                                </p>
-                            </div>
-                        )}
-                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="col-span-full">
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Nama Lokasi</label>
@@ -166,13 +172,32 @@ export default function TitikAbsenModal({ isOpen, onClose, editData, showToast }
                         </div>
 
                         {/* Preview Map */}
-                        {data.latitude && data.longitude && (
-                            <div className="h-48 rounded overflow-hidden border border-slate-200">
-                                <iframe
-                                    width="100%"
-                                    height="100%"
-                                    src={`https://www.google.com/maps?q=${data.latitude},${data.longitude}&hl=id;z=16&output=embed`}
-                                ></iframe>
+                        {data.latitude && data.longitude && !isNaN(parseFloat(data.latitude)) && !isNaN(parseFloat(data.longitude)) && (
+                            <div className="h-64 rounded overflow-hidden border border-slate-200">
+                                <MapContainer 
+                                    center={[parseFloat(data.latitude), parseFloat(data.longitude)]} 
+                                    zoom={18} 
+                                    style={{ height: '100%', width: '100%' }}
+                                    scrollWheelZoom={true}
+                                    key={`${data.latitude}-${data.longitude}`} // Force re-render on lat/lng change
+                                >
+                                    <TileLayer
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    
+                                    <Marker position={[parseFloat(data.latitude), parseFloat(data.longitude)]} />
+                                    
+                                    <Circle 
+                                        center={[parseFloat(data.latitude), parseFloat(data.longitude)]} 
+                                        radius={data.radius || 0}
+                                        pathOptions={{ 
+                                            fillColor: '#0ea5e9', 
+                                            fillOpacity: 0.2,
+                                            stroke: false
+                                        }}
+                                    />
+                                </MapContainer>
                             </div>
                         )}
 

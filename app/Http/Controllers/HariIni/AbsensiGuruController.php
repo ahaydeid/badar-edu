@@ -96,8 +96,14 @@ class AbsensiGuruController extends Controller
                 ];
             });
 
+        // 4. Ambil lokasi kantor aktif
+        $lokasiKantor = DB::table('absen_lokasi_kantor')
+            ->where('is_active', true)
+            ->first();
+
         return Inertia::render('HariIni/AbsensiGuru/Index', [
             'items' => $items,
+            'lokasiKantor' => $lokasiKantor,
         ]);
     }
 

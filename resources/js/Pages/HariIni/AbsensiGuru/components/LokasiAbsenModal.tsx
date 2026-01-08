@@ -1,6 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -27,11 +27,10 @@ interface LokasiAbsenModalProps {
     foto: string | null;
     verifikasi: "OTOMATIS" | "PENDING" | "DISETUJUI" | "DITOLAK" | null;
     isInRange: boolean;
+    schoolLat: number;
+    schoolLng: number;
+    radius: number;
 }
-
-// School coordinates from absen_lokasi_kantor table
-const SCHOOL_LAT = -6.2060385486991960;
-const SCHOOL_LNG = 106.4230608253868700;
 
 // Calculate distance between two coordinates using Haversine formula
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -68,13 +67,16 @@ export default function LokasiAbsenModal({
     foto,
     verifikasi,
     isInRange,
+    schoolLat,
+    schoolLng,
+    radius,
 }: LokasiAbsenModalProps) {
     if (!open) return null;
 
     const hasLocation = lat !== null && lng !== null;
-    const distance = hasLocation ? calculateDistance(SCHOOL_LAT, SCHOOL_LNG, lat!, lng!) : 0;
+    const distance = hasLocation ? calculateDistance(schoolLat, schoolLng, lat!, lng!) : 0;
 
-    const schoolPosition: [number, number] = [SCHOOL_LAT, SCHOOL_LNG];
+    const schoolPosition: [number, number] = [schoolLat, schoolLng];
     const teacherPosition: [number, number] = hasLocation ? [lat!, lng!] : [0, 0];
 
     return (
@@ -129,11 +131,22 @@ export default function LokasiAbsenModal({
                                                 <strong>Sekolah</strong>
                                                 <br />
                                                 <span className="text-xs text-gray-600">
-                                                    {SCHOOL_LAT}, {SCHOOL_LNG}
+                                                    {schoolLat}, {schoolLng}
                                                 </span>
                                             </div>
                                         </Popup>
                                     </Marker>
+                                    
+                                    {/* Radius Circle */}
+                                    <Circle 
+                                        center={schoolPosition} 
+                                        radius={radius}
+                                        pathOptions={{ 
+                                            fillColor: '#38a9f4ff', 
+                                            fillOpacity: 0.35,
+                                            stroke: false
+                                        }}
+                                    />
                                     
                                     {/* Teacher Marker */}
                                     <Marker position={teacherPosition}>

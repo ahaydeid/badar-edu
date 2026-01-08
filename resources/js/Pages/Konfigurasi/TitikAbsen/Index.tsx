@@ -6,10 +6,6 @@ import 'leaflet/dist/leaflet.css';
 import { 
     Plus, 
     Map as MapIcon,
-    Edit,
-    Trash2,
-    MapPin,
-    Ruler,
 } from "lucide-react";
 import ConfirmDialog from "@/Components/ui/ConfirmDialog";
 import Toast from "@/Components/ui/Toast";
@@ -85,50 +81,36 @@ export default function Index() {
     const hasLocation = location !== null;
 
     return (
-        <div className="p-6">
+        <div className="px-6 pb-6">
             <Head title="Konfigurasi Titik Absen" />
 
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-extrabold text-slate-800 flex items-center gap-3">
                         Konfigurasi Titik Absen
                     </h1>
-                    <p className="text-slate-500 mt-1">
-                        {hasLocation 
-                            ? 'Kelola "Titik 0" lokasi sekolah untuk presensi guru.' 
-                            : 'Tambahkan "Titik 0" lokasi sekolah untuk mengaktifkan presensi berbasis lokasi.'}
-                    </p>
                 </div>
                 
-                {/* Conditional Add Button - Only show if no location exists */}
+                {/* Conditional Add Button */}
                 {!hasLocation && (
                     <button
                         onClick={() => openModal()}
-                        className="bg-sky-600 hover:bg-sky-700 text-white px-6 cursor-pointer py-3 rounded-lg font-semibold hover:shadow-lg shadow-sky-200 transition-all flex items-center gap-2 active:scale-95"
+                        className="bg-sky-600 hover:bg-sky-700 text-white px-4 cursor-pointer py-2 rounded font-semibold hover:shadow shadow-sky-200 transition-all flex items-center gap-2 active:scale-95 text-sm"
                     >
                         <Plus className="w-5 h-5" />
-                        Tambah Titik Absen
+                        Tambah Lokasi
                     </button>
                 )}
             </div>
 
             {/* Full-Screen Map or Empty State */}
             {hasLocation ? (
-                <div className="space-y-6">
-                    {/* Alert: Single Location Policy */}
-                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-                        <p className="text-sm text-blue-800">
-                            <strong>ℹ️ Kebijakan:</strong> Hanya 1 titik absen yang dapat aktif pada satu waktu. 
-                            Ini memastikan konsistensi dalam validasi presensi berbasis lokasi.
-                        </p>
-                    </div>
-
-                    {/* Full-Screen Map */}
-                    <div className="h-[600px] rounded-xl overflow-hidden border-4 border-sky-200 shadow-2xl">
+                <div className="flex flex-col lg:flex-row gap-6">
+                    {/* Map Side (Left) */}
+                    <div className="flex-1 lg:w-3/4 h-[550px] rounded overflow-hidden border-2 border-slate-200">
                         <MapContainer 
                             center={[location.latitude, location.longitude]} 
-                            zoom={16} 
+                            zoom={18} 
                             style={{ height: '100%', width: '100%' }}
                             scrollWheelZoom={true}
                         >
@@ -141,119 +123,97 @@ export default function Index() {
                             <Marker position={[location.latitude, location.longitude]}>
                                 <Popup>
                                     <div className="text-center">
-                                        <strong className="text-lg">{location.nama}</strong>
+                                        <strong>{location.nama}</strong>
                                         <br />
                                         <span className="text-xs text-gray-600">
-                                            {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
-                                        </span>
-                                        <br />
-                                        <span className="text-xs text-blue-600 font-semibold">
-                                            Radius: {location.radius}m
+                                            {Number(location.latitude).toFixed(6)}, {Number(location.longitude).toFixed(6)}
                                         </span>
                                     </div>
                                 </Popup>
                             </Marker>
                             
-                            {/* Radius Circle */}
+                            {/* Radius Circle - No border, just faint background */}
                             <Circle 
                                 center={[location.latitude, location.longitude]} 
                                 radius={location.radius}
                                 pathOptions={{ 
-                                    color: '#0ea5e9', 
-                                    fillColor: '#0ea5e9', 
-                                    fillOpacity: 0.15,
-                                    weight: 3
+                                    fillColor: '#38a9f4ff', 
+                                    fillOpacity: 0.35,
+                                    stroke: false
                                 }}
                             />
                         </MapContainer>
                     </div>
 
-                    {/* Info Card Below Map */}
-                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            {/* Nama Lokasi */}
-                            <div className="flex items-start gap-3">
-                                <div className="bg-sky-100 p-2 rounded-lg">
-                                    <MapPin className="w-5 h-5 text-sky-600" />
-                                </div>
+                    {/* Info Side (Right) */}
+                    <div className="lg:w-1/4 flex flex-col gap-4">
+                        <div className="bg-white rounded border border-slate-200 p-6 flex-1 shadow-sm">
+                            <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
+                                <MapIcon className="w-5 h-5 text-sky-600" />
+                                Detail Lokasi
+                            </h3>
+                            
+                            <div className="space-y-6">
                                 <div>
-                                    <p className="text-sm text-gray-500 mb-1">Nama Lokasi</p>
-                                    <p className="font-bold text-lg text-gray-800">{location.nama}</p>
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nama Lokasi</p>
+                                    <p className="font-bold text-slate-700">{location.nama}</p>
                                 </div>
-                            </div>
 
-                            {/* Koordinat */}
-                            <div className="flex items-start gap-3">
-                                <div className="bg-emerald-100 p-2 rounded-lg">
-                                    <MapIcon className="w-5 h-5 text-emerald-600" />
-                                </div>
                                 <div>
-                                    <p className="text-sm text-gray-500 mb-1">Koordinat</p>
-                                    <p className="font-mono text-sm text-gray-800">
-                                        {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Koordinat</p>
+                                    <p className="font-mono text-xs text-slate-700">
+                                        {Number(location.latitude).toFixed(6)}, {Number(location.longitude).toFixed(6)}
                                     </p>
                                 </div>
-                            </div>
 
-                            {/* Radius */}
-                            <div className="flex items-start gap-3">
-                                <div className="bg-purple-100 p-2 rounded-lg">
-                                    <Ruler className="w-5 h-5 text-purple-600" />
-                                </div>
                                 <div>
-                                    <p className="text-sm text-gray-500 mb-1">Radius Jangkauan</p>
-                                    <p className="font-bold text-lg text-gray-800">{location.radius} meter</p>
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Radius Jangkauan</p>
+                                    <p className="font-bold text-slate-700">{location.radius} meter</p>
                                 </div>
-                            </div>
 
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 md:justify-end">
-                                <button
-                                    onClick={() => openModal(location)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition-all cursor-pointer active:scale-95"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => setConfirmDelete({ open: true, id: location.id })}
-                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all cursor-pointer active:scale-95"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                    Hapus
-                                </button>
+                                <div className="pt-4 flex flex-col gap-2">
+                                    <button
+                                        onClick={() => openModal(location)}
+                                        className="w-full px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded font-bold transition-all cursor-pointer flex justify-center items-center gap-2"
+                                    >
+                                        Edit Lokasi
+                                    </button>
+                                    <button
+                                        onClick={() => setConfirmDelete({ open: true, id: location.id })}
+                                        className="w-full px-4 py-2.5 text-white bg-red-600 hover:bg-red-50 rounded font-bold transition-all cursor-pointer flex justify-center items-center gap-2"
+                                    >
+                                        Hapus Titik
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Status Badge */}
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
-                                location.is_active 
-                                    ? 'bg-green-100 text-green-700' 
-                                    : 'bg-gray-100 text-gray-700'
-                            }`}>
-                                {location.is_active ? '✓ Aktif' : '○ Tidak Aktif'}
-                            </span>
+                        {/* Status Card */}
+                        <div className={`p-4 rounded border ${location.is_active ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-slate-50 border-slate-100 text-slate-700'}`}>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-bold">Status Presensi</span>
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${location.is_active ? 'bg-emerald-200' : 'bg-slate-200'}`}>
+                                    {location.is_active ? 'Aktif' : 'Nonaktif'}
+                                </span>
+                            </div>
+                            <p className="text-[11px] mt-1 opacity-80">
+                                {location.is_active 
+                                    ? 'Titik ini digunakan sebagai referensi presensi.' 
+                                    : 'Titik ini tidak digunakan untuk validasi lokasi.'}
+                            </p>
                         </div>
                     </div>
                 </div>
             ) : (
                 /* Empty State */
-                <div className="h-[600px] bg-gradient-to-br from-sky-50 to-blue-100 rounded-xl border-4 border-dashed border-sky-300 flex flex-col items-center justify-center shadow-inner">
-                    <MapIcon className="w-32 h-32 text-sky-400 mb-6 opacity-30" />
-                    <h3 className="text-3xl font-bold text-sky-900 mb-3">
-                        Belum Ada Titik Absen
-                    </h3>
-                    <p className="text-sky-700 mb-8 text-center max-w-md">
-                        Tambahkan titik absen pertama untuk mengaktifkan sistem presensi berbasis lokasi GPS.
-                        Hanya 1 titik absen yang dapat aktif pada satu waktu.
-                    </p>
+                <div className="py-20 bg-slate-50 rounded border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
+                    <MapIcon className="w-16 h-16 mb-4 opacity-20" />
+                    <p className="text-lg font-medium">Belum ada titik absen yang terdaftar.</p>
                     <button 
-                        onClick={() => openModal()}
-                        className="bg-sky-600 hover:bg-sky-700 text-white px-8 cursor-pointer py-4 rounded-lg font-bold text-lg hover:shadow-xl transition-all flex items-center gap-3 active:scale-95"
+                        onClick={() => openModal()} 
+                        className="mt-4 text-sky-600 cursor-pointer hover:underline"
                     >
-                        <Plus className="w-6 h-6" />
-                        Tambah Titik Absen Pertama
+                        Tambah Titik Pertama
                     </button>
                 </div>
             )}
@@ -272,7 +232,7 @@ export default function Index() {
                 open={confirmDelete.open}
                 variant="danger"
                 title="Hapus Lokasi"
-                message="Apakah Anda yakin ingin menghapus lokasi ini? Tindakan ini tidak dapat dibatalkan dan akan menonaktifkan presensi berbasis lokasi."
+                message="Apakah Anda yakin ingin menghapus lokasi ini? Tindakan ini tidak dapat dibatalkan."
                 confirmText="Ya, Hapus"
                 onClose={() => setConfirmDelete({ open: false, id: null })}
                 onConfirm={handleDelete}
