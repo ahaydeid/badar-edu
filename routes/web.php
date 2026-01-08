@@ -18,6 +18,7 @@ use App\Http\Controllers\MasterData\KelasController;
 // Hari Ini
 use App\Http\Controllers\HariIni\AbsensiGuruController;
 use App\Http\Controllers\HariIni\KelasBerlangsungController;
+use App\Http\Controllers\HariIni\GuruAttendanceReportController;
 
 // Guru Mapel
 use App\Http\Controllers\GuruMapel\AbsensiSiswaController;
@@ -94,10 +95,14 @@ Route::middleware(['auth'])->group(function () use ($ud) {
     Route::middleware(['permission:absensi_guru.view'])->group(function () {
         Route::get('/absensi-guru', [AbsensiGuruController::class, 'index']);
         Route::post('/absensi-guru/verify/{id}', [AbsensiGuruController::class, 'verify'])->name('absensi-guru.verify');
-        });
+    });
 
-        Route::get('/kelas-berlangsung', [KelasBerlangsungController::class, 'index'])
-            ->middleware(['permission:kelas-berlangsung.view']);
+    Route::get('/kehadiran-guru', [GuruAttendanceReportController::class, 'index'])
+        ->middleware(['permission:absensi_guru.report.view'])
+        ->name('kehadiran-guru.index');
+
+    Route::get('/kelas-berlangsung', [KelasBerlangsungController::class, 'index'])
+        ->middleware(['permission:kelas-berlangsung.view']);
 
     // PENGUMUMAN: view vs manage
     Route::prefix('pengumuman')->group(function () {

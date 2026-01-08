@@ -13,18 +13,34 @@ use App\Models\Siswa;
 
 class AbsensiSiswaController extends Controller
 {
+    private function getGuru()
+    {
+        $user = auth()->user();
+        if (!$user || $user->profile_type !== 'App\Models\Guru') {
+             abort(403, 'Akses khusus Guru');
+        }
+        return $user->profile;
+    }
+
+    private function getActiveSemester()
+    {
+        $now = now();
+        return Semester::where('tanggal_mulai', '<=', $now)
+            ->where('tanggal_selesai', '>=', $now)
+            ->first() 
+            ?? Semester::latest()->firstOrFail();
+    }
+
     public function index()
     {
-        $guruId = 3;
-        $today = Carbon::today();
-
-        $semesterId = Semester::whereDate('tanggal_mulai','<=',$today)
-            ->whereDate('tanggal_selesai','>=',$today)->value('id');
+        $guru = $this->getGuru();
+        $semester = $this->getActiveSemester();
 
         $kelasList = Kelas::join('jadwal','jadwal.kelas_id','=','kelas.id')
             ->leftJoin('guru','guru.id','=','kelas.wali_guru_id')
-            ->where('jadwal.guru_id',$guruId)
-            ->where('jadwal.semester_id',$semesterId)
+            ->where('jadwal.guru_id', $guru->id)
+            ->where('jadwal.semester_id', $semester->id)
+            ->where('jadwal.is_active', true)
             ->select('kelas.id','kelas.nama as nama_rombel','guru.nama as wali_nama')
             ->groupBy('kelas.id','kelas.nama','guru.nama')
             ->orderBy('kelas.nama')
@@ -41,16 +57,14 @@ class AbsensiSiswaController extends Controller
 
     public function kelas($kelasId)
     {
-        $guruId = 3;
-        $today = Carbon::today();
-
-        $semesterId = Semester::whereDate('tanggal_mulai','<=',$today)
-            ->whereDate('tanggal_selesai','>=',$today)->value('id');
+        $guru = $this->getGuru();
+        $semester = $this->getActiveSemester();
 
         $jadwal = Jadwal::with(['kelas:id,nama','mapel:id,nama'])
-            ->where('guru_id',$guruId)
-            ->where('kelas_id',$kelasId)
-            ->where('semester_id',$semesterId)
+            ->where('guru_id', $guru->id)
+            ->where('kelas_id', $kelasId)
+            ->where('semester_id', $semester->id)
+            ->where('is_active', true)
             ->firstOrFail();
 
         $siswaList = Siswa::where('rombel_saat_ini',$kelasId)->orderBy('nama')->get();

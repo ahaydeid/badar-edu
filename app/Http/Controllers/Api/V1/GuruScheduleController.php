@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\AbsenKelas;
+use App\Models\AbsenGuru; // NEW
 use App\Models\Guru;
 use App\Models\Jadwal;
 use Carbon\Carbon;
@@ -15,8 +16,12 @@ class GuruScheduleController extends Controller
 {
     /**
      * Get Teacher's Teaching Schedule (Merged Block)
+     * 
+     * Query Parameters:
+     * - week=true : Returns full week schedule (Monday-Saturday)
+     * - (no params): Returns today's schedule only (default)
      */
-    public function index()
+    public function index(Request $request)
     {
         // Get authenticated guru
         $user = Auth::user();
@@ -38,8 +43,28 @@ class GuruScheduleController extends Controller
             ], 404);
         }
 
+        // Check if weekly schedule is requested
+        $isWeeklyRequest = $request->query('week') === 'true' || $request->query('week') === '1';
+
+        if ($isWeeklyRequest) {
+            return $this->getWeeklySchedule($guru);
+        }
+
+        // Default behavior: Return today's schedule only
         $today = Carbon::today()->toDateString();
         
+        // NEW: Pengecekan apakah guru sudah absen masuk hari ini
+        $hasCheckedIn = AbsenGuru::where('guru_id', $guru->id)
+            ->where('tanggal', $today)
+            ->whereNotNull('jam_masuk')
+            ->exists();
+
+        // NEW: Pengecekan apakah guru sudah absen pulang hari ini
+        $hasCheckedOut = AbsenGuru::where('guru_id', $guru->id)
+            ->where('tanggal', $today)
+            ->whereNotNull('jam_pulang')
+            ->exists();
+
         // Get jadwal mengajar hari ini
         $hariIni = Carbon::now()->dayOfWeek;
         $hariId = $hariIni == 0 ? 7 : $hariIni;
@@ -91,6 +116,8 @@ class GuruScheduleController extends Controller
                     'mapel' => $j->mapel->nama ?? '-',
                     'jp_count' => 1,
                     'status' => $isCompleted ? 'selesai' : 'berlangsung',
+                    'canAccess' => $hasCheckedIn, // NEW FIELD
+                    'hasCheckedOut' => $hasCheckedOut, // NEW FIELD
                     // Internal check
                     'kelas_id' => $j->kelas_id,
                     'mapel_id' => $j->mapel_id,
@@ -129,6 +156,8 @@ class GuruScheduleController extends Controller
                     'mapel' => $j->mapel->nama ?? '-',
                     'jp_count' => 1,
                     'status' => $isCompleted ? 'selesai' : 'berlangsung',
+                    'canAccess' => $hasCheckedIn, // NEW FIELD
+                    'hasCheckedOut' => $hasCheckedOut, // NEW FIELD
                     'kelas_id' => $j->kelas_id,
                     'mapel_id' => $j->mapel_id,
                 ];
@@ -148,6 +177,132 @@ class GuruScheduleController extends Controller
             'data' => $mergedJadwal,
         ]);
     }
+
+    /**
+     * Get Teacher's Weekly Schedule (Monday-Saturday)
+     * Returns raw schedule items without merging
+     * 
+     * @param Guru $guru
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function getWeeklySchedule($guru)
+    {
+        // Get all days (1-6 = Monday-Saturday)
+        $days = DB::table('hari')
+            ->whereIn('id', [1, 2, 3, 4, 5, 6])
+            ->orderBy('id')
+            ->select('id', 'nama')
+            ->get()
+            ->map(function($day) {
+                return [
+                    'id' => $day->id,
+                    'nama' => $day->nama
+                ];
+            });
+
+        // Get all schedules for the week
+        $jadwals = Jadwal::with(['jam', 'kelas', 'mapel', 'hari'])
+            ->where('guru_id', $guru->id)
+            ->whereIn('hari_id', [1, 2, 3, 4, 5, 6])
+            ->where('is_active', true)
+            ->orderBy('hari_id')
+            ->orderBy('jam_id')
+            ->get();
+
+        // Group by hari_id for merging
+        $jadwalsByDay = $jadwals->groupBy('hari_id');
+        
+        $mergedJadwals = [];
+
+        foreach ($jadwalsByDay as $hariId => $dayJadwals) {
+            $currentBlock = null;
+            
+            foreach ($dayJadwals as $jadwal) {
+                if (!$jadwal->jam) continue;
+                
+                $jamMulai = substr($jadwal->jam->jam_mulai, 0, 5);
+                $jamSelesai = substr($jadwal->jam->jam_selesai, 0, 5);
+                $jamNama = $jadwal->jam->nama; // e.g., "J-1", "J-2"
+                
+                // Init current block if null
+                if (!$currentBlock) {
+                    $currentBlock = [
+                        'id' => $jadwal->id,
+                        'hari_id' => $jadwal->hari_id,
+                        'jam_id' => $jadwal->jam_id,
+                        'kelas_id' => $jadwal->kelas_id,
+                        'mapel_id' => $jadwal->mapel_id,
+                        'guru_id' => $jadwal->guru_id,
+                        'jp_count' => 1,
+                        'jamMulai' => $jamMulai,
+                        'jamSelesai' => $jamSelesai,
+                        'jamPertama' => $jamNama,
+                        'jamKedua' => $jamNama,
+                        'kelas' => [
+                            'nama' => $jadwal->kelas ? $jadwal->kelas->nama : '-'
+                        ],
+                        'mapel' => $jadwal->mapel ? $jadwal->mapel->nama : '-',
+                    ];
+                    continue;
+                }
+                
+                // Check merge condition: Same Kelas AND Same Mapel
+                if ($jadwal->kelas_id == $currentBlock['kelas_id'] && 
+                    $jadwal->mapel_id == $currentBlock['mapel_id']) {
+                    // Merge - extend current block
+                    $currentBlock['jp_count']++;
+                    $currentBlock['jamSelesai'] = $jamSelesai;
+                    $currentBlock['jamKedua'] = $jamNama;
+                } else {
+                    // Different class or subject - push current block and start new
+                    $currentBlock['jp'] = $currentBlock['jp_count'];
+                    unset($currentBlock['jp_count']);
+                    unset($currentBlock['kelas_id']);
+                    unset($currentBlock['mapel_id']);
+                    
+                    $mergedJadwals[] = $currentBlock;
+                    
+                    // Start new block
+                    $currentBlock = [
+                        'id' => $jadwal->id,
+                        'hari_id' => $jadwal->hari_id,
+                        'jam_id' => $jadwal->jam_id,
+                        'kelas_id' => $jadwal->kelas_id,
+                        'mapel_id' => $jadwal->mapel_id,
+                        'guru_id' => $jadwal->guru_id,
+                        'jp_count' => 1,
+                        'jamMulai' => $jamMulai,
+                        'jamSelesai' => $jamSelesai,
+                        'jamPertama' => $jamNama,
+                        'jamKedua' => $jamNama,
+                        'kelas' => [
+                            'nama' => $jadwal->kelas ? $jadwal->kelas->nama : '-'
+                        ],
+                        'mapel' => $jadwal->mapel ? $jadwal->mapel->nama : '-',
+                    ];
+                }
+            }
+            
+            // Push last block of the day
+            if ($currentBlock) {
+                $currentBlock['jp'] = $currentBlock['jp_count'];
+                unset($currentBlock['jp_count']);
+                unset($currentBlock['kelas_id']);
+                unset($currentBlock['mapel_id']);
+                
+                $mergedJadwals[] = $currentBlock;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'days' => $days,
+                'jadwals' => $mergedJadwals
+            ]
+        ]);
+    }
+
 
     /**
      * Get Detail Jadwal (TodayPage)

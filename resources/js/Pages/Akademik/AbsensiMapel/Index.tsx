@@ -38,27 +38,52 @@ export default function Index() {
                     </div>
                 </div>
 
-                {["X ", "XI ", "XII "].map((prefix) => {
-                    const data = kelasList.filter((k) =>
-                        k.nama_rombel.startsWith(prefix)
-                    );
+                <div className="space-y-8">
+                    {["10", "11", "12", "X", "XI", "XII"].map((prefix) => {
+                        const data = kelasList.filter((k) =>
+                            k.nama_rombel.toUpperCase().startsWith(prefix.toUpperCase())
+                        );
 
-                    if (data.length === 0) return null;
+                        if (data.length === 0) return null;
 
-                    return (
-                        <div key={prefix} className="space-y-4">
-                            <h2 className="text-2xl font-bold text-sky-600">
-                                Kelas {prefix.trim()}
-                            </h2>
+                        return (
+                            <div key={prefix} className="space-y-4">
+                                <h2 className="text-2xl font-bold text-sky-600">
+                                    Kelas {prefix.trim()}
+                                </h2>
 
-                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                {data.map((k) => (
-                                    <Card k={k} key={k.id} />
-                                ))}
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {data.map((k) => (
+                                        <Card k={k} key={k.id} />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+
+                    {/* Fallback for classes that don't match any prefix */}
+                    {(() => {
+                        const matchedIds = ["10", "11", "12", "X", "XI", "XII"].flatMap(prefix => 
+                            kelasList.filter(k => k.nama_rombel.toUpperCase().startsWith(prefix.toUpperCase())).map(k => k.id)
+                        );
+                        const remaining = kelasList.filter(k => !matchedIds.includes(k.id));
+                        
+                        if (remaining.length === 0) return null;
+
+                        return (
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-bold text-slate-400">
+                                    Kelas Lainnya
+                                </h2>
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {remaining.map((k) => (
+                                        <Card k={k} key={k.id} />
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })()}
+                </div>
             </div>
         </div>
     );
@@ -68,7 +93,7 @@ function Card({ k }: { k: KelasItem }) {
     return (
         <div
             onClick={() => router.get(`/absensi-siswa/${k.id}`)}
-            className="group cursor-pointer rounded-xl border border-slate-200 bg-white p-6 transition hover:shadow-lg"
+            className="group cursor-pointer rounded-xl border border-slate-200 bg-white p-6 transition hover:shadow"
         >
             <div className="flex items-start justify-between">
                 <div>

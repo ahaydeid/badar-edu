@@ -34,8 +34,15 @@ export default function ClassCard({ kelas, jadwal, hari, jam, isEditMode, pendin
 
     const confirmDelete = () => {
         if (selectedJadwal) {
-            router.delete(route("master-data.jadwal.destroy", selectedJadwal), {
-                onSuccess: () => setIsConfirmOpen(false),
+            router.delete(`/master-data/jadwal-ajar/${selectedJadwal}`, {
+                onSuccess: () => {
+                    setIsConfirmOpen(false);
+                    setSelectedJadwal(null);
+                },
+                onError: (errors) => {
+                    console.error('Delete failed:', errors);
+                    setIsConfirmOpen(false);
+                }
             });
         }
     };

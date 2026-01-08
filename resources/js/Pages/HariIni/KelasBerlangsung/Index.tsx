@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import AttendanceDetailModal from "./components/AttendanceDetailModal";
 
-type KelasTab = "X " | "XI " | "XII ";
+type KelasTab = string;
 
 type AttendanceRow = {
     id: number;
@@ -43,7 +43,6 @@ export default function KegiatanBelajar({
     items: Kegiatan[];
     detailAbsen: Record<number, AttendanceRow[]>;
 }) {
-    const [activeKelas, setActiveKelas] = useState<KelasTab>("X ");
     const [openDetail, setOpenDetail] = useState(false);
     const [selectedKelasId, setSelectedKelasId] = useState<number | null>(null);
     const [animate, setAnimate] = useState(false);
@@ -53,14 +52,23 @@ export default function KegiatanBelajar({
         return () => cancelAnimationFrame(t);
     }, []);
 
-    const tabList: { key: KelasTab; label: string }[] = [
-        { key: "X ", label: "Kelas X" },
-        { key: "XI ", label: "Kelas XI" },
-        { key: "XII ", label: "Kelas XII" },
+    const tabList = [
+        { key: "10", label: "Kelas 10" },
+        { key: "11", label: "Kelas 11" },
+        { key: "12", label: "Kelas 12" },
+        { key: "X", label: "Kelas X" },
+        { key: "XI", label: "Kelas XI" },
+        { key: "XII", label: "Kelas XII" },
     ];
 
+    const [activeKelas, setActiveKelas] = useState<KelasTab>(() => {
+        // Try to find which tab has data
+        const firstWithData = tabList.find(tab => items.some(k => k.kelas.toUpperCase().startsWith(tab.key.toUpperCase())));
+        return firstWithData ? firstWithData.key : (items.length > 0 ? "10" : "X");
+    });
+
     const filteredData = items.filter((item) =>
-        item.kelas.startsWith(activeKelas)
+        item.kelas.toUpperCase().startsWith(activeKelas.toUpperCase())
     );
 
     const getChartData = (kelas: Kegiatan) => [

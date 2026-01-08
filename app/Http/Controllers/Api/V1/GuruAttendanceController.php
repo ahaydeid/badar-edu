@@ -180,23 +180,42 @@ class GuruAttendanceController extends Controller
             ], 400);
         }
 
-        // Get jadwal terakhir
+        // Get all jadwal guru pada hari ini
         $hariIni = Carbon::now()->dayOfWeek;
         $hariId = $hariIni == 0 ? 7 : $hariIni;
 
-        $jadwalTerakhir = Jadwal::with('jam')
+        $jadwalHariIni = Jadwal::with('jam')
             ->where('guru_id', $guru->id)
             ->where('hari_id', $hariId)
             ->where('is_active', true)
-            ->orderBy('jam_id', 'desc')
-            ->first();
+            ->get();
 
-        $jamSelesaiTerakhir = $jadwalTerakhir?->jam?->jam_selesai ?? '14:30:00';
+        // Calculate jp_total based on overlap
+        $jamMasuk = Carbon::parse($today . ' ' . $absen->jam_masuk);
+        $jamPulang = $request->timestamp 
+            ? Carbon::parse($request->timestamp)->setTimezone('Asia/Jakarta')
+            : Carbon::now('Asia/Jakarta');
+        
+        $jpTotal = 0;
+        
+        foreach ($jadwalHariIni as $jadwal) {
+            if (!$jadwal->jam) continue;
+            
+            $jadwalMulai = Carbon::parse($today . ' ' . $jadwal->jam->jam_mulai);
+            $jadwalSelesai = Carbon::parse($today . ' ' . $jadwal->jam->jam_selesai);
+            
+            // Check overlap: start1 < end2 AND start2 < end1
+            // Partial overlap tetap dihitung
+            if ($jamMasuk->lt($jadwalSelesai) && $jadwalMulai->lt($jamPulang)) {
+                // Ada overlap, tambahkan JP
+                $jpTotal += $jadwal->jam->jumlah_jp ?? 1;
+            }
+        }
 
-        // Update jam_pulang
-        $jamPulang = Carbon::now()->format('H:i:s');
+        // Update jam_pulang dan jp_total
         $absen->update([
-            'jam_pulang' => $jamPulang,
+            'jam_pulang' => $jamPulang->format('H:i:s'),
+            'jp_total' => $jpTotal,
         ]);
 
         return response()->json([
@@ -204,8 +223,8 @@ class GuruAttendanceController extends Controller
             'message' => 'Absen pulang berhasil',
             'data' => [
                 'id' => $absen->id,
-                'waktu_keluar' => $jamPulang,
-                'jadwal_selesai' => $jamSelesaiTerakhir,
+                'waktu_keluar' => $jamPulang->format('H:i:s'),
+                'jp_total' => $jpTotal,
             ],
         ]);
     }

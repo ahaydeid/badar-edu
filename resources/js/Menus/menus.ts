@@ -173,6 +173,12 @@ export const panelMenu: MenuItem[] = [
                 permission: "jadwal-semua-kelas.view",
             },
             {
+                name: "Kehadiran Guru",
+                icon: ClipboardCheck,
+                path: "/kehadiran-guru",
+                permission: "absensi_guru.report.view",
+            },
+            {
                 name: "Kalender Akademik",
                 icon: CalendarDays,
                 path: "/kalender-akademik",
@@ -295,7 +301,7 @@ export const panelMenu: MenuItem[] = [
     // SECTION: ADMINISTRASI
     // ================================================================
     {
-        section: "Administrasi",
+        section: "Keuangan",
         children: [
             {
                 name: "Payroll",

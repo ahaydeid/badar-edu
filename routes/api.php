@@ -28,6 +28,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/check-out', [\App\Http\Controllers\Api\V1\GuruAttendanceController::class, 'checkOut']);
             Route::get('/today', [\App\Http\Controllers\Api\V1\GuruAttendanceController::class, 'today']);
             Route::get('/config', [\App\Http\Controllers\Api\V1\GuruAttendanceController::class, 'getConfig']);
+            Route::get('/log', [\App\Http\Controllers\Api\V1\GuruAttendanceLogController::class, 'index']);
         });
         
         // Guru Schedule

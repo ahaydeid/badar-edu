@@ -38,49 +38,51 @@ export default function Index() {
                     </div>
                 </div>
 
-                {/* KELAS X */}
-                <div className="space-y-4">
-                    <h2 className="text-2xl font-bold text-sky-600">
-                        Kelas X
-                    </h2>
+                <div className="space-y-8">
+                    {["10", "11", "12", "X", "XI", "XII"].map((prefix) => {
+                        const data = kelasList.filter((k) =>
+                            k.nama_rombel.toUpperCase().startsWith(prefix.toUpperCase())
+                        );
 
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {kelasList
-                            .filter((k) => k.nama_rombel.startsWith("X "))
-                            .map((k) => (
-                                <Card k={k} key={k.id} />
-                            ))}
-                    </div>
-                </div>
+                        if (data.length === 0) return null;
 
-                {/* KELAS XI */}
-                <div className="space-y-4 pt-6">
-                    <h2 className="text-2xl font-bold text-sky-600">
-                        Kelas XI
-                    </h2>
+                        return (
+                            <div key={prefix} className="space-y-4">
+                                <h2 className="text-2xl font-bold text-sky-600">
+                                    Kelas {prefix.trim()}
+                                </h2>
 
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {kelasList
-                            .filter((k) => k.nama_rombel.startsWith("XI "))
-                            .map((k) => (
-                                <Card k={k} key={k.id} />
-                            ))}
-                    </div>
-                </div>
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {data.map((k) => (
+                                        <Card k={k} key={k.id} />
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
 
-                {/* KELAS XII */}
-                <div className="space-y-4 pt-6">
-                    <h2 className="text-2xl font-bold text-sky-600">
-                        Kelas XII
-                    </h2>
+                    {/* Fallback for classes that don't match any prefix */}
+                    {(() => {
+                        const matchedIds = ["10", "11", "12", "X", "XI", "XII"].flatMap(prefix => 
+                            kelasList.filter(k => k.nama_rombel.toUpperCase().startsWith(prefix.toUpperCase())).map(k => k.id)
+                        );
+                        const remaining = kelasList.filter(k => !matchedIds.includes(k.id));
+                        
+                        if (remaining.length === 0) return null;
 
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {kelasList
-                            .filter((k) => k.nama_rombel.startsWith("XII "))
-                            .map((k) => (
-                                <Card k={k} key={k.id} />
-                            ))}
-                    </div>
+                        return (
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-bold text-slate-400">
+                                    Kelas Lainnya
+                                </h2>
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {remaining.map((k) => (
+                                        <Card k={k} key={k.id} />
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })()}
                 </div>
             </div>
         </div>
@@ -93,7 +95,7 @@ function Card({ k }: { k: KelasItem }) {
             onClick={() => {
                 router.get(`/jadwal-semua-kelas/${k.id}`);
             }}
-            className="group cursor-pointer rounded-xl border border-slate-200 bg-white p-6 transition hover:shadow-lg"
+            className="group cursor-pointer rounded-xl border border-slate-200 bg-white p-6 transition hover:shadow"
         >
             <div className="flex items-start justify-between">
                 <div>

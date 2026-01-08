@@ -21,6 +21,7 @@ class PermissionSeeder extends Seeder
 
             // Hari Ini
             'absensi_guru.view',
+            'absensi_guru.report.view',
             'kelas-berlangsung.view',
 
             // Pengumuman
