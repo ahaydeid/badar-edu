@@ -52,5 +52,44 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd ~/badu
-            ./update-server.sh
+            echo "Starting deployment..."
+            
+            # Login to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Navigate to project directory
+            cd /srv/apps/laravel-core
+            
+            # Pull latest code
+            echo "Pulling latest code..."
+            git pull origin main
+            
+            # Pull latest Docker image
+            echo "Pulling latest Docker image..."
+            docker pull ghcr.io/${{ github.repository }}/app:latest
+            
+            # Navigate to docker-compose directory
+            cd /srv/apps
+            
+            # Restart containers
+            echo "Restarting containers..."
+            docker compose up -d
+            
+            # Clean up old images
+            echo "Cleaning up old images..."
+            docker image prune -f
+            
+            # Laravel maintenance
+            echo "Running Laravel maintenance..."
+            docker exec badu_app php artisan migrate --force
+            docker exec badu_app php artisan config:cache
+            docker exec badu_app php artisan route:cache
+            docker exec badu_app php artisan view:cache
+            
+            # Set permissions
+            echo "Setting permissions..."
+            docker exec badu_app chown -R www-data:www-data storage bootstrap/cache
+            docker exec badu_app chmod -R 775 storage bootstrap/cache
+            
+            echo "Deployment successful!"
+
