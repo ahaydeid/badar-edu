@@ -86,6 +86,16 @@ export default function TitikAbsenModal({ isOpen, onClose, editData, showToast }
                     </div>
 
                     <form onSubmit={handleConfirmSave} className="p-6 space-y-6">
+                        {/* Warning: Single Location Policy */}
+                        {data.is_active && (
+                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                                <p className="text-sm text-yellow-800">
+                                    <strong>⚠️ Perhatian:</strong> Hanya 1 titik absen yang dapat aktif pada satu waktu.
+                                    Mengaktifkan titik ini akan menonaktifkan titik lain secara otomatis.
+                                </p>
+                            </div>
+                        )}
+                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="col-span-full">
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Nama Lokasi</label>

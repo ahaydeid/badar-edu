@@ -26,6 +26,11 @@ class TitikAbsenController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
+        // If setting this as active, deactivate all others
+        if ($validated['is_active']) {
+            AbsenLokasiKantor::query()->update(['is_active' => false]);
+        }
+
         AbsenLokasiKantor::create($validated);
 
         return back()->with('success', 'Lokasi berhasil ditambahkan.');
@@ -42,6 +47,11 @@ class TitikAbsenController extends Controller
             'radius' => 'required|integer|min:1',
             'is_active' => 'required|boolean',
         ]);
+
+        // If setting this as active, deactivate all others
+        if ($validated['is_active'] && !$location->is_active) {
+            AbsenLokasiKantor::where('id', '!=', $id)->update(['is_active' => false]);
+        }
 
         $location->update($validated);
 
