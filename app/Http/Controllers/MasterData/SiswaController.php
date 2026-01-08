@@ -660,6 +660,11 @@ class SiswaController extends Controller
                             'rombel_saat_ini' => $rombelId ?: $existingSiswa->rombel_saat_ini, // Update rombel jika ada
                              // ... (field lain bisa diupdate sesuai kebutuhan, untuk sekarang yang krusial saja)
                          ]);
+                         
+                         // Update wali dengan Title Case
+                         $existingSiswa->wali()->delete();
+                         $this->saveWaliFromImportRow($existingSiswa->id, $r);
+                         
                          $siswa = $existingSiswa;
                     } else {
                         // CREATE BARU
@@ -737,6 +742,8 @@ class SiswaController extends Controller
                             ImportHelper::number($this->pick($r, 'Jarak Rumah ke Sekolah (KM)', 'jarak_rumah_ke_sekolah_km')),
                     ]);
 
+                    // Delete old wali records before creating new ones (untuk update Title Case)
+                    $siswa->wali()->delete();
                     $this->saveWaliFromImportRow($siswa->id, $r);
                     }
                 } catch (\Throwable $e) {
