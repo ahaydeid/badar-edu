@@ -1,9 +1,7 @@
 version: "3.9"
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/ahaydeid/badar-edu/app:latest
     container_name: badu_app
     restart: unless-stopped
     working_dir: /var/www
