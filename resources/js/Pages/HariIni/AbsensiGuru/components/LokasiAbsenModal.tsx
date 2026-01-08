@@ -1,5 +1,22 @@
 "use client";
 
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix Leaflet default marker icons
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
 interface LokasiAbsenModalProps {
     open: boolean;
     onClose: () => void;
@@ -10,6 +27,35 @@ interface LokasiAbsenModalProps {
     foto: string | null;
     verifikasi: "OTOMATIS" | "PENDING" | "DISETUJUI" | "DITOLAK" | null;
     isInRange: boolean;
+}
+
+// School coordinates (hardcoded - adjust to your school location)
+const SCHOOL_LAT = -6.200000;
+const SCHOOL_LNG = 106.816666;
+
+// Calculate distance between two coordinates using Haversine formula
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // Radius of Earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    
+    const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c * 1000; // Convert to meters
+    
+    return Math.round(distance);
+}
+
+// Format distance for display
+function formatDistance(meters: number): string {
+    if (meters >= 1000) {
+        return `${(meters / 1000).toFixed(2)} km`;
+    }
+    return `${meters} m`;
 }
 
 export default function LokasiAbsenModal({
@@ -26,6 +72,10 @@ export default function LokasiAbsenModal({
     if (!open) return null;
 
     const hasLocation = lat !== null && lng !== null;
+    const distance = hasLocation ? calculateDistance(SCHOOL_LAT, SCHOOL_LNG, lat!, lng!) : 0;
+
+    const schoolPosition: [number, number] = [SCHOOL_LAT, SCHOOL_LNG];
+    const teacherPosition: [number, number] = hasLocation ? [lat!, lng!] : [0, 0];
 
     return (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -61,13 +111,52 @@ export default function LokasiAbsenModal({
 
                             {/* MAPS - Kanan */}
                             <div className={`w-full h-[400px] overflow-hidden border border-gray-200 rounded-lg ${!foto ? 'md:col-span-2' : ''}`}>
-                                <iframe
-                                    width="100%"
-                                    height="100%"
-                                    loading="lazy"
-                                    allowFullScreen
-                                    src={`https://www.google.com/maps?q=${lat},${lng}&hl=es;z=16&output=embed`}
-                                ></iframe>
+                                <MapContainer 
+                                    center={teacherPosition} 
+                                    zoom={16} 
+                                    style={{ height: '100%', width: '100%' }}
+                                    scrollWheelZoom={false}
+                                >
+                                    <TileLayer
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    
+                                    {/* School Marker */}
+                                    <Marker position={schoolPosition}>
+                                        <Popup>
+                                            <div className="text-center">
+                                                <strong>Sekolah</strong>
+                                                <br />
+                                                <span className="text-xs text-gray-600">
+                                                    {SCHOOL_LAT}, {SCHOOL_LNG}
+                                                </span>
+                                            </div>
+                                        </Popup>
+                                    </Marker>
+                                    
+                                    {/* Teacher Marker */}
+                                    <Marker position={teacherPosition}>
+                                        <Popup>
+                                            <div className="text-center">
+                                                <strong>{nama}</strong>
+                                                <br />
+                                                <span className="text-xs text-gray-600">
+                                                    {lat}, {lng}
+                                                </span>
+                                            </div>
+                                        </Popup>
+                                    </Marker>
+                                    
+                                    {/* Connecting Line */}
+                                    <Polyline 
+                                        positions={[schoolPosition, teacherPosition]} 
+                                        color="#3b82f6" 
+                                        weight={3}
+                                        dashArray="10, 10"
+                                        opacity={0.7}
+                                    />
+                                </MapContainer>
                             </div>
                         </div>
 
@@ -85,6 +174,14 @@ export default function LokasiAbsenModal({
                                         Koordinat:
                                     </span>{" "}
                                     {lat}, {lng}
+                                </p>
+                                <p>
+                                    <span className="font-semibold">
+                                        Jarak dari Sekolah:
+                                    </span>{" "}
+                                    <span className="font-bold text-sky-600">
+                                        {formatDistance(distance)}
+                                    </span>
                                 </p>
                             </div>
 
