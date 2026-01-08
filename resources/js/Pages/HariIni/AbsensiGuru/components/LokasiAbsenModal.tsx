@@ -29,9 +29,9 @@ interface LokasiAbsenModalProps {
     isInRange: boolean;
 }
 
-// School coordinates (hardcoded - adjust to your school location)
-const SCHOOL_LAT = -6.200000;
-const SCHOOL_LNG = 106.816666;
+// School coordinates from absen_lokasi_kantor table
+const SCHOOL_LAT = -6.2060385486991960;
+const SCHOOL_LNG = 106.4230608253868700;
 
 // Calculate distance between two coordinates using Haversine formula
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
